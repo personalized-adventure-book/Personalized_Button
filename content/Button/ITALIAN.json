@@ -1,0 +1,317 @@
+{
+  "homepage": {
+    "menu": {
+      "features": "Funzionalità",
+      "order": "Ordina ora",
+      "contact": "Contatto",
+      "adventures": "Personalizzazioni",
+      "examples": "Esempi"
+    },
+    "hero": {
+      "title": "MyMood Button",
+      "subtitle": "Personalizza il tuo pulsante luminoso magico con nome, colori e scintille!",
+      "cta_text": "Ordina ora"
+    },
+    "about": {
+      "title": "Informazioni sui nostri pulsanti",
+      "text": "Ogni pulsante è realizzato su misura per illuminarsi con il colore e il messaggio che scegli. È più di un prodotto – è la tua scintilla personale."
+    },
+    "features": [
+      {
+        "icon": "✨",
+        "title": "Si illumina con un tocco",
+        "text": "Il nostro pulsante si accende delicatamente quando premuto, rivelando il tuo design personalizzato."
+      },
+      {
+        "icon": "🎨",
+        "title": "Colori personalizzati",
+        "text": "Scegli tra un arcobaleno di colori LED per adattarlo al tuo umore o all'occasione."
+      },
+      {
+        "icon": "🔋",
+        "title": "Batteria inclusa",
+        "text": "Batteria a lunga durata integrata. Pronto all’uso appena aperto!"
+      }
+    ],
+    "examples": {
+      "title": "Personalizzazioni popolari",
+      "items": [
+        "Pulsante 'Ti amo' con luce rosa",
+        "Pulsanti con nome per regali di compleanno",
+        "Citazione motivazionale con LED arcobaleno"
+      ]
+    },
+    "how_it_works": {
+      "title": "Come funziona",
+      "steps": [
+        {
+          "title": "1. Personalizza",
+          "description": "Scegli messaggio, colori e forma del tuo pulsante."
+        },
+        {
+          "title": "2. Produzione",
+          "description": "Creiamo il tuo pulsante su misura con cura artigianale."
+        },
+        {
+          "title": "3. Consegna veloce",
+          "description": "Ricevi il tuo pulsante in pochi giorni."
+        },
+        {
+          "title": "4. Premi e brilla",
+          "description": "Goditi il tuo pulsante magico ogni giorno."
+        }
+      ]
+    },
+    "pricing": {
+      "title": "I nostri pacchetti",
+      "plans": [
+        {
+          "title": "Essenziale",
+          "price": "19€",
+          "features": [
+            "1 pulsante personalizzato",
+            "Colore a scelta",
+            "Testo semplice"
+          ]
+        },
+        {
+          "title": "Magico",
+          "price": "29€",
+          "features": [
+            "2 pulsanti",
+            "Testo + design",
+            "LED multicolore"
+          ]
+        },
+        {
+          "title": "Edizione regalo",
+          "price": "39€",
+          "features": [
+            "Confezione regalo inclusa",
+            "Effetti luminosi speciali",
+            "Messaggio inciso"
+          ]
+        }
+      ]
+    },
+    "faq": [
+      {
+        "q": "Quanto dura la batteria?",
+        "a": "Fino a 3 mesi con uso quotidiano. Facile da sostituire."
+      },
+      {
+        "q": "Posso incidere un messaggio personalizzato?",
+        "a": "Certo! Puoi scrivere fino a 25 caratteri."
+      },
+      {
+        "q": "Quali colori sono disponibili?",
+        "a": "Blu, rosso, verde, giallo, viola, bianco o arcobaleno."
+      }
+    ],
+    "footer": {
+      "company_name": "Glowify Co.",
+      "privacy": "Privacy Policy",
+      "terms": "Termini di utilizzo",
+      "copyright": "© 2025 MyMood Button"
+    }
+  },
+  "form": {
+    "steps": [
+      {
+        "id": "customer_info",
+        "title": "Informazioni cliente",
+        "fields": [
+          {
+            "type": "text",
+            "name": "full_name",
+            "label": "Nome completo",
+            "required": true
+          },
+          {
+            "type": "email",
+            "name": "email",
+            "label": "Indirizzo e-mail",
+            "required": true
+          },
+          {
+            "type": "tel",
+            "name": "phone",
+            "label": "Numero di telefono (facoltativo)",
+            "required": false
+          }
+        ]
+      },
+      {
+        "id": "purpose",
+        "title": "Scopo del pulsante",
+        "fields": [
+          {
+            "type": "select",
+            "name": "purpose",
+            "label": "Scegli l’uso del tuo pulsante",
+            "options": [
+              "Modalità concentrazione",
+              "Luce da lettura",
+              "Serata film",
+              "Atmosfera festa",
+              "Altro uso"
+            ],
+            "required": true
+          }
+        ]
+      },
+      {
+        "id": "style",
+        "title": "Stile",
+        "fields": [
+          {
+            "type": "select",
+            "name": "shape",
+            "label": "Forma",
+            "options": [
+              "Cerchio",
+              "Quadrato",
+              "Esagono",
+              "Ottagono",
+              "Rombo",
+              "Stella",
+              "Triangolo",
+              "Cuore",
+              "Ovale",
+              "Pentagono",
+              "Quadrato arrotondato",
+              "Pillola",
+              "Nuvola",
+              "Fiore",
+              "Saetta"
+            ],
+            "required": true
+          },
+          {
+            "type": "select",
+            "name": "color",
+            "label": "Colore",
+            "options": [
+              "Blu",
+              "#FF7A00",
+              "Viola",
+              "Verde",
+              "Giallo",
+              "Rosa",
+              "Rosso",
+              "Turchese",
+              "Indaco",
+              "Lime",
+              "Ciano",
+              "Arancione",
+              "Personalizzato"
+            ],
+            "required": true
+          },
+          {
+            "type": "select",
+            "name": "finish",
+            "label": "Finitura",
+            "options": [
+              "Opaco",
+              "Lucido",
+              "Satinato",
+              "Metallico",
+              "Perlato",
+              "Testurizzato",
+              "Fibra di carbonio",
+              "Soft Touch"
+            ],
+            "required": true
+          }
+        ]
+      },
+      {
+        "id": "label",
+        "title": "Testo del pulsante",
+        "fields": [
+          {
+            "type": "text",
+            "name": "label_text",
+            "label": "Testo sul pulsante",
+            "maxLength": 12,
+            "required": false
+          },
+          {
+            "type": "range",
+            "name": "text_size",
+            "label": "Dimensione del testo",
+            "min": 10,
+            "max": 24,
+            "default": 14
+          }
+        ]
+      },
+      {
+        "id": "behavior",
+        "title": "Comportamento",
+        "fields": [
+          {
+            "type": "textarea",
+            "name": "button_behavior",
+            "label": "Descrivi il comportamento desiderato del pulsante",
+            "required": false
+          }
+        ]
+      },
+      {
+        "id": "delivery",
+        "title": "Consegna",
+        "fields": [
+          {
+            "type": "text",
+            "name": "street",
+            "label": "Indirizzo",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "city",
+            "label": "Città",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "state",
+            "label": "Regione / Provincia",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "zip",
+            "label": "CAP / Codice postale",
+            "required": true
+          },
+          {
+            "type": "choice",
+            "name": "country",
+            "label": "Paese",
+            "required": true,
+            "options": [
+              "Francia",
+              "Stati Uniti",
+              "Italia",
+              "Arabia Saudita",
+              "Emirati Arabi Uniti",
+              "Algeria",
+              "Germania",
+              "Canada",
+              "Altro"
+            ]
+          },
+          {
+            "type": "textarea",
+            "name": "instructions",
+            "label": "Istruzioni di consegna (facoltativo)",
+            "required": false
+          }
+        ]
+      }
+    ]
+  }
+}

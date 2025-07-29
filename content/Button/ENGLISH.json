@@ -1,0 +1,324 @@
+{
+  "homepage": {
+    "menu": {
+      "features": "Features",
+      "order": "Order Now",
+      "contact": "Contact Us",
+      "adventures": "Ideas",
+      "examples": "Examples"
+    },
+    "hero": {
+      "title": "MyMood Button",
+      "subtitle": "Customize your own magical light-up button with name, colors & sparkles!",
+      "cta_text": "Order Now"
+    },
+    "about": {
+      "title": "About Our Buttons",
+      "text": "Each button is uniquely crafted to light up with the color and message you choose. It’s more than a product – it's your personal spark."
+    },
+    "features": [
+      {
+        "icon": "✨",
+        "title": "Glows With a Tap",
+        "text": "Our button lights up gently when pressed, revealing your custom design."
+      },
+      {
+        "icon": "🎨",
+        "title": "Custom Colors",
+        "text": "Choose from a rainbow of LED colors to match your mood or occasion."
+      },
+      {
+        "icon": "🔋",
+        "title": "Battery Included",
+        "text": "Long-lasting battery built in. Ready to use right out of the box!"
+      }
+    ],
+    "examples": {
+      "title": "Popular Customizations",
+      "items": [
+        {
+          "text": "‘I Love You’ button with pink light"
+        },
+        {
+          "text": "Name buttons for birthday gifts"
+        },
+        {
+          "text": "Motivational quote with rainbow LED"
+        }
+      ]
+    },
+    "how_it_works": {
+      "title": "How It Works",
+      "steps": [
+        {
+          "title": "Pick Your Style",
+          "description": "Choose shape, color, and finish to reflect your personality."
+        },
+        {
+          "title": "Add Your Message",
+          "description": "Personalize it with a name or inspiring phrase."
+        },
+        {
+          "title": "We Build It",
+          "description": "Our team creates your button with love and magic."
+        },
+        {
+          "title": "Delivered to You",
+          "description": "We ship it straight to your door, ready to glow."
+        }
+      ]
+    },
+    "pricing": {
+      "title": "Pricing",
+      "plans": [
+        {
+          "name": "Single Glow",
+          "price": "€19",
+          "features": [
+            "One custom button",
+            "Standard colors",
+            "Engraving up to 12 characters"
+          ]
+        },
+        {
+          "name": "Glow Duo",
+          "price": "€35",
+          "features": [
+            "Two custom buttons",
+            "Choose different styles",
+            "Great for couples"
+          ]
+        },
+        {
+          "name": "Party Pack",
+          "price": "€79",
+          "features": [
+            "5 custom buttons",
+            "Gift-ready packaging",
+            "Perfect for events"
+          ]
+        }
+      ]
+    },
+    "faq": [
+      {
+        "q": "How long does the battery last?",
+        "a": "It lasts up to 3 months with normal daily use and can be replaced easily."
+      },
+      {
+        "q": "Can I get a specific message engraved?",
+        "a": "Absolutely! We support up to 25 characters per button."
+      },
+      {
+        "q": "What color lights are available?",
+        "a": "You can choose from blue, red, green, yellow, purple, white, or rainbow."
+      }
+    ],
+    "footer": {
+      "company_name": "Glowify Co.",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Use",
+      "contact": "Contact",
+      "copyright": "© 2025 MyMood Button"
+    }
+  },
+  "form": {
+    "steps": [
+      {
+        "id": "customer_info",
+        "title": "Customer Info",
+        "fields": [
+          {
+            "type": "text",
+            "name": "full_name",
+            "label": "Full Name",
+            "required": true
+          },
+          {
+            "type": "email",
+            "name": "email",
+            "label": "Email Address",
+            "required": true
+          },
+          {
+            "type": "tel",
+            "name": "phone",
+            "label": "Phone Number (optional)",
+            "required": false
+          }
+        ]
+      },
+      {
+        "id": "purpose",
+        "title": "Purpose",
+        "fields": [
+          {
+            "type": "select",
+            "name": "purpose",
+            "label": "Choose Your Button's Purpose",
+            "options": [
+              "Focus Mode",
+              "Reading Light",
+              "Movie Night",
+              "Party Scene",
+              "Custom Purpose"
+            ],
+            "required": true
+          }
+        ]
+      },
+      {
+        "id": "style",
+        "title": "Style",
+        "fields": [
+          {
+            "type": "select",
+            "name": "shape",
+            "label": "Shape",
+            "options": [
+              "Circle",
+              "Square",
+              "Hexagon",
+              "Octagon",
+              "Diamond",
+              "Star",
+              "Triangle",
+              "Heart",
+              "Oval",
+              "Pentagon",
+              "Rounded Square",
+              "Pill",
+              "Cloud",
+              "Flower",
+              "Lightning"
+            ],
+            "required": true
+          },
+          {
+            "type": "select",
+            "name": "color",
+            "label": "Color",
+            "options": [
+              "Blue",
+              "#FF7A00",
+              "Purple",
+              "Green",
+              "Yellow",
+              "Pink",
+              "Red",
+              "Teal",
+              "Indigo",
+              "Lime",
+              "Cyan",
+              "Orange",
+              "Custom"
+            ],
+            "required": true
+          },
+          {
+            "type": "select",
+            "name": "finish",
+            "label": "Finish",
+            "options": [
+              "Matte",
+              "Glossy",
+              "Satin",
+              "Metallic",
+              "Pearl",
+              "Textured",
+              "Carbon Fiber",
+              "Soft Touch"
+            ],
+            "required": true
+          }
+        ]
+      },
+      {
+        "id": "label",
+        "title": "Label",
+        "fields": [
+          {
+            "type": "text",
+            "name": "label_text",
+            "label": "Button Text",
+            "maxLength": 12,
+            "required": false
+          },
+          {
+            "type": "range",
+            "name": "text_size",
+            "label": "Text Size",
+            "min": 10,
+            "max": 24,
+            "default": 14
+          }
+        ]
+      },
+      {
+        "id": "behavior",
+        "title": "Behavior",
+        "fields": [
+          {
+            "type": "textarea",
+            "name": "button_behavior",
+            "label": "Describe your button's behavior",
+            "required": false
+          }
+        ]
+      },
+      {
+        "id": "delivery",
+        "title": "Delivery",
+        "fields": [
+          {
+            "type": "text",
+            "name": "street",
+            "label": "Street Address",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "city",
+            "label": "City",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "state",
+            "label": "State/Province",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "zip",
+            "label": "IP/Postal Code",
+            "required": true
+          },
+          {
+            "type": "choice",
+            "name": "country",
+            "label": "Country",
+            "required": true,
+            "options": [
+              "France",
+              "United States",
+              "Italy",
+              "Saudi Arabia",
+              "United Arab Emirates",
+              "Algeria",
+              "Germany",
+              "Canada",
+              "Other"
+            ]
+          },
+          {
+            "type": "textarea",
+            "name": "instructions",
+            "label": "Delivery Instructions (optional)",
+            "required": false
+          }
+        ]
+      }
+    ]
+  }
+}

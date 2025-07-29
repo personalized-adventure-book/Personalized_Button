@@ -1,0 +1,353 @@
+{
+  "homepage": {
+    "menu": {
+      "features": "Fonctionnalités",
+      "order": "Commencer",
+      "contact": "Contact",
+      "adventures": "Services",
+      "examples": "Portfolio"
+    },
+    "hero": {
+      "badge": "Experts en Branding Personnel",
+      "headline": "Image de Marque Personnelle",
+      "subheadline": "Du logo à l’emballage, en passant par les kits de bienvenue et la salle d’attente — chaque détail est personnalisé avec élégance, âme et cohérence.",
+      "start_button": "Commencer votre Branding"
+    },
+    "features": [
+      {
+        "icon": "palette",
+        "title": "Identité Visuelle",
+        "description": "Logos, couleurs et typographies alignés avec l’âme de votre marque"
+      },
+      {
+        "icon": "gift",
+        "title": "Produits Personnalisés",
+        "description": "Bougies, agendas, mugs… chaque article reflète votre identité"
+      },
+      {
+        "icon": "layout",
+        "title": "Formulaires & Kits",
+        "description": "Création de menus, kits d’accueil, cartes cadeaux, stickers, etc."
+      }
+    ],
+    "adventure_possibilities": {
+      "title": "Ce que nous personnalisons",
+      "subtitle": "Découvrez les éléments que nous adaptons à l’image de votre entreprise",
+      "cards": [
+        {
+          "icon": "coffee",
+          "title": "Mugs & Bouteilles",
+          "description": "Motifs élégants et logo sur chaque gorgée"
+        },
+        {
+          "icon": "book-open",
+          "title": "Agendas & Carnets",
+          "description": "Organisez-vous avec style, page après page"
+        },
+        {
+          "icon": "sparkles",
+          "title": "Bougies & Décoration",
+          "description": "Toucher aromatique avec étiquettes sur mesure"
+        },
+        {
+          "icon": "form",
+          "title": "Formulaires Clients",
+          "description": "Fiches de prise de rendez-vous, de retour ou d’accueil"
+        },
+        {
+          "icon": "tag",
+          "title": "Stickers & Étiquettes",
+          "description": "Vintage, minimalistes ou artistiques — toujours personnalisés"
+        },
+        {
+          "icon": "chair",
+          "title": "Salle d’Attente",
+          "description": "Créez un espace qui reflète l’âme de votre marque"
+        }
+      ]
+    },
+    "book_examples": {
+      "title": "Transformations de Marque",
+      "subtitle": "Découvrez comment certaines entreprises ont fleuri grâce à notre branding",
+      "examples": [
+        {
+          "title": "ZenWellness Studio",
+          "child": "Identité Visuelle",
+          "adventure": "Logo lotus, palette de couleurs, kits de bienvenue, emballages de tisanes",
+          "preview": "D’un espace blanc à un univers plein de douceur et de cohérence visuelle…"
+        },
+        {
+          "title": "Glow Café",
+          "child": "Design Produit",
+          "adventure": "Mugs, sachets de sucre, menus et étiquettes en tons pastel vintage",
+          "preview": "Chaque café servi dans une tasse qui raconte une histoire — de style et de senteur."
+        },
+        {
+          "title": "SoulBreathe Yoga",
+          "child": "Branding Complet",
+          "adventure": "Logo, tapis, formulaires, bougies parfumées — tout est en harmonie",
+          "preview": "Le logo ne se voyait pas seulement, il se ressentait à chaque respiration."
+        }
+      ]
+    },
+    "how_it_works": {
+      "title": "Comment ça fonctionne",
+      "steps": [
+        {
+          "title": "Partagez votre vision",
+          "description": "Dites-nous ce que vous voulez transmettre à travers votre marque"
+        },
+        {
+          "title": "Choisissez les éléments",
+          "description": "Sélectionnez ce que vous souhaitez personnaliser — formulaires, produits, décoration..."
+        },
+        {
+          "title": "Aperçu du design",
+          "description": "Nous créons et vous envoyons une prévisualisation complète de votre identité"
+        },
+        {
+          "title": "Livraison & Conseils",
+          "description": "Recevez vos produits ou fichiers — accompagnés de nos recommandations d’utilisation"
+        }
+      ]
+    },
+    "book_options": {
+      "title": "Formules de Branding",
+      "description": "Choisissez la formule adaptée à vos besoins — de l'identité digitale à l'expérience physique complète",
+      "digital": {
+        "title": "Branding Digital",
+        "subtitle": "Logo, palette, formulaires et fichiers",
+        "price": "149€",
+        "features": [
+          "Logo en haute définition",
+          "Palette de couleurs & typographie",
+          "3 formulaires personnalisés",
+          "Guide d'utilisation de la marque"
+        ]
+      },
+      "printed": {
+        "title": "Expérience Complète",
+        "subtitle": "Produits personnalisés + identité digitale",
+        "price": "349€",
+        "popular_badge": "Populaire",
+        "features": [
+          "Inclus dans le digital",
+          "Mugs, stickers ou agendas sur mesure",
+          "Kits de bienvenue imprimés ou cartes",
+          "Consultation & livraison incluse"
+        ]
+      }
+    },
+    "cta": {
+      "title": "Faites rayonner votre marque",
+      "description": "Prêt(e) à rendre votre entreprise inoubliable ? Créons ensemble une marque qui a du sens et de l’impact.",
+      "button": "Je me lance"
+    },
+    "footer": {
+      "product": [
+        "Comment ça marche",
+        "Portfolio",
+        "Tarifs"
+      ],
+      "support": [
+        "Centre d’aide",
+        "Contact",
+        "FAQ"
+      ],
+      "company": [
+        "À propos",
+        "Confidentialité",
+        "Conditions"
+      ],
+      "copyright": "© 2025 Soulbloom Branding. Tous droits réservés."
+    }
+  },
+  "form": {
+    "steps": [
+      {
+        "id": "client_info",
+        "title": "Informations sur l’entreprise",
+        "icon": "briefcase",
+        "fields": [
+          {
+            "type": "text",
+            "name": "client_name",
+            "label": "Votre nom",
+            "placeholder": "ex. Sarah Martin",
+            "required": true
+          },
+          {
+            "type": "email",
+            "name": "client_email",
+            "label": "Adresse e-mail",
+            "placeholder": "votre.nom@example.com",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "business_name",
+            "label": "Nom de la marque ou entreprise",
+            "placeholder": "ex. Studio Soulbloom",
+            "required": true
+          },
+          {
+            "type": "choice",
+            "name": "language",
+            "label": "Langue préférée",
+            "placeholder": "Choisissez votre langue",
+            "required": true,
+            "options": [
+              "Français",
+              "Anglais",
+              "Arabe",
+              "Italien"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "brand_details",
+        "title": "Identité de la Marque",
+        "icon": "palette",
+        "fields": [
+          {
+            "type": "text",
+            "name": "brand_keywords",
+            "label": "Mots-clés décrivant votre marque",
+            "placeholder": "ex. Apaisant, Minimal, Naturel, Luxueux",
+            "required": true
+          },
+          {
+            "type": "textarea",
+            "name": "brand_story",
+            "label": "Parlez-nous de votre marque",
+            "placeholder": "Quelle est votre mission, histoire ou philosophie ?",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "preferred_colors",
+            "label": "Couleurs préférées",
+            "placeholder": "ex. Vert sauge, Or doux, Blanc"
+          },
+          {
+            "type": "text",
+            "name": "avoid_elements",
+            "label": "Éléments à éviter",
+            "placeholder": "Couleurs, icônes, styles à ne pas inclure"
+          }
+        ]
+      },
+      {
+        "id": "product_selection",
+        "title": "Éléments à Personnaliser",
+        "icon": "tag",
+        "fields": [
+          {
+            "type": "checkbox",
+            "name": "branding_products",
+            "label": "Que souhaitez-vous personnaliser ?",
+            "options": [
+              "Logo",
+              "Cartes de visite",
+              "Emballage produit",
+              "Mugs ou bouteilles",
+              "Bougies ou déco",
+              "Formulaires clients",
+              "Cartes cadeaux",
+              "Stickers & étiquettes",
+              "Kits de bienvenue",
+              "Aménagement de salle d’attente"
+            ],
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "product_quantity",
+            "label": "Quantité approximative (si produits physiques)",
+            "placeholder": "ex. 100 stickers, 20 bougies..."
+          },
+          {
+            "type": "textarea",
+            "name": "custom_requests",
+            "label": "Idées ou demandes spécifiques",
+            "placeholder": "Parlez-nous de toute idée ou inspiration"
+          }
+        ]
+      },
+      {
+        "id": "inspiration_upload",
+        "title": "Inspiration Visuelle (optionnel)",
+        "icon": "upload",
+        "fields": [
+          {
+            "type": "file",
+            "name": "reference_images",
+            "label": "Téléchargez des images ou logos d’inspiration"
+          },
+          {
+            "type": "text",
+            "name": "reference_links",
+            "label": "Lien Pinterest, Instagram ou site web (facultatif)",
+            "placeholder": "ex. https://pinterest.com/votretableau"
+          }
+        ]
+      },
+      {
+        "id": "shipping_info",
+        "title": "Informations de Livraison",
+        "icon": "map",
+        "fields": [
+          {
+            "type": "text",
+            "name": "address_line1",
+            "label": "Adresse ligne 1",
+            "placeholder": "Rue, boîte postale...",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "address_line2",
+            "label": "Adresse ligne 2",
+            "placeholder": "Appartement, étage, bâtiment..."
+          },
+          {
+            "type": "text",
+            "name": "city",
+            "label": "Ville",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "state",
+            "label": "Région / Département",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "postal_code",
+            "label": "Code postal",
+            "required": true
+          },
+          {
+            "type": "choice",
+            "name": "country",
+            "label": "Pays",
+            "required": true,
+            "options": [
+              "France",
+              "États-Unis",
+              "Italie",
+              "Arabie Saoudite",
+              "Émirats Arabes Unis",
+              "Algérie",
+              "Allemagne",
+              "Canada",
+              "Autre"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

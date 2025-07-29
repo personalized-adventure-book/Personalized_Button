@@ -1,0 +1,389 @@
+{
+  "homepage": {
+    "menu": {
+      "features": "Caractéristiques",
+      "order": "Commander",
+      "contact": "Contact",
+      "adventures": "Aventures",
+      "examples": "Exemples"
+    },
+    "hero": {
+      "badge": "Livres d'aventure personnalisés",
+      "headline": "Livres d'aventure personnalisés",
+      "subheadline": "Transformez votre enfant en héros de son propre livre d'aventure personnalisé. Choisissez parmi des forêts enchantées, des missions spatiales, des expéditions sous-marines et bien plus encore !",
+      "start_button": "Commencer la création"
+    },
+    "features": [
+      {
+        "icon": "person",
+        "title": "Personnages personnalisés",
+        "description": "Incluez votre enfant, ses amis et les membres de la famille dans l'histoire"
+      },
+      {
+        "icon": "book",
+        "title": "Aperçu instantané",
+        "description": "Voyez votre livre prendre vie grâce à un aperçu instantané"
+      },
+      {
+        "icon": "heart",
+        "title": "Imprimé ou numérique",
+        "description": "Recevez un livre physique livré ou téléchargez-le instantanément"
+      }
+    ],
+    "adventure_possibilities": {
+      "title": "Possibilités d'aventure",
+      "subtitle": "Explorez les mondes magiques que nous pouvons créer pour votre enfant – et bien d'autres !",
+      "cards": [
+        {
+          "icon": "rocket",
+          "title": "Mission spatiale",
+          "description": "Envolez-vous vers des planètes lointaines et rencontrez des amis extraterrestres"
+        },
+        {
+          "icon": "tree",
+          "title": "Forêt enchantée",
+          "description": "Découvrez des créatures magiques et des trésors cachés"
+        },
+        {
+          "icon": "crown",
+          "title": "Château royal",
+          "description": "Devenez un chevalier courageux ou une princesse sage"
+        },
+        {
+          "icon": "anchor",
+          "title": "Voyage de pirate",
+          "description": "Parcourez les sept mers à la recherche de trésors"
+        },
+        {
+          "icon": "bolt",
+          "title": "Académie de super-héros",
+          "description": "Entraînez-vous pour devenir le prochain grand héros du monde"
+        },
+        {
+          "icon": "heart",
+          "title": "Monde sous-marin",
+          "description": "Plongez pour explorer des royaumes coralliens"
+        }
+      ]
+    },
+    "book_examples": {
+      "title": "Exemples de livres",
+      "subtitle": "Découvrez comment les aventures d’autres enfants ont pris vie dans leurs livres personnalisés",
+      "examples": [
+        {
+          "title": "Quête dans la forêt magique",
+          "child": "L'aventure d'Emma",
+          "adventure": "Forêt enchantée avec des animaux parlants et des villages de fées cachés",
+          "preview": "Emma passa par l'arche dorée et poussa un cri d'étonnement en voyant des papillons aux ailes arc-en-ciel danser autour d'elle..."
+        },
+        {
+          "title": "Mission d'exploration spatiale",
+          "child": "L'aventure de Lucas",
+          "adventure": "Voyage vers Mars avec des compagnons robotiques et des découvertes extraterrestres",
+          "preview": "Le capitaine Lucas ajusta son casque spatial et regarda la planète rouge en contrebas..."
+        },
+        {
+          "title": "Académie de princesses",
+          "child": "L'aventure de Sofia",
+          "adventure": "Château royal avec des dragons amis et des sorts magiques à apprendre",
+          "preview": "La princesse Sofia agita sa baguette scintillante et observa les fleurs s'illuminer..."
+        }
+      ]
+    },
+    "how_it_works": {
+      "title": "Comment ça marche",
+      "steps": [
+        {
+          "title": "Saisir les informations",
+          "description": "Entrez le nom, l'âge de votre enfant et ses préférences d'aventure"
+        },
+        {
+          "title": "Personnaliser l'histoire",
+          "description": "Choisissez le décor, les personnages et les détails spéciaux"
+        },
+        {
+          "title": "Prévisualiser les pages",
+          "description": "Voyez votre livre personnalisé prendre vie instantanément"
+        },
+        {
+          "title": "Obtenez votre livre",
+          "description": "Téléchargez la version numérique ou commandez une version imprimée"
+        }
+      ]
+    },
+    "book_options": {
+      "title": "Choix du livre",
+      "description": "Créez des souvenirs impérissables avec un livre personnalisé que votre enfant chérira pour toujours. Choisissez l'option idéale en fonction du budget et des préférences de votre famille.",
+      "digital": {
+        "title": "Livre numérique",
+        "subtitle": "Téléchargement instantané (PDF)",
+        "price": "$12.99",
+        "features": [
+          "Histoire personnalisée de plus de 20 pages",
+          "Illustrations de haute qualité",
+          "Téléchargement instantané",
+          "Option d'impression à domicile"
+        ]
+      },
+      "printed": {
+        "title": "Livre imprimé",
+        "subtitle": "Couverture rigide professionnelle",
+        "price": "$24.99",
+        "popular_badge": "Populaire",
+        "features": [
+          "Tout ce qui est inclus dans la version numérique",
+          "Reliure rigide premium",
+          "Impression professionnelle",
+          "Livraison gratuite en Europe"
+        ]
+      }
+    },
+    "cta": {
+      "title": "Prêt à créer de la magie ?",
+      "description": "Offrez à votre enfant le cadeau d'être le héros de sa propre histoire d'aventure personnalisée. Commencez à créer son livre magique dès aujourd'hui !",
+      "button": "Commencez votre aventure"
+    },
+    "footer": {
+      "product": [
+        "Comment ça marche",
+        "Exemples",
+        "Tarifs"
+      ],
+      "support": [
+        "Centre d'aide",
+        "Contactez-nous",
+        "FAQ"
+      ],
+      "company": [
+        "À propos",
+        "Confidentialité",
+        "Conditions générales"
+      ],
+      "copyright": "© 2024 Livre d'aventure personnalisé. Tous droits réservés."
+    }
+  },
+  "form": {
+    "steps": [
+      {
+        "id": "parent_info",
+        "title": "Informations parentales",
+        "icon": "user",
+        "fields": [
+          {
+            "type": "text",
+            "name": "parent_name",
+            "label": "Votre nom",
+            "placeholder": "Votre nom",
+            "required": true
+          },
+          {
+            "type": "email",
+            "name": "parent_email",
+            "label": "Adresse e-mail",
+            "placeholder": "votre.nom@example.com",
+            "required": true
+          },
+          {
+            "type": "choice",
+            "name": "book_language",
+            "label": "Langue du livre",
+            "placeholder": "Choisissez la langue du livre",
+            "required": true,
+            "options": [
+              "Anglais",
+              "Français",
+              "Arabe",
+              "Italien"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "child_info",
+        "title": "Informations sur l'enfant",
+        "icon": "baby",
+        "fields": [
+          {
+            "type": "text",
+            "name": "child_name",
+            "label": "Nom de l'enfant",
+            "placeholder": "Nom de l'enfant",
+            "required": true
+          },
+          {
+            "type": "choice",
+            "name": "child_age",
+            "label": "Âge",
+            "placeholder": "Sélectionnez l'âge",
+            "required": true,
+            "options": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10+"
+            ]
+          },
+          {
+            "type": "radio",
+            "name": "child_gender",
+            "label": "Genre",
+            "required": true,
+            "options": [
+              "Garçon",
+              "Fille",
+              "Autre"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "adventure_selection",
+        "title": "Choix de l'aventure",
+        "icon": "location",
+        "fields": [
+          {
+            "type": "adventure_selector",
+            "name": "adventure_type",
+            "label": "Type d'aventure",
+            "required": true,
+            "options": [
+              {
+                "title": "Mission spatiale",
+                "description": "Envolez-vous vers des planètes lointaines",
+                "icon": "rocket"
+              },
+              {
+                "title": "Forêt enchantée",
+                "description": "Découvrez des créatures magiques",
+                "icon": "tree"
+              },
+              {
+                "title": "Château royal",
+                "description": "Soyez chevalier ou princesse",
+                "icon": "crown"
+              },
+              {
+                "title": "Voyage pirate",
+                "description": "Naviguez à la recherche de trésors",
+                "icon": "anchor"
+              },
+              {
+                "title": "Académie de super-héros",
+                "description": "Devenez un héros",
+                "icon": "bolt"
+              },
+              {
+                "title": "Monde sous-marin",
+                "description": "Explorez les fonds marins",
+                "icon": "heart"
+              }
+            ]
+          },
+          {
+            "type": "textarea",
+            "name": "custom_adventure",
+            "label": "Autre type d'aventure (si non listé)"
+          },
+          {
+            "type": "text",
+            "name": "setting_location",
+            "label": "Lieu ou cadre",
+            "placeholder": "Royaume magique, station spatiale..."
+          }
+        ]
+      },
+      {
+        "id": "personal_touches",
+        "title": "Touches personnelles",
+        "icon": "heart",
+        "fields": [
+          {
+            "type": "text",
+            "name": "favorite_color",
+            "label": "Couleur préférée de l'enfant",
+            "placeholder": "Bleu, Rose, Arc-en-ciel..."
+          },
+          {
+            "type": "text",
+            "name": "pet_name",
+            "label": "Nom de l'animal (si existant)",
+            "placeholder": "Fluffy, Rex..."
+          },
+          {
+            "type": "text",
+            "name": "family_to_include",
+            "label": "Famille ou amis à inclure",
+            "placeholder": "Maman, Papa, sœur Emma..."
+          },
+          {
+            "type": "textarea",
+            "name": "special_details",
+            "label": "Détails ou anecdotes spéciales",
+            "placeholder": "Intérêts, passe-temps, souvenirs..."
+          }
+        ]
+      },
+      {
+        "id": "shipping_info",
+        "title": "Informations de livraison",
+        "icon": "map",
+        "fields": [
+          {
+            "type": "text",
+            "name": "address_line1",
+            "label": "Adresse ligne 1",
+            "placeholder": "Adresse, boîte postale",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "address_line2",
+            "label": "Adresse ligne 2",
+            "placeholder": "Appartement, bâtiment..."
+          },
+          {
+            "type": "text",
+            "name": "city",
+            "label": "Ville",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "state",
+            "label": "État / Région",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "postal_code",
+            "label": "Code postal",
+            "required": true
+          },
+          {
+            "type": "choice",
+            "name": "country",
+            "label": "Pays",
+            "required": true,
+            "options": [
+              "France",
+              "États-Unis",
+              "Italie",
+              "Arabie Saoudite",
+              "Émirats",
+              "Algérie",
+              "Allemagne",
+              "Canada",
+              "Autre"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

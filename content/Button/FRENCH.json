@@ -1,0 +1,317 @@
+{
+  "homepage": {
+    "menu": {
+      "features": "Fonctionnalités",
+      "order": "Commander",
+      "contact": "Contact",
+      "adventures": "Personnalisations",
+      "examples": "Exemples"
+    },
+    "hero": {
+      "title": "MyMood Button",
+      "subtitle": "Personnalisez votre bouton lumineux magique avec un nom, des couleurs et des paillettes !",
+      "cta_text": "Commander maintenant"
+    },
+    "about": {
+      "title": "À propos de nos boutons",
+      "text": "Chaque bouton est conçu de manière unique pour s’illuminer avec la couleur et le message que vous choisissez. C’est plus qu’un produit – c’est votre étincelle personnelle."
+    },
+    "features": [
+      {
+        "icon": "✨",
+        "title": "S’allume au toucher",
+        "text": "Notre bouton s’éclaire doucement lorsqu’on l’appuie, révélant votre design personnalisé."
+      },
+      {
+        "icon": "🎨",
+        "title": "Couleurs personnalisables",
+        "text": "Choisissez parmi un arc-en-ciel de couleurs LED pour correspondre à votre humeur ou à l’occasion."
+      },
+      {
+        "icon": "🔋",
+        "title": "Pile incluse",
+        "text": "Pile longue durée intégrée. Prêt à l’emploi dès la sortie de la boîte !"
+      }
+    ],
+    "examples": {
+      "title": "Personnalisations populaires",
+      "items": [
+        "Bouton « Je t’aime » avec lumière rose",
+        "Boutons avec prénom pour cadeaux d’anniversaire",
+        "Citation de motivation avec LED arc-en-ciel"
+      ]
+    },
+    "how_it_works": {
+      "title": "Comment ça marche",
+      "steps": [
+        {
+          "title": "1. Personnalisez",
+          "description": "Choisissez votre message, couleurs et forme."
+        },
+        {
+          "title": "2. Nous fabriquons",
+          "description": "Nous créons votre bouton sur mesure avec soin."
+        },
+        {
+          "title": "3. Livraison rapide",
+          "description": "Recevez votre bouton en quelques jours seulement."
+        },
+        {
+          "title": "4. Appuyez et brillez",
+          "description": "Profitez de votre bouton magique au quotidien."
+        }
+      ]
+    },
+    "pricing": {
+      "title": "Nos offres",
+      "plans": [
+        {
+          "title": "Essentiel",
+          "price": "19€",
+          "features": [
+            "1 bouton personnalisé",
+            "Couleur au choix",
+            "Texte simple"
+          ]
+        },
+        {
+          "title": "Magique",
+          "price": "29€",
+          "features": [
+            "2 boutons",
+            "Texte + design",
+            "LED multicolores"
+          ]
+        },
+        {
+          "title": "Édition Cadeau",
+          "price": "39€",
+          "features": [
+            "Boîte cadeau incluse",
+            "Effets lumineux spéciaux",
+            "Message gravé"
+          ]
+        }
+      ]
+    },
+    "faq": [
+      {
+        "q": "Combien de temps dure la pile ?",
+        "a": "Jusqu’à 3 mois en usage quotidien. Facile à remplacer."
+      },
+      {
+        "q": "Puis-je graver un message personnalisé ?",
+        "a": "Bien sûr ! Jusqu’à 25 caractères sont autorisés."
+      },
+      {
+        "q": "Quelles couleurs sont disponibles ?",
+        "a": "Bleu, rouge, vert, jaune, violet, blanc ou arc-en-ciel."
+      }
+    ],
+    "footer": {
+      "company_name": "Glowify Co.",
+      "privacy": "Politique de confidentialité",
+      "terms": "Conditions d'utilisation",
+      "copyright": "© 2025 MyMood Button"
+    }
+  },
+  "form": {
+    "steps": [
+      {
+        "id": "customer_info",
+        "title": "Informations client",
+        "fields": [
+          {
+            "type": "text",
+            "name": "full_name",
+            "label": "Nom complet",
+            "required": true
+          },
+          {
+            "type": "email",
+            "name": "email",
+            "label": "Adresse e-mail",
+            "required": true
+          },
+          {
+            "type": "tel",
+            "name": "phone",
+            "label": "Numéro de téléphone (facultatif)",
+            "required": false
+          }
+        ]
+      },
+      {
+        "id": "purpose",
+        "title": "Utilisation du bouton",
+        "fields": [
+          {
+            "type": "select",
+            "name": "purpose",
+            "label": "Choisissez l’usage de votre bouton",
+            "options": [
+              "Mode concentration",
+              "Lumière de lecture",
+              "Soirée film",
+              "Ambiance fête",
+              "Autre usage"
+            ],
+            "required": true
+          }
+        ]
+      },
+      {
+        "id": "style",
+        "title": "Style",
+        "fields": [
+          {
+            "type": "select",
+            "name": "shape",
+            "label": "Forme",
+            "options": [
+              "Cercle",
+              "Carré",
+              "Hexagone",
+              "Octogone",
+              "Losange",
+              "Étoile",
+              "Triangle",
+              "Cœur",
+              "Ovale",
+              "Pentagone",
+              "Carré arrondi",
+              "Pilule",
+              "Nuage",
+              "Fleur",
+              "Éclair"
+            ],
+            "required": true
+          },
+          {
+            "type": "select",
+            "name": "color",
+            "label": "Couleur",
+            "options": [
+              "Bleu",
+              "#FF7A00",
+              "Violet",
+              "Vert",
+              "Jaune",
+              "Rose",
+              "Rouge",
+              "Turquoise",
+              "Indigo",
+              "Citron vert",
+              "Cyan",
+              "Orange",
+              "Personnalisée"
+            ],
+            "required": true
+          },
+          {
+            "type": "select",
+            "name": "finish",
+            "label": "Finition",
+            "options": [
+              "Mat",
+              "Brillant",
+              "Satiné",
+              "Métallique",
+              "Nacré",
+              "Texturé",
+              "Carbone",
+              "Toucher doux"
+            ],
+            "required": true
+          }
+        ]
+      },
+      {
+        "id": "label",
+        "title": "Texte du bouton",
+        "fields": [
+          {
+            "type": "text",
+            "name": "label_text",
+            "label": "Texte affiché sur le bouton",
+            "maxLength": 12,
+            "required": false
+          },
+          {
+            "type": "range",
+            "name": "text_size",
+            "label": "Taille du texte",
+            "min": 10,
+            "max": 24,
+            "default": 14
+          }
+        ]
+      },
+      {
+        "id": "behavior",
+        "title": "Comportement",
+        "fields": [
+          {
+            "type": "textarea",
+            "name": "button_behavior",
+            "label": "Décrivez le comportement souhaité du bouton",
+            "required": false
+          }
+        ]
+      },
+      {
+        "id": "delivery",
+        "title": "Livraison",
+        "fields": [
+          {
+            "type": "text",
+            "name": "street",
+            "label": "Adresse",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "city",
+            "label": "Ville",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "state",
+            "label": "Région / Département",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "zip",
+            "label": "Code postal",
+            "required": true
+          },
+          {
+            "type": "choice",
+            "name": "country",
+            "label": "Pays",
+            "required": true,
+            "options": [
+              "France",
+              "États-Unis",
+              "Italie",
+              "Arabie Saoudite",
+              "Émirats Arabes Unis",
+              "Algérie",
+              "Allemagne",
+              "Canada",
+              "Autre"
+            ]
+          },
+          {
+            "type": "textarea",
+            "name": "instructions",
+            "label": "Instructions de livraison (facultatif)",
+            "required": false
+          }
+        ]
+      }
+    ]
+  }
+}
