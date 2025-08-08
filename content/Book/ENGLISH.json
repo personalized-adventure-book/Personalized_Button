@@ -9,27 +9,31 @@
     },
     "hero": {
       "badge": "Personalized Adventure Books",
-      "headline": "Personalized Adventure Books",
-      "subheadline": "Transform your child into the hero of their own personalized adventure book. Choose from enchanted forests, space missions, underwater expeditions, and more!",
-      "start_button": "Start Creating"
+      "title": "Personalized Adventure Books",
+      "subtitle": "Transform your child into the hero of their own personalized adventure book. Choose from enchanted forests, space missions, underwater expeditions, and more!",
+      "cta_text": "Start Creating"
     },
-    "features": [
-      {
-        "icon": "person",
-        "title": "Personalized Characters",
-        "description": "Include your child, friends, and family members in the story"
-      },
-      {
-        "icon": "book",
-        "title": "Instant Preview",
-        "description": "See your book come to life with immediate preview pages"
-      },
-      {
-        "icon": "heart",
-        "title": "Print or Digital",
-        "description": "Get a physical book delivered or download instantly"
-      }
-    ],
+    "features": {
+      "title": "Why Choose Our Books?",
+      "subtitle": "Every personalized book is crafted with love and attention to detail",
+      "items": [
+        {
+          "icon": "person",
+          "title": "Personalized Characters",
+          "description": "Include your child, friends, and family members in the story"
+        },
+        {
+          "icon": "book",
+          "title": "Instant Preview",
+          "description": "See your book come to life with immediate preview pages"
+        },
+        {
+          "icon": "heart",
+          "title": "Print or Digital",
+          "description": "Get a physical book delivered or download instantly"
+        }
+      ]
+    },
     "adventure_possibilities": {
       "title": "Adventure Possibilities",
       "subtitle": "Explore the magical worlds we can create for your child – and many more!",

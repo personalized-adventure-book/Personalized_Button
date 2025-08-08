@@ -9,27 +9,31 @@
     },
     "hero": {
       "badge": "Experts en Branding Personnel",
-      "headline": "Image de Marque Personnelle",
-      "subheadline": "Du logo à l’emballage, en passant par les kits de bienvenue et la salle d’attente — chaque détail est personnalisé avec élégance, âme et cohérence.",
-      "start_button": "Commencer votre Branding"
+      "title": "Image de Marque Personnelle",
+      "subtitle": "Du logo à l’emballage, en passant par les kits de bienvenue et la salle d’attente — chaque détail est personnalisé avec élégance, âme et cohérence.",
+      "cta_text": "Commencer votre Branding"
     },
-    "features": [
-      {
-        "icon": "palette",
-        "title": "Identité Visuelle",
-        "description": "Logos, couleurs et typographies alignés avec l’âme de votre marque"
-      },
-      {
-        "icon": "gift",
-        "title": "Produits Personnalisés",
-        "description": "Bougies, agendas, mugs… chaque article reflète votre identité"
-      },
-      {
-        "icon": "layout",
-        "title": "Formulaires & Kits",
-        "description": "Création de menus, kits d’accueil, cartes cadeaux, stickers, etc."
-      }
-    ],
+    "features": {
+      "title": "Fonctionnalités",
+      "subtitle": "Pourquoi choisir nos services de branding",
+      "items": [
+        {
+          "icon": "palette",
+          "title": "Identité Visuelle",
+          "description": "Logos, couleurs et typographies alignés avec l’âme de votre marque"
+        },
+        {
+          "icon": "gift",
+          "title": "Produits Personnalisés",
+          "description": "Bougies, agendas, mugs… chaque article reflète votre identité"
+        },
+        {
+          "icon": "layout",
+          "title": "Formulaires & Kits",
+          "description": "Création de menus, kits d’accueil, cartes cadeaux, stickers, etc."
+        }
+      ]
+    },
     "adventure_possibilities": {
       "title": "Ce que nous personnalisons",
       "subtitle": "Découvrez les éléments que nous adaptons à l’image de votre entreprise",

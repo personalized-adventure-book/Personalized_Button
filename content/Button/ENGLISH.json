@@ -1,5 +1,9 @@
 {
   "homepage": {
+    "urgency_banner": {
+      "text": "⚡ Limited stock this week — order now before they're gone!",
+      "style": "highlight"
+    },
     "menu": {
       "features": "Features",
       "order": "Order Now",
@@ -9,30 +13,34 @@
     },
     "hero": {
       "title": "MyMood Button",
-      "subtitle": "Customize your own magical light-up button with name, colors & sparkles!",
+      "subtitle": "Customize your own magical light-up button with your name, colors & sparkles — in just seconds!",
       "cta_text": "Order Now"
     },
     "about": {
       "title": "About Our Buttons",
       "text": "Each button is uniquely crafted to light up with the color and message you choose. It’s more than a product – it's your personal spark."
     },
-    "features": [
-      {
-        "icon": "✨",
-        "title": "Glows With a Tap",
-        "text": "Our button lights up gently when pressed, revealing your custom design."
-      },
-      {
-        "icon": "🎨",
-        "title": "Custom Colors",
-        "text": "Choose from a rainbow of LED colors to match your mood or occasion."
-      },
-      {
-        "icon": "🔋",
-        "title": "Battery Included",
-        "text": "Long-lasting battery built in. Ready to use right out of the box!"
-      }
-    ],
+    "features": {
+      "title": "Features",
+      "subtitle": "Why Choose Our Custom Buttons",
+      "items": [
+        {
+          "icon": "✨",
+          "title": "Glows With a Tap",
+          "text": "Our button lights up gently when pressed, revealing your custom design."
+        },
+        {
+          "icon": "🎨",
+          "title": "Custom Colors",
+          "text": "Choose from a rainbow of LED colors to match your mood or occasion."
+        },
+        {
+          "icon": "🔋",
+          "title": "Battery Included",
+          "text": "Long-lasting battery built in. Ready to use right out of the box!"
+        }
+      ]
+    },
     "examples": {
       "title": "Popular Customizations",
       "items": [
@@ -46,6 +54,10 @@
           "text": "Motivational quote with rainbow LED"
         }
       ]
+    },
+    "gallery": {
+      "title": "See the Magic in Action",
+      "subtitle": "Real buttons, real moments - scroll horizontally to explore our collection!"
     },
     "how_it_works": {
       "title": "How It Works",
@@ -65,7 +77,19 @@
         {
           "title": "Delivered to You",
           "description": "We ship it straight to your door, ready to glow."
+        },
+        {
+          "title": "Make Yours Now",
+          "description": "Click below to start creating your button — it only takes a minute!"
         }
+      ]
+    },
+    "why_people_love_it": {
+      "title": "Why Our Button Matters",
+      "points": [
+        "A unique gift for any occasion",
+        "Brings personality to your space",
+        "Perfect for kids, couples, and creators"
       ]
     },
     "pricing": {
@@ -114,6 +138,21 @@
         "a": "You can choose from blue, red, green, yellow, purple, white, or rainbow."
       }
     ],
+    "testimonials": {
+      "title": "What Our Customers Say",
+      "items": [
+        {
+          "name": "Sarah",
+          "comment": "Absolutely love my Zen Mode button! It’s so calming.",
+          "rating": 5
+        },
+        {
+          "name": "Ali",
+          "comment": "Gave it as a gift — they lit up when they saw it (literally!).",
+          "rating": 4.5
+        }
+      ]
+    },
     "footer": {
       "company_name": "Glowify Co.",
       "privacy": "Privacy Policy",
@@ -153,7 +192,7 @@
         "title": "Purpose",
         "fields": [
           {
-            "type": "select",
+            "type": "select_box",
             "name": "purpose",
             "label": "Choose Your Button's Purpose",
             "options": [
@@ -164,6 +203,17 @@
               "Custom Purpose"
             ],
             "required": true
+          },
+          {
+            "type": "text",
+            "name": "custom_purpose",
+            "label": "Describe your custom purpose",
+            "placeholder": "e.g., Evening meditation button, Study alarm...",
+            "required": false,
+            "conditional": {
+              "field": "purpose",
+              "value": "Custom Purpose"
+            }
           }
         ]
       },
@@ -172,7 +222,7 @@
         "title": "Style",
         "fields": [
           {
-            "type": "select",
+            "type": "select_box",
             "name": "shape",
             "label": "Shape",
             "options": [
@@ -200,7 +250,6 @@
             "label": "Color",
             "options": [
               "Blue",
-              "#FF7A00",
               "Purple",
               "Green",
               "Yellow",
@@ -216,7 +265,7 @@
             "required": true
           },
           {
-            "type": "select",
+            "type": "select_box",
             "name": "finish",
             "label": "Finish",
             "options": [
@@ -241,8 +290,9 @@
             "type": "text",
             "name": "label_text",
             "label": "Button Text",
-            "maxLength": 12,
-            "required": false
+            "maxLength": 25,
+            "required": false,
+            "placeholder": "e.g., I Love You, Focus Mode"
           },
           {
             "type": "range",
@@ -291,7 +341,7 @@
           {
             "type": "text",
             "name": "zip",
-            "label": "IP/Postal Code",
+            "label": "Postal Code",
             "required": true
           },
           {

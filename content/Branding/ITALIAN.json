@@ -9,27 +9,31 @@
     },
     "hero": {
       "badge": "Esperti in Personal Branding",
-      "headline": "Branding Personale",
-      "subheadline": "Dal logo al packaging, dai kit di benvenuto agli spazi d’attesa — personalizziamo ogni dettaglio con eleganza, anima e coerenza.",
-      "start_button": "Inizia il tuo Branding"
+      "title": "Branding Personale",
+      "subtitle": "Dal logo al packaging, dai kit di benvenuto agli spazi d’attesa — personalizziamo ogni dettaglio con eleganza, anima e coerenza.",
+      "cta_text": "Inizia il tuo Branding"
     },
-    "features": [
-      {
-        "icon": "palette",
-        "title": "Identità Visiva",
-        "description": "Loghi, palette colori e tipografia allineati all’essenza del tuo brand"
-      },
-      {
-        "icon": "gift",
-        "title": "Prodotti Personalizzati",
-        "description": "Candele, agende, tazze… ogni pezzo riflette la tua identità"
-      },
-      {
-        "icon": "layout",
-        "title": "Moduli & Kit",
-        "description": "Creiamo menu, kit di benvenuto, gift card, adesivi e altro"
-      }
-    ],
+    "features": {
+      "title": "Caratteristiche",
+      "subtitle": "Perché scegliere i nostri servizi di branding",
+      "items": [
+        {
+          "icon": "palette",
+          "title": "Identità Visiva",
+          "description": "Loghi, palette colori e tipografia allineati all’essenza del tuo brand"
+        },
+        {
+          "icon": "gift",
+          "title": "Prodotti Personalizzati",
+          "description": "Candele, agende, tazze… ogni pezzo riflette la tua identità"
+        },
+        {
+          "icon": "layout",
+          "title": "Moduli & Kit",
+          "description": "Creiamo menu, kit di benvenuto, gift card, adesivi e altro"
+        }
+      ]
+    },
     "adventure_possibilities": {
       "title": "Cosa Personalizziamo",
       "subtitle": "Scopri gli elementi del tuo business che possiamo rendere unici",

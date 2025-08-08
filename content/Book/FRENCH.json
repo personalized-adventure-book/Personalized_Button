@@ -9,27 +9,31 @@
     },
     "hero": {
       "badge": "Livres d'aventure personnalisés",
-      "headline": "Livres d'aventure personnalisés",
-      "subheadline": "Transformez votre enfant en héros de son propre livre d'aventure personnalisé. Choisissez parmi des forêts enchantées, des missions spatiales, des expéditions sous-marines et bien plus encore !",
-      "start_button": "Commencer la création"
+      "title": "Livres d'aventure personnalisés",
+      "subtitle": "Transformez votre enfant en héros de son propre livre d'aventure personnalisé. Choisissez parmi des forêts enchantées, des missions spatiales, des expéditions sous-marines et bien plus encore !",
+      "cta_text": "Commencer la création"
     },
-    "features": [
-      {
-        "icon": "person",
-        "title": "Personnages personnalisés",
-        "description": "Incluez votre enfant, ses amis et les membres de la famille dans l'histoire"
-      },
-      {
-        "icon": "book",
-        "title": "Aperçu instantané",
-        "description": "Voyez votre livre prendre vie grâce à un aperçu instantané"
-      },
-      {
-        "icon": "heart",
-        "title": "Imprimé ou numérique",
-        "description": "Recevez un livre physique livré ou téléchargez-le instantanément"
-      }
-    ],
+    "features": {
+      "title": "Pourquoi choisir nos livres ?",
+      "subtitle": "Chaque livre personnalisé est créé avec amour et attention aux détails",
+      "items": [
+        {
+          "icon": "person",
+          "title": "Personnages personnalisés",
+          "description": "Incluez votre enfant, ses amis et les membres de la famille dans l'histoire"
+        },
+        {
+          "icon": "book",
+          "title": "Aperçu instantané",
+          "description": "Voyez votre livre prendre vie grâce à un aperçu instantané"
+        },
+        {
+          "icon": "heart",
+          "title": "Imprimé ou numérique",
+          "description": "Recevez un livre physique livré ou téléchargez-le instantanément"
+        }
+      ]
+    },
     "adventure_possibilities": {
       "title": "Possibilités d'aventure",
       "subtitle": "Explorez les mondes magiques que nous pouvons créer pour votre enfant – et bien d'autres !",

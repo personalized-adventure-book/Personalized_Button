@@ -9,27 +9,31 @@
     },
     "hero": {
       "badge": "Libri di Avventura Personalizzati",
-      "headline": "Libri di Avventura Personalizzati",
-      "subheadline": "Trasforma tuo figlio nell’eroe del suo libro di avventure personalizzato. Scegli tra foreste incantate, missioni spaziali, spedizioni sottomarine e molto altro!",
-      "start_button": "Inizia a Creare"
+      "title": "Libri di Avventura Personalizzati",
+      "subtitle": "Trasforma tuo figlio nell’eroe del suo libro di avventure personalizzato. Scegli tra foreste incantate, missioni spaziali, spedizioni sottomarine e molto altro!",
+      "cta_text": "Inizia a Creare"
     },
-    "features": [
-      {
-        "icon": "person",
-        "title": "Personaggi Personalizzati",
-        "description": "Includi tuo figlio, amici e familiari nella storia"
-      },
-      {
-        "icon": "book",
-        "title": "Anteprima Istantanea",
-        "description": "Guarda il tuo libro prendere vita con pagine di anteprima immediate"
-      },
-      {
-        "icon": "heart",
-        "title": "Cartaceo o Digitale",
-        "description": "Ricevi un libro fisico o scaricalo istantaneamente"
-      }
-    ],
+    "features": {
+      "title": "Perché scegliere i nostri libri?",
+      "subtitle": "Ogni libro personalizzato è creato con amore e attenzione ai dettagli",
+      "items": [
+        {
+          "icon": "person",
+          "title": "Personaggi Personalizzati",
+          "description": "Includi tuo figlio, amici e familiari nella storia"
+        },
+        {
+          "icon": "book",
+          "title": "Anteprima Istantanea",
+          "description": "Guarda il tuo libro prendere vita con pagine di anteprima immediate"
+        },
+        {
+          "icon": "heart",
+          "title": "Cartaceo o Digitale",
+          "description": "Ricevi un libro fisico o scaricalo istantaneamente"
+        }
+      ]
+    },
     "adventure_possibilities": {
       "title": "Possibilità di Avventura",
       "subtitle": "Esplora i mondi magici che possiamo creare per tuo figlio – e molto altro!",

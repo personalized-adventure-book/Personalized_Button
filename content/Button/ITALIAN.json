@@ -1,199 +1,321 @@
 {
   "homepage": {
     "menu": {
-      "features": "Funzionalità",
-      "order": "Ordina ora",
-      "contact": "Contatto",
-      "adventures": "Personalizzazioni",
+      "features": "Caratteristiche",
+      "order": "Ordina Ora",
+      "contact": "Contattaci",
+      "adventures": "Idee",
       "examples": "Esempi"
     },
     "hero": {
-      "title": "MyMood Button",
+      "title": "Pulsante MyMood",
       "subtitle": "Personalizza il tuo pulsante luminoso magico con nome, colori e scintille!",
-      "cta_text": "Ordina ora"
+      "cta_text": "Ordina Ora"
+    },
+    "urgency_banner": {
+      "text": "⚡ Scorte limitate questa settimana — ordina ora prima che finiscano!",
+      "style": "highlight"
+    },
+    "gallery": {
+      "title": "Guarda la Magia in Azione",
+      "subtitle": "Pulsanti reali, momenti reali - scorri orizzontalmente per esplorare la nostra collezione!"
+    },
+    "why_people_love_it": {
+      "title": "Perché il Nostro Pulsante È Speciale",
+      "points": [
+        "Un regalo unico per ogni occasione",
+        "Dà personalità al tuo spazio",
+        "Perfetto per bambini, coppie e creativi"
+      ]
+    },
+    "shipping_info": {
+      "title": "Consegna Rapida e Affidabile",
+      "points": [
+        "Spedizione entro 2–4 giorni lavorativi",
+        "Consegna tracciata in tutto il mondo",
+        "Spedizione gratuita sopra i 50€"
+      ]
+    },
+    "testimonials": {
+      "title": "Cosa Dicono i Nostri Clienti",
+      "items": [
+        {
+          "name": "Sarah",
+          "comment": "Adoro il mio pulsante Zen Mode! È così rilassante.",
+          "rating": 5
+        },
+        {
+          "name": "Ali",
+          "comment": "L'ho regalato — si sono illuminati quando l'hanno visto (letteralmente!).",
+          "rating": 4.5
+        }
+      ]
     },
     "about": {
-      "title": "Informazioni sui nostri pulsanti",
-      "text": "Ogni pulsante è realizzato su misura per illuminarsi con il colore e il messaggio che scegli. È più di un prodotto – è la tua scintilla personale."
+      "title": "Informazioni sui Nostri Pulsanti",
+      "text": "Ogni pulsante è realizzato su misura per illuminarsi con il colore e il messaggio che scegli. Non è solo un prodotto – è la tua scintilla personale."
     },
-    "features": [
-      {
-        "icon": "✨",
-        "title": "Si illumina con un tocco",
-        "text": "Il nostro pulsante si accende delicatamente quando premuto, rivelando il tuo design personalizzato."
-      },
-      {
-        "icon": "🎨",
-        "title": "Colori personalizzati",
-        "text": "Scegli tra un arcobaleno di colori LED per adattarlo al tuo umore o all'occasione."
-      },
-      {
-        "icon": "🔋",
-        "title": "Batteria inclusa",
-        "text": "Batteria a lunga durata integrata. Pronto all’uso appena aperto!"
-      }
-    ],
-    "examples": {
-      "title": "Personalizzazioni popolari",
+    "features": {
+      "title": "Caratteristiche",
+      "subtitle": "Perché scegliere i nostri pulsanti personalizzati",
       "items": [
-        "Pulsante 'Ti amo' con luce rosa",
-        "Pulsanti con nome per regali di compleanno",
-        "Citazione motivazionale con LED arcobaleno"
+        {
+          "icon": "✨",
+          "title": "Si Illumina con un Tocco",
+          "description": "Il nostro pulsante si illumina delicatamente quando viene premuto, rivelando il tuo design personalizzato."
+        },
+        {
+          "icon": "🎨",
+          "title": "Colori Personalizzati",
+          "description": "Scegli tra un arcobaleno di colori LED per adattarsi al tuo umore o occasione."
+        },
+        {
+          "icon": "🔋",
+          "title": "Batteria Inclusa",
+          "description": "Batteria a lunga durata integrata. Pronto all'uso subito!"
+        }
+      ]
+    },
+    "book_examples": {
+      "title": "Personalizzazioni Popolari",
+      "subtitle": "",
+      "examples": [
+        {
+          "title": "Pulsante Amore",
+          "child": "",
+          "adventure": "",
+          "preview": "Pulsante 'Ti Amo' con luce rosa"
+        },
+        {
+          "title": "Nome Compleanno",
+          "child": "",
+          "adventure": "",
+          "preview": "Pulsanti con nome per regali di compleanno"
+        },
+        {
+          "title": "Citazione Brillante",
+          "child": "",
+          "adventure": "",
+          "preview": "Citazione motivazionale con LED arcobaleno"
+        }
       ]
     },
     "how_it_works": {
-      "title": "Come funziona",
+      "title": "Come Funziona",
       "steps": [
         {
-          "title": "1. Personalizza",
-          "description": "Scegli messaggio, colori e forma del tuo pulsante."
+          "title": "Scegli il Tuo Stile",
+          "description": "Scegli forma, colore e finitura per riflettere la tua personalità."
         },
         {
-          "title": "2. Produzione",
-          "description": "Creiamo il tuo pulsante su misura con cura artigianale."
+          "title": "Aggiungi il Tuo Messaggio",
+          "description": "Personalizzalo con un nome o una frase ispiratrice."
         },
         {
-          "title": "3. Consegna veloce",
-          "description": "Ricevi il tuo pulsante in pochi giorni."
+          "title": "Lo Costruiamo",
+          "description": "Il nostro team crea il tuo pulsante con amore e magia."
         },
         {
-          "title": "4. Premi e brilla",
-          "description": "Goditi il tuo pulsante magico ogni giorno."
+          "title": "Consegnato a Casa Tua",
+          "description": "Lo spediamo direttamente a casa tua, pronto a brillare."
         }
       ]
     },
-    "pricing": {
-      "title": "I nostri pacchetti",
-      "plans": [
-        {
-          "title": "Essenziale",
-          "price": "19€",
-          "features": [
-            "1 pulsante personalizzato",
-            "Colore a scelta",
-            "Testo semplice"
-          ]
-        },
-        {
-          "title": "Magico",
-          "price": "29€",
-          "features": [
-            "2 pulsanti",
-            "Testo + design",
-            "LED multicolore"
-          ]
-        },
-        {
-          "title": "Edizione regalo",
-          "price": "39€",
-          "features": [
-            "Confezione regalo inclusa",
-            "Effetti luminosi speciali",
-            "Messaggio inciso"
-          ]
-        }
-      ]
+    "book_options": {
+      "title": "Prezzi",
+      "description": "",
+      "digital": {
+        "title": "Bagliore Singolo",
+        "subtitle": "",
+        "price": "€19",
+        "features": [
+          "Un pulsante personalizzato",
+          "Colori standard",
+          "Incisione fino a 12 caratteri"
+        ]
+      },
+      "printed": {
+        "title": "Duo Luminoso",
+        "subtitle": "",
+        "price": "€35",
+        "features": [
+          "Due pulsanti personalizzati",
+          "Scegli stili diversi",
+          "Perfetto per le coppie"
+        ]
+      },
+      "extra": {
+        "title": "Pacchetto Festa",
+        "subtitle": "",
+        "price": "€79",
+        "features": [
+          "5 pulsanti personalizzati",
+          "Confezione regalo inclusa",
+          "Ideale per eventi"
+        ]
+      }
     },
     "faq": [
       {
         "q": "Quanto dura la batteria?",
-        "a": "Fino a 3 mesi con uso quotidiano. Facile da sostituire."
+        "a": "Dura fino a 3 mesi con uso quotidiano normale e può essere facilmente sostituita."
       },
       {
-        "q": "Posso incidere un messaggio personalizzato?",
-        "a": "Certo! Puoi scrivere fino a 25 caratteri."
+        "q": "Posso incidere un messaggio specifico?",
+        "a": "Assolutamente! Supportiamo fino a 25 caratteri per pulsante."
       },
       {
-        "q": "Quali colori sono disponibili?",
-        "a": "Blu, rosso, verde, giallo, viola, bianco o arcobaleno."
+        "q": "Quali colori LED sono disponibili?",
+        "a": "Puoi scegliere tra blu, rosso, verde, giallo, viola, bianco o arcobaleno."
       }
     ],
     "footer": {
-      "company_name": "Glowify Co.",
-      "privacy": "Privacy Policy",
-      "terms": "Termini di utilizzo",
-      "copyright": "© 2025 MyMood Button"
+      "product": [
+        "Come Funziona",
+        "Esempi",
+        "Prezzi"
+      ],
+      "support": [
+        "Contatto",
+        "FAQ",
+        "Consegna"
+      ],
+      "company": [
+        "Glowify Co.",
+        "Politica sulla Privacy",
+        "Termini di Utilizzo"
+      ],
+      "copyright": "© 2025 Pulsante MyMood"
     }
   },
   "form": {
     "steps": [
       {
         "id": "customer_info",
-        "title": "Informazioni cliente",
+        "title": "Informazioni Cliente",
+        "icon": "user",
         "fields": [
           {
             "type": "text",
             "name": "full_name",
-            "label": "Nome completo",
+            "label": "Nome Completo",
+            "placeholder": "Il tuo nome completo",
             "required": true
           },
           {
             "type": "email",
             "name": "email",
-            "label": "Indirizzo e-mail",
+            "label": "Indirizzo Email",
+            "placeholder": "tuo.nome@example.com",
             "required": true
           },
           {
             "type": "tel",
             "name": "phone",
-            "label": "Numero di telefono (facoltativo)",
+            "label": "Numero di Telefono (opzionale)",
+            "placeholder": "+39 123 456 7890",
+            "required": false
+          }
+        ]
+      },
+      {
+        "id": "gift",
+        "title": "Questo è un Regalo?",
+        "fields": [
+          {
+            "type": "choice",
+            "name": "is_gift",
+            "label": "Stai regalando questo pulsante?",
+            "options": ["Sì", "No"],
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "recipient_name",
+            "label": "Nome del Destinatario",
+            "required": false
+          },
+          {
+            "type": "textarea",
+            "name": "gift_message",
+            "label": "Messaggio Regalo (opzionale)",
+            "required": false
+          },
+          {
+            "type": "choice",
+            "name": "gift_wrap",
+            "label": "Aggiungere una Confezione Regalo?",
+            "options": ["Sì", "No"],
             "required": false
           }
         ]
       },
       {
         "id": "purpose",
-        "title": "Scopo del pulsante",
+        "title": "Finalità del Pulsante",
+        "icon": "target",
         "fields": [
           {
-            "type": "select",
+            "type": "select_box",
             "name": "purpose",
-            "label": "Scegli l’uso del tuo pulsante",
+            "label": "Scegli la finalità del tuo pulsante",
+            "required": true,
             "options": [
               "Modalità concentrazione",
-              "Luce da lettura",
-              "Serata film",
-              "Atmosfera festa",
-              "Altro uso"
-            ],
-            "required": true
+              "Luce per la lettura",
+              "Serata cinema",
+              "Festa",
+              "Finalità personalizzata"
+            ]
+          },
+          {
+            "type": "text",
+            "name": "custom_purpose",
+            "label": "Descrivi la tua finalità personalizzata",
+            "placeholder": "es. Pulsante per meditazione serale, Allarme per studio...",
+            "required": false,
+            "conditional": {
+              "field": "purpose",
+              "value": "Finalità personalizzata"
+            }
           }
         ]
       },
       {
         "id": "style",
-        "title": "Stile",
+        "title": "Stile del Pulsante",
+        "icon": "palette",
         "fields": [
           {
-            "type": "select",
+            "type": "select_box",
             "name": "shape",
             "label": "Forma",
+            "required": true,
             "options": [
               "Cerchio",
               "Quadrato",
               "Esagono",
               "Ottagono",
-              "Rombo",
+              "Diamante",
               "Stella",
               "Triangolo",
               "Cuore",
               "Ovale",
               "Pentagono",
-              "Quadrato arrotondato",
+              "Quadrato Arrotondato",
               "Pillola",
               "Nuvola",
               "Fiore",
-              "Saetta"
-            ],
-            "required": true
+              "Fulmine"
+            ]
           },
           {
             "type": "select",
             "name": "color",
-            "label": "Colore",
+            "label": "Colore LED",
+            "required": true,
             "options": [
               "Blu",
-              "#FF7A00",
               "Viola",
               "Verde",
               "Giallo",
@@ -205,42 +327,43 @@
               "Ciano",
               "Arancione",
               "Personalizzato"
-            ],
-            "required": true
+            ]
           },
           {
-            "type": "select",
+            "type": "select_box",
             "name": "finish",
             "label": "Finitura",
+            "required": true,
             "options": [
-              "Opaco",
-              "Lucido",
-              "Satinato",
-              "Metallico",
-              "Perlato",
-              "Testurizzato",
-              "Fibra di carbonio",
+              "Opaca",
+              "Lucida",
+              "Satinata",
+              "Metallica",
+              "Perlata",
+              "Testurizzata",
+              "Fibra di Carbonio",
               "Soft Touch"
-            ],
-            "required": true
+            ]
           }
         ]
       },
       {
         "id": "label",
-        "title": "Testo del pulsante",
+        "title": "Etichetta del Pulsante",
+        "icon": "type",
         "fields": [
           {
             "type": "text",
             "name": "label_text",
-            "label": "Testo sul pulsante",
-            "maxLength": 12,
+            "label": "Testo sul Pulsante",
+            "placeholder": "es. Ti Amo, Modalità Focus",
+            "maxLength": 25,
             "required": false
           },
           {
             "type": "range",
             "name": "text_size",
-            "label": "Dimensione del testo",
+            "label": "Dimensione del Testo",
             "min": 10,
             "max": 24,
             "default": 14
@@ -249,24 +372,28 @@
       },
       {
         "id": "behavior",
-        "title": "Comportamento",
+        "title": "Comportamento del Pulsante",
+        "icon": "zap",
         "fields": [
           {
             "type": "textarea",
             "name": "button_behavior",
-            "label": "Descrivi il comportamento desiderato del pulsante",
+            "label": "Descrivi il comportamento del pulsante",
+            "placeholder": "Descrivi cosa succede quando si preme il pulsante...",
             "required": false
           }
         ]
       },
       {
         "id": "delivery",
-        "title": "Consegna",
+        "title": "Informazioni di Spedizione",
+        "icon": "map",
         "fields": [
           {
             "type": "text",
             "name": "street",
             "label": "Indirizzo",
+            "placeholder": "Indirizzo, casella postale",
             "required": true
           },
           {
@@ -278,13 +405,13 @@
           {
             "type": "text",
             "name": "state",
-            "label": "Regione / Provincia",
+            "label": "Provincia/Stato",
             "required": true
           },
           {
             "type": "text",
             "name": "zip",
-            "label": "CAP / Codice postale",
+            "label": "CAP",
             "required": true
           },
           {
@@ -307,7 +434,8 @@
           {
             "type": "textarea",
             "name": "instructions",
-            "label": "Istruzioni di consegna (facoltativo)",
+            "label": "Istruzioni di Consegna (opzionale)",
+            "placeholder": "es. Lascia alla porta o al vicino",
             "required": false
           }
         ]

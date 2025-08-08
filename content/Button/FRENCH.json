@@ -16,23 +16,27 @@
       "title": "À propos de nos boutons",
       "text": "Chaque bouton est conçu de manière unique pour s’illuminer avec la couleur et le message que vous choisissez. C’est plus qu’un produit – c’est votre étincelle personnelle."
     },
-    "features": [
-      {
-        "icon": "✨",
-        "title": "S’allume au toucher",
-        "text": "Notre bouton s’éclaire doucement lorsqu’on l’appuie, révélant votre design personnalisé."
-      },
-      {
-        "icon": "🎨",
-        "title": "Couleurs personnalisables",
-        "text": "Choisissez parmi un arc-en-ciel de couleurs LED pour correspondre à votre humeur ou à l’occasion."
-      },
-      {
-        "icon": "🔋",
-        "title": "Pile incluse",
-        "text": "Pile longue durée intégrée. Prêt à l’emploi dès la sortie de la boîte !"
-      }
-    ],
+    "features": {
+      "title": "Caractéristiques",
+      "subtitle": "Pourquoi choisir nos boutons personnalisés",
+      "items": [
+        {
+          "icon": "✨",
+          "title": "S’allume au toucher",
+          "text": "Notre bouton s’éclaire doucement lorsqu’on l’appuie, révélant votre design personnalisé."
+        },
+        {
+          "icon": "🎨",
+          "title": "Couleurs personnalisables",
+          "text": "Choisissez parmi un arc-en-ciel de couleurs LED pour correspondre à votre humeur ou à l’occasion."
+        },
+        {
+          "icon": "🔋",
+          "title": "Pile incluse",
+          "text": "Pile longue durée intégrée. Prêt à l’emploi dès la sortie de la boîte !"
+        }
+      ]
+    },
     "examples": {
       "title": "Personnalisations populaires",
       "items": [
@@ -146,7 +150,7 @@
         "title": "Utilisation du bouton",
         "fields": [
           {
-            "type": "select",
+            "type": "select_box",
             "name": "purpose",
             "label": "Choisissez l’usage de votre bouton",
             "options": [
@@ -157,6 +161,17 @@
               "Autre usage"
             ],
             "required": true
+          },
+          {
+            "type": "text",
+            "name": "custom_purpose",
+            "label": "Décrivez votre usage personnalisé",
+            "placeholder": "ex. Bouton pour méditation du soir, Alarme d'étude...",
+            "required": false,
+            "conditional": {
+              "field": "purpose",
+              "value": "Autre usage"
+            }
           }
         ]
       },
@@ -165,7 +180,7 @@
         "title": "Style",
         "fields": [
           {
-            "type": "select",
+            "type": "select_box",
             "name": "shape",
             "label": "Forme",
             "options": [
@@ -188,7 +203,7 @@
             "required": true
           },
           {
-            "type": "select",
+            "type": "select_box",
             "name": "color",
             "label": "Couleur",
             "options": [
@@ -209,7 +224,7 @@
             "required": true
           },
           {
-            "type": "select",
+            "type": "select_box",
             "name": "finish",
             "label": "Finition",
             "options": [

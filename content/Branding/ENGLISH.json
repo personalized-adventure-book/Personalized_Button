@@ -9,27 +9,31 @@
     },
     "hero": {
       "badge": "Personal Branding",
-      "headline": "Personal Branding",
-      "subheadline": "From logos and packaging to welcome kits and waiting rooms, we personalize every detail of your business — with elegance, soul, and consistency.",
-      "start_button": "Start Your Branding"
+      "title": "Personal Branding",
+      "subtitle": "From logos and packaging to welcome kits and waiting rooms, we personalize every detail of your business — with elegance, soul, and consistency.",
+      "cta_text": "Start Your Branding"
     },
-    "features": [
-      {
-        "icon": "palette",
-        "title": "Visual Identity Design",
-        "description": "Logos, colors, and typography tailored to your brand's essence"
-      },
-      {
-        "icon": "gift",
-        "title": "Branded Products",
-        "description": "From candles to agendas, every item reflects your unique identity"
-      },
-      {
-        "icon": "layout",
-        "title": "Custom Forms & Kits",
-        "description": "Designs for menus, welcome packs, gift cards, stickers, and more"
-      }
-    ],
+    "features": {
+      "title": "Features",
+      "subtitle": "Why Choose Our Branding Services",
+      "items": [
+        {
+          "icon": "palette",
+          "title": "Visual Identity Design",
+          "description": "Logos, colors, and typography tailored to your brand's essence"
+        },
+        {
+          "icon": "gift",
+          "title": "Branded Products",
+          "description": "From candles to agendas, every item reflects your unique identity"
+        },
+        {
+          "icon": "layout",
+          "title": "Custom Forms & Kits",
+          "description": "Designs for menus, welcome packs, gift cards, stickers, and more"
+        }
+      ]
+    },
     "adventure_possibilities": {
       "title": "What We Personalize",
       "subtitle": "Explore the range of branding elements we can customize for your business",
