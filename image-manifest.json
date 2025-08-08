@@ -64,16 +64,19 @@
       ]
     },
     "hero": {},
-    "features": {}
+    "features": {},
+    "demo": {}
   },
   "Book": {
     "gallery": {},
     "hero": {},
-    "features": {}
+    "features": {},
+    "demo": {}
   },
   "Branding": {
     "gallery": {},
     "hero": {},
-    "features": {}
+    "features": {},
+    "demo": {}
   }
 }
