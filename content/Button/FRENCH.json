@@ -1,7 +1,19 @@
 {
   "homepage": {
     "menu": {
-      "features": "Fonctionnalités",
+      "    "examples": {
+      "title": "Personnalisations populaires",
+      "items": [
+        "Bouton « Je t'aime » avec lumière rose",
+        "Boutons avec prénom pour cadeaux d'anniversaire",
+        "Citation de motivation avec LED arc-en-ciel"
+      ]
+    },
+    "gallery": {
+      "title": "Galerie de Boutons",
+      "subtitle": "Explorez notre collection de magnifiques boutons personnalisés - faites défiler horizontalement pour en voir plus !"
+    },
+    "how_it_works": {: "Fonctionnalités",
       "order": "Commander",
       "contact": "Contact",
       "adventures": "Personnalisations",
