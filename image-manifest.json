@@ -65,7 +65,11 @@
     },
     "hero": {},
     "features": {},
-    "demo": {}
+    "demo": {
+      "files": [
+        "Demo.mov"
+      ]
+    }
   },
   "Book": {
     "gallery": {},
