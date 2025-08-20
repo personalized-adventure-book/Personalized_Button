@@ -1,7 +1,6 @@
 {
   "homepage": {
     "urgency_banner": { "text": "🎶 Créneaux limités cette semaine — réservez votre chanson !", "style": "highlight", "contact": "Contact", "adventures": "Idées", "examples": "Exemples" },
-    "hero": { "title": "Chanson Personnalisée", "subtitle": "Une chanson originale créée pour vous (histoire, style, émotion)", "cta_text": "Créer votre chanson" },
     "about": { "title": "À propos", "text": "Mini chanson 60–120s basée sur votre histoire, parfaite pour cadeaux et surprises." },
     "features": { "title": "Fonctionnalités", "subtitle": "Pourquoi on l'adore", "items": [
       { "icon": "🎵", "title": "Composition originale", "text": "Chaque chanson est écrite de zéro." },
@@ -13,7 +12,7 @@
       { "text": "Ballade acoustique romantique" },
       { "text": "Pièce cinématique épique motivante" }
     ] },
-    "gallery": { "title": "Inspiration", "subtitle": "Covers & ambiances imaginées" },
+    "gallery": { "title": "Chanson Personnalisée", "subtitle": "Une chanson originale créée pour vous (histoire, style, émotion)" },
     "how_it_works": { "title": "Comment ça marche", "steps": [
       { "title": "Racontez l'histoire", "description": "Occasion, personne, détails clés." },
       { "title": "On écrit & produit", "description": "Auteur + inspiration assistée." },

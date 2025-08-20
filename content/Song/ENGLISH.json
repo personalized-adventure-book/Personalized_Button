@@ -7,11 +7,6 @@
       "adventures": "Ideas",
       "examples": "Examples"
     },
-    "hero": {
-      "title": "Personalized Song",
-      "subtitle": "A custom original song — your story, mood & style in music.",
-      "cta_text": "Create Your Song"
-    },
     "about": {
       "title": "About Your Custom Song",
       "text": "We craft original mini songs (60–120s) based on the mood, story, and style you choose. Perfect for gifts, proposals, birthdays, motivation or just for fun."
@@ -34,8 +29,8 @@
       ]
     },
     "gallery": {
-      "title": "Song Moments",
-      "subtitle": "Imagined cover art concepts & mood inspirations."
+      "title": "Personalized Song",
+      "subtitle": "A custom original song — your story, mood & style in music."
     },
     "how_it_works": {
       "title": "How It Works",

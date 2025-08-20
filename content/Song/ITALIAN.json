@@ -1,7 +1,6 @@
 {
   "homepage": {
     "urgency_banner": { "text": "🎶 Posti creativi limitati – prenota la tua canzone!", "style": "highlight", "contact": "Contatto", "adventures": "Idee", "examples": "Esempi" },
-    "hero": { "title": "Canzone Personalizzata", "subtitle": "Una canzone originale basata sulla tua storia ed emozione", "cta_text": "Crea la tua canzone" },
     "about": { "title": "Informazioni", "text": "Mini canzone 60–120s basata su stile e stato d'animo scelti." },
     "features": { "title": "Caratteristiche", "subtitle": "Perché piace", "items": [
       { "icon": "🎵", "title": "Composizione originale", "text": "Scritta da zero per te." },
@@ -13,7 +12,7 @@
       { "text": "Ballata acustica romantica" },
       { "text": "Pezzo epico cinematografico motivazionale" }
     ] },
-    "gallery": { "title": "Ispirazioni", "subtitle": "Concept e mood" },
+    "gallery": { "title": "Canzone Personalizzata", "subtitle": "Una canzone originale basata sulla tua storia ed emozione" },
     "how_it_works": { "title": "Come Funziona", "steps": [
       { "title": "Racconta la storia", "description": "Occasione, persona, dettagli." },
       { "title": "Scriviamo & produciamo", "description": "Autore + ispirazione assistita." },
