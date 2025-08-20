@@ -1,0 +1,203 @@
+{
+  "homepage": {
+    "urgency_banner": { "text": "🎶 Créneaux limités cette semaine — réservez votre chanson !", "style": "highlight", "contact": "Contact", "adventures": "Idées", "examples": "Exemples" },
+    "hero": { "title": "Chanson Personnalisée", "subtitle": "Une chanson originale créée pour vous (histoire, style, émotion)", "cta_text": "Créer votre chanson" },
+    "about": { "title": "À propos", "text": "Mini chanson 60–120s basée sur votre histoire, parfaite pour cadeaux et surprises." },
+    "features": { "title": "Fonctionnalités", "subtitle": "Pourquoi on l'adore", "items": [
+      { "icon": "🎵", "title": "Composition originale", "text": "Chaque chanson est écrite de zéro." },
+      { "icon": "💌", "title": "Émotion d'abord", "text": "On se concentre sur votre histoire." },
+  { "icon": "⚡", "title": "Préparation rapide", "text": "Préparation en 3 jours max (envoi par email)." }
+    ] },
+    "examples": { "title": "Thèmes", "items": [
+      { "text": "Titre pop anniversaire entraînant" },
+      { "text": "Ballade acoustique romantique" },
+      { "text": "Pièce cinématique épique motivante" }
+    ] },
+    "gallery": { "title": "Inspiration", "subtitle": "Covers & ambiances imaginées" },
+    "how_it_works": { "title": "Comment ça marche", "steps": [
+      { "title": "Racontez l'histoire", "description": "Occasion, personne, détails clés." },
+      { "title": "On écrit & produit", "description": "Auteur + inspiration assistée." },
+      { "title": "Vous révisez", "description": "Révision optionnelle selon l'offre." },
+  { "title": "Préparation", "description": "Préparée en 3 jours max — email avec MP3 + WAV (selon offre) et paroles PDF ou vidéo paroles." },
+      { "title": "Créez la vôtre", "description": "Moins d'une minute pour commencer." }
+    ] },
+    "why_people_love_it": { "title": "Pourquoi c'est spécial", "points": [
+      "Cadeau émotionnel unique",
+      "Capture un souvenir en musique",
+      "Idéal pour montages & événements"
+    ] },
+    "pricing": { "title": "Tarifs", "plans": [
+      { "name": "Départ", "price": "49€", "features": ["~60s", "1 style", "Paroles incluses", "MP3"] },
+      { "name": "Pro", "price": "89€", "features": ["75–90s", "Mélange 2 styles", "1 révision", "MP3 + WAV", "Mix basique"] },
+      { "name": "Ultime", "price": "149€", "features": ["Jusqu'à 120s", "Arrangement complexe", "2 révisions", "Stems WAV HQ", "Prioritaire"] }
+    ] },
+    "testimonials": { "title": "Avis", "items": [
+      { "name": "Élise", "comment": "Émouvant, ça nous ressemble.", "rating": 5 },
+      { "name": "Thomas", "comment": "Super cadeau surprise, son pro.", "rating": 4.5 }
+    ] },
+    "faq": [
+      { "q": "Puis-je l'utiliser commercialement ?", "a": "Usage personnel par défaut. Option commerciale sur demande." },
+      { "q": "Quels genres disponibles ?", "a": "Pop, acoustique, cinématique, piano, lofi, ambient, épique..." },
+      { "q": "Ai-je les paroles ?", "a": "Oui pour usage perso; droits complets sur option." }
+    ],
+    "cta": { "title": "Prêt ?", "description": "Commencez maintenant.", "button": "Démarrer" },
+    "footer": { "company_name": "CustomSound Lab", "privacy": "Confidentialité", "terms": "Conditions", "contact": "Contact", "copyright": "© 2025 Personalized Song" }
+  },
+  "form": {
+    "steps": [
+      {
+        "id": "song_purpose",
+        "title": "Occasion & Destinataire",
+        "fields": [
+          { "type": "select_box", "name": "occasion", "label": "Occasion", "required": true, "options": ["Anniversaire", "Anniversaire de couple", "Demande en mariage", "Motivation", "Amitié", "Juste comme ça", "Personnalisé..."] },
+          { "type": "text", "name": "custom_occasion", "label": "Occasion personnalisée", "required": false, "conditional": { "field": "occasion", "value": "Personnalisé..." } },
+          { "type": "text", "name": "recipient_name", "label": "Nom du destinataire", "placeholder": "Nom de la personne (vous ou quelqu'un d'autre)", "required": false }
+          
+        ]
+      },
+      {
+        "id": "style",
+        "title": "Style & Ambiance",
+        "fields": [
+          { "type": "select_box", "name": "primary_style", "label": "Style principal", "required": true, "options": ["Pop", "Acoustique", "Piano", "Cinématique", "Lofi", "Ambiant", "Électronique", "Folk", "Épique", "Orchestral", "Jazz", "Détente", "Trap", "Rock", "Style personnalisé"] },
+          { "type": "text", "name": "custom_style", "label": "Décrivez le style personnalisé", "required": true, "placeholder": "ex: Synthwave rétro + orchestral", "conditional": { "field": "primary_style", "value": "Style personnalisé" } },
+          { "type": "select_box", "name": "mood", "label": "Humeur principale", "required": true, "options": ["Heureux", "Romantique", "Mélancolique", "Motivant", "Inspirant", "Calme", "Énergique", "Élévateur", "Rêveur", "Humeur personnalisée"] },
+          { "type": "text", "name": "custom_mood", "label": "Humeur personnalisée", "required": false, "conditional": { "field": "mood", "value": "Humeur personnalisée" } },
+          { "type": "select_box", "name": "lyric_focus", "label": "Focus des paroles", "required": true, "options": ["Noms", "Récit", "Accent sur le message", "Paroles minimales", "Instrumental", "Focalisation personnalisée"] },
+          { "type": "text", "name": "custom_focus", "label": "Focus personnalisé", "required": false, "conditional": { "field": "lyric_focus", "value": "Focalisation personnalisée" } }
+        ]
+      },
+      {
+        "id": "extras",
+        "title": "Extras",
+        "fields": [
+          { "type": "select_box", "name": "length", "label": "Durée", "required": true, "options": ["~60s", "~90s", "Jusqu'à 120s"] }
+        ]
+      },
+      {
+        "id": "story_details",
+        "title": "Histoire / Détails clés",
+        "fields": [
+          { "type": "suggestion_textarea", "name": "story", "label": "Histoire / Détails clés", "suggestions": [
+            "Amie 30 ans – adore randonnée & café",
+            "Romantique 5e anniversaire – inclure 'pour toujours mon foyer'",
+            "Anniv frère diplômé – énergie motivante",
+            "Motivation personnelle – résilience & dépassement",
+            "Berceuse douce pour ma nièce Lina",
+            "Demande en mariage avec montée finale",
+            "Ajouter une blague interne 'tacos du mardi'",
+            "Tonalité d'espoir pour nouveaux débuts 2025"
+          ], "placeholder": "Quelques lignes sur le contexte, émotions, noms, phrases...", "helper": "Cliquez pour ajouter. Ajoutez prénoms, souvenirs, blagues internes, mots clés.", "maxLength": 600, "required": false }
+        ]
+      },
+      {
+        "id": "voice",
+        "title": "Voix & Paroles",
+        "description": "Option de reproduction de votre voix (échantillon parlé 1–2 minutes). Nous utilisons uniquement cet enregistrement pour cette chanson et ne le stockons pas, ne le réutilisons pas et ne le vendons pas.",
+        "fields": [
+          { "type": "binary_cards", "name": "voice_option", "label": "Voix", "required": true, "helper": "Option personnalisée = clonage de votre timbre à partir d'un court extrait parlé.", "options": [
+            { "label": "Voix standard", "value": "Voix standard", "description": "Voix produite pro adaptée au style choisi." },
+            { "label": "Voix personnalisée (votre voix)", "value": "Voix personnalisée (votre voix)", "description": "Recréation de votre timbre. Échantillon supprimé ensuite.", "badge": "+50€", "icon": "mic" }
+          ] },
+          { "type": "file", "name": "voice_sample", "label": "Téléversez un échantillon (1–2 min parlé)", "required": false, "accept": "audio/*", "multiple": false, "conditional": { "field": "voice_option", "value": "Voix personnalisée (votre voix)" } },
+          { "type": "binary_cards", "name": "lyric_video", "label": "Vidéo paroles", "required": true, "helper": "Choisissez si vous voulez une vidéo paroles.", "options": [
+            { "label": "Pas de vidéo", "value": "Pas de vidéo", "description": "Audio + PDF paroles uniquement." },
+            { "label": "Vidéo paroles", "value": "Vidéo paroles", "description": "Création d'une vidéo paroles simple.", "icon": "video" }
+          ] },
+          { "type": "file", "name": "lyric_video_cover", "label": "Image de couverture vidéo paroles (optionnel)", "required": false, "accept": "image/*", "multiple": false, "helper": "Ajoutez une image si vous avez choisi la vidéo paroles.", "conditional": { "field": "lyric_video", "value": "Vidéo paroles" } },
+          { "type": "binary_cards", "name": "lyrics_source", "label": "Source des paroles", "required": true, "helper": "Fournissez les vôtres si elles sont déjà écrites sinon laissez-nous créer.", "options": [
+            { "label": "Nous générons les paroles", "value": "Nous générons les paroles", "description": "On écrit des paroles originales à partir de vos infos." },
+            { "label": "Je fournis les paroles", "value": "Je fournis les paroles", "description": "Vous collez un brouillon ou complet (on peut ajuster léger).", "badge": "-5€", "icon": "star" }
+          ] },
+          { "type": "textarea", "name": "provided_lyrics", "label": "Saisissez les paroles (brouillon / idées clés)", "required": false, "placeholder": "Collez vos paroles ou points clés...", "conditional": { "field": "lyrics_source", "value": "Je fournis les paroles" } },
+          { "type": "textarea", "name": "voice_note", "label": "Notes supplémentaires (voix / prononciation)", "required": false, "placeholder": "Prononciations, noms, accents..." }
+        ]
+      },
+      {
+        "id": "customer_info",
+        "title": "Vos informations",
+        "fields": [
+          { "type": "text", "name": "full_name", "label": "Nom complet", "required": true },
+          { "type": "email", "name": "email", "label": "Adresse email", "required": true },
+          { "type": "tel", "name": "phone", "label": "Numéro de téléphone (optionnel)", "required": false }
+        ]
+      },
+      {
+        "id": "delivery",
+        "title": "Livraison",
+        "fields": [
+          { "type": "text", "name": "street", "label": "Adresse", "required": true },
+            { "type": "text", "name": "city", "label": "Ville", "required": true },
+            { "type": "text", "name": "state", "label": "Région / Province", "required": false },
+            { "type": "text", "name": "zip", "label": "Code postal", "required": true },
+            { "type": "choice", "name": "country", "label": "Pays", "required": true, "options": ["France", "États-Unis", "Italie", "Arabie Saoudite", "Émirats Arabes Unis", "Algérie", "Allemagne", "Canada", "Autre"] },
+            { "type": "textarea", "name": "instructions", "label": "Instructions de livraison (optionnel)", "required": false }
+        ]
+      }
+    ]
+  },
+  "pricing_config": {
+    "base_price": 49,
+    "fields": {
+      "occasion": {
+        "Anniversaire": 0,
+        "Anniversaire de couple": 5,
+        "Demande en mariage": 15,
+        "Motivation": 5,
+        "Amitié": 0,
+        "Juste comme ça": 0,
+        "Personnalisé...": 10
+      },
+      "primary_style": {
+        "Pop": 0,
+        "Acoustique": 0,
+        "Piano": 4,
+        "Cinématique": 12,
+        "Lofi": 2,
+        "Ambiant": 3,
+        "Électronique": 6,
+        "Folk": 2,
+        "Épique": 14,
+        "Orchestral": 16,
+        "Jazz": 10,
+        "Détente": 3,
+        "Trap": 6,
+        "Rock": 8,
+        "Style personnalisé": 18
+      },
+      "mood": {
+        "Heureux": 0,
+        "Romantique": 4,
+        "Mélancolique": 5,
+        "Motivant": 6,
+        "Inspirant": 5,
+        "Calme": 2,
+        "Énergique": 6,
+        "Élévateur": 4,
+        "Rêveur": 3,
+        "Humeur personnalisée": 8
+      },
+      "lyric_focus": {
+        "Noms": 0,
+        "Récit": 6,
+        "Accent sur le message": 4,
+        "Paroles minimales": -2,
+        "Instrumental": -5,
+        "Focalisation personnalisée": 8
+      },
+      "length": {
+        "~60s": 0,
+        "~90s": 15,
+        "Jusqu'à 120s": 35
+      },
+      "voice_option": {
+        "Voix standard": 0,
+        "Voix personnalisée (votre voix)": 50
+      },
+      "lyrics_source": {
+        "Nous générons les paroles": 0,
+        "Je fournis les paroles": -5
+      }
+    }
+  }
+}

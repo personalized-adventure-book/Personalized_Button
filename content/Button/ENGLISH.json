@@ -6,7 +6,11 @@
     },
     "menu": {
       "features": "Features",
+      "howItWorks": "How It Works",
+      "gallery": "Gallery",
+      "pricing": "Pricing",
       "order": "Order Now",
+      "orders": "Orders",
       "contact": "Contact Us",
       "adventures": "Ideas",
       "examples": "Examples"
@@ -56,8 +60,8 @@
       ]
     },
     "gallery": {
-      "title": "See the Magic in Action",
-      "subtitle": "Real buttons, real moments - scroll horizontally to explore our collection!"
+      "title": "MyMood Button",
+      "subtitle": "Real buttons, real moments!"
     },
     "how_it_works": {
       "title": "How It Works",
@@ -164,30 +168,6 @@
   "form": {
     "steps": [
       {
-        "id": "customer_info",
-        "title": "Customer Info",
-        "fields": [
-          {
-            "type": "text",
-            "name": "full_name",
-            "label": "Full Name",
-            "required": true
-          },
-          {
-            "type": "email",
-            "name": "email",
-            "label": "Email Address",
-            "required": true
-          },
-          {
-            "type": "tel",
-            "name": "phone",
-            "label": "Phone Number (optional)",
-            "required": false
-          }
-        ]
-      },
-      {
         "id": "purpose",
         "title": "Purpose",
         "fields": [
@@ -200,6 +180,14 @@
               "Reading Light",
               "Movie Night",
               "Party Scene",
+              "Gaming Session",
+              "Meditation",
+              "Workout",
+              "Study Mode",
+              "Relaxation",
+              "Sleep Time",
+              "Wake Up",
+              "Mood Lighting",
               "Custom Purpose"
             ],
             "required": true
@@ -209,7 +197,7 @@
             "name": "custom_purpose",
             "label": "Describe your custom purpose",
             "placeholder": "e.g., Evening meditation button, Study alarm...",
-            "required": false,
+            "required": true,
             "conditional": {
               "field": "purpose",
               "value": "Custom Purpose"
@@ -240,12 +228,24 @@
               "Pill",
               "Cloud",
               "Flower",
-              "Lightning"
+              "Lightning",
+              "Custom Shape"
             ],
             "required": true
           },
           {
-            "type": "select",
+            "type": "text",
+            "name": "custom_shape",
+            "label": "Describe your custom shape",
+            "placeholder": "e.g., Custom geometric pattern, Logo shape",
+            "required": true,
+            "conditional": {
+              "field": "shape",
+              "value": "Custom Shape"
+            }
+          },
+          {
+            "type": "select_box",
             "name": "color",
             "label": "Color",
             "options": [
@@ -265,6 +265,17 @@
             "required": true
           },
           {
+            "type": "text",
+            "name": "custom_color",
+            "label": "Describe your custom color",
+            "placeholder": "e.g., Gradient blue to purple, Neon green, #FF5733",
+            "required": true,
+            "conditional": {
+              "field": "color",
+              "value": "Custom"
+            }
+          },
+          {
             "type": "select_box",
             "name": "finish",
             "label": "Finish",
@@ -276,9 +287,21 @@
               "Pearl",
               "Textured",
               "Carbon Fiber",
-              "Soft Touch"
+              "Soft Touch",
+              "Custom Finish"
             ],
             "required": true
+          },
+          {
+            "type": "text",
+            "name": "custom_finish",
+            "label": "Describe your custom finish",
+            "placeholder": "e.g., Holographic, Glow-in-the-dark, Wood grain",
+            "required": true,
+            "conditional": {
+              "field": "finish",
+              "value": "Custom Finish"
+            }
           }
         ]
       },
@@ -287,31 +310,55 @@
         "title": "Label",
         "fields": [
           {
-            "type": "text",
+            "type": "choice_text",
             "name": "label_text",
             "label": "Button Text",
-            "maxLength": 25,
+            "options": [
+              "I Love You",
+              "Focus Mode",
+              "Do Not Disturb",
+              "Good Luck",
+              "Stay Strong",
+              "Smile!"
+            ],
             "required": false,
-            "placeholder": "e.g., I Love You, Focus Mode"
+            "placeholder": "Choose a label or select Custom..."
           },
           {
-            "type": "range",
+            "type": "choice_text",
             "name": "text_size",
             "label": "Text Size",
-            "min": 10,
-            "max": 24,
-            "default": 14
+            "options": [
+              "Small (10px)",
+              "Medium (14px)",
+              "Large (18px)",
+              "Extra Large (24px)"
+            ],
+            "required": false,
+            "placeholder": "Choose text size"
           }
         ]
       },
-      {
-        "id": "behavior",
-        "title": "Behavior",
+            {
+        "id": "customer_info",
+        "title": "Customer Info",
         "fields": [
           {
-            "type": "textarea",
-            "name": "button_behavior",
-            "label": "Describe your button's behavior",
+            "type": "text",
+            "name": "full_name",
+            "label": "Full Name",
+            "required": true
+          },
+          {
+            "type": "email",
+            "name": "email",
+            "label": "Email Address",
+            "required": true
+          },
+          {
+            "type": "tel",
+            "name": "phone",
+            "label": "Phone Number (optional)",
             "required": false
           }
         ]
@@ -336,7 +383,7 @@
             "type": "text",
             "name": "state",
             "label": "State/Province",
-            "required": true
+            "required": false
           },
           {
             "type": "text",
@@ -370,5 +417,74 @@
         ]
       }
     ]
+  },
+  "pricing_config": {
+    "base_price": 30,
+    "fields": {
+      "purpose": {
+        "Focus Mode": 0,
+        "Reading Light": 5,
+        "Movie Night": 7,
+        "Party Scene": 12,
+        "Gaming Session": 10,
+        "Meditation": 4,
+        "Workout": 6,
+        "Study Mode": 3,
+        "Relaxation": 4,
+        "Sleep Time": 5,
+        "Wake Up": 5,
+        "Mood Lighting": 8,
+  "Custom Purpose": 15
+      },
+      "shape": {
+        "Circle": 0,
+        "Square": 0,
+        "Hexagon": 6,
+        "Octagon": 8,
+        "Diamond": 5,
+        "Star": 10,
+        "Triangle": 4,
+        "Heart": 9,
+        "Oval": 3,
+        "Pentagon": 6,
+        "Rounded Square": 2,
+        "Pill": 3,
+        "Cloud": 7,
+        "Flower": 11,
+        "Lightning": 12,
+        "Custom Shape": 15
+      },
+      "color": {
+        "Blue": 0,
+        "Purple": 0,
+        "Green": 0,
+        "Yellow": 2,
+        "Pink": 2,
+        "Red": 2,
+        "Teal": 3,
+        "Indigo": 3,
+        "Lime": 2,
+        "Cyan": 2,
+        "Orange": 3,
+        "Custom": 10
+      },
+      "finish": {
+        "Matte": 0,
+        "Glossy": 4,
+        "Satin": 5,
+        "Metallic": 12,
+        "Pearl": 9,
+        "Textured": 6,
+        "Carbon Fiber": 18,
+        "Soft Touch": 7,
+  "Custom Finish": 25
+      },
+      "text_size": {
+        "Small (10px)": 0,
+        "Medium (14px)": 2,
+        "Large (18px)": 4,
+        "Extra Large (24px)": 6
+      }
+    }
   }
 }
