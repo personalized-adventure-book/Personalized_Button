@@ -331,19 +331,25 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
       if (Array.isArray(list) && list.length) {
         // Probe candidate base paths (resolved + root) to pick a working one
         const candidates = Array.from(new Set([resolveBasePath(), '']));
-        let chosen = candidates[0];
-        for (const cand of candidates) {
-          if (cand === '' && chosen === '') break;
-          const testUrl = `${cand || ''}/content/Song/Audios/gallery/${langFolder}/${list[0]}`.replace(/\\+/g,'/');
-          try {
-            const r = await fetch(testUrl, { method: 'HEAD' });
-            if (r.ok) { chosen = cand; break; }
-          } catch { /* try next */ }
+        const dirCasing = ['Audios','audios','Audio','AUDIO'];
+        let chosen = '';
+        const attempts: any[] = [];
+        outer: for (const cand of candidates) {
+          for (const dc of dirCasing) {
+            const testUrl = `${cand || ''}/content/Song/${dc}/gallery/${langFolder}/${list[0]}`.replace(/\+/g,'/');
+            try {
+              const r = await fetch(testUrl, { method: 'HEAD' });
+              attempts.push({ testUrl, ok: r.ok });
+              if (r.ok) { chosen = cand; (window as any).__AUDIO_DIR_CASING__ = dc; break outer; }
+            } catch (e) { attempts.push({ testUrl, ok: false, error: (e as any)?.message }); }
+          }
         }
+        if (!(window as any).__AUDIO_DIR_CASING__) (window as any).__AUDIO_DIR_CASING__ = 'Audios';
         if (typeof window !== 'undefined') {
-          try { (window as any).__AUDIO_BASE_CHOSEN__ = chosen; } catch {}
+          try { (window as any).__AUDIO_BASE_CHOSEN__ = chosen; (window as any).__AUDIO_DEBUG__ = attempts; } catch {}
         }
-        return list.slice(0, max).map(name => ({ name, path: `${chosen || ''}/content/Song/Audios/gallery/${langFolder}/${name}` }));
+        const dirChosen = (window as any).__AUDIO_DIR_CASING__ || 'Audios';
+        return list.slice(0, max).map(name => ({ name, path: `${chosen || ''}/content/Song/${dirChosen}/gallery/${langFolder}/${name}` }));
       }
     }
   } catch (e) {
@@ -358,7 +364,8 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
     for (const ext of ['.mp3', '.wav', '.wov']) {
       const name = `song_gallery_${num}${ext}`;
   const dynamicBase = (typeof window !== 'undefined' && (window as any).__AUDIO_BASE_CHOSEN__) || resolveBasePath();
-  const path = `${dynamicBase || ''}/content/Song/Audios/gallery/${langFolder}/${name}`;
+  const dirChosen = (typeof window !== 'undefined' && (window as any).__AUDIO_DIR_CASING__) || 'Audios';
+  const path = `${dynamicBase || ''}/content/Song/${dirChosen}/gallery/${langFolder}/${name}`;
       try { if (await audioExists(path)) { files.push({ name, path }); break; } } catch {}
     }
   }
