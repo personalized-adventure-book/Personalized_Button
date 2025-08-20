@@ -1,0 +1,38 @@
+{
+  "Song": {
+    "gallery": {
+      "ar": [
+        "song_gallery_01.wav",
+        "song_gallery_02.wav",
+        "song_gallery_03.wav",
+        "song_gallery_04.wav",
+        "song_gallery_05.wav",
+        "song_gallery_06.wav"
+      ],
+      "en": [
+        "song_gallery_01.wav",
+        "song_gallery_02.wav",
+        "song_gallery_03.wav",
+        "song_gallery_04.wav",
+        "song_gallery_05.wav",
+        "song_gallery_06.wav"
+      ],
+      "fr": [
+        "song_gallery_01.wav",
+        "song_gallery_02.wav",
+        "song_gallery_03.wav",
+        "song_gallery_04.wav",
+        "song_gallery_05.wav",
+        "song_gallery_06.wav"
+      ],
+      "it": [
+        "song_gallery_01.wav",
+        "song_gallery_02.wav",
+        "song_gallery_03.wav",
+        "song_gallery_04.wav",
+        "song_gallery_05.wav",
+        "song_gallery_06.wav"
+      ]
+    }
+  }
+}
