@@ -5,12 +5,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { LocalContentData } from '@/hooks/useLocalContent';
 import { Check, ArrowRight, Sparkles, User, Book, Heart, Rocket, TreePine, Crown, Anchor, Zap, Palette, Music, Gift, Star, Camera, Globe2 } from 'lucide-react';
-import { getHeroImage, imageExistsWithFallback, getCurrentProduct, getCurrentLanguage, getFallbackImagePath, getAllImagesInFolder, getRecommendedImageCounts } from '@/utils/productAssets';
-import SongGallery from '@/components/SongGallery';
+import { getGalleryImages, getHeroImage, imageExists, imageExistsWithFallback, getCurrentProduct, getCurrentLanguage, getFallbackImagePath, getAllImagesInFolder, getRecommendedImageCounts, getGalleryAudios } from '@/utils/productAssets';
+import { getGlobalAudio } from '@/utils/globalAudio';
+import { getPlaybackState, setPlaybackState } from '@/utils/globalPlayback';
+import comprehensiveTracker from '@/utils/comprehensiveTracker';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Helper function to get proper icons for features and adventures
 function getFeatureIcon(iconName?: string, index: number = 0) {
+  // Base colored icon components
   const iconMap: Record<string, React.ReactNode> = {
     person: <User className="w-8 h-8 text-blue-500 dark:text-blue-400" />,
     book: <Book className="w-8 h-8 text-amber-500 dark:text-amber-400" />,
@@ -21,20 +24,25 @@ function getFeatureIcon(iconName?: string, index: number = 0) {
     anchor: <Anchor className="w-8 h-8 text-slate-500 dark:text-slate-400" />,
     bolt: <Zap className="w-8 h-8 text-orange-500 dark:text-orange-400" />
   };
+
+  // Rotating fallback sequence for items without explicit icon field
   const rotation: string[] = ['rocket','heart','tree','crown','bolt','person','book','anchor'];
   const chosenKey = iconName && iconMap[iconName] ? iconName : rotation[index % rotation.length];
   return iconMap[chosenKey] || <Sparkles className="w-8 h-8 text-violet-500 dark:text-violet-400" />;
 }
+
+// Separate icon set for THEMES (examples) to avoid visual duplication with features
 function getThemeIcon(index: number) {
+  // Distinct themed icons (avoid overlap with feature set where possible)
   const themeIcons: React.ReactNode[] = [
-    <Music className="w-8 h-8 text-fuchsia-500 dark:text-fuchsia-400" />,
-    <Palette className="w-8 h-8 text-emerald-600 dark:text-emerald-500" />,
-    <Gift className="w-8 h-8 text-amber-500 dark:text-amber-400" />,
-    <Star className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />,
-    <Camera className="w-8 h-8 text-rose-500 dark:text-rose-400" />,
-    <Anchor className="w-8 h-8 text-sky-500 dark:text-sky-400" />,
-    <Globe2 className="w-8 h-8 text-teal-500 dark:text-teal-400" />,
-    <Sparkles className="w-8 h-8 text-violet-500 dark:text-violet-400" />
+    <Music className="w-8 h-8 text-fuchsia-500 dark:text-fuchsia-400" />,   // sound / mood
+    <Palette className="w-8 h-8 text-emerald-600 dark:text-emerald-500" />, // colors / style
+    <Gift className="w-8 h-8 text-amber-500 dark:text-amber-400" />,        // occasion
+    <Star className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />,      // highlight
+    <Camera className="w-8 h-8 text-rose-500 dark:text-rose-400" />,        // imagery / vibe
+    <Anchor className="w-8 h-8 text-sky-500 dark:text-sky-400" />,          // connection / grounded
+    <Globe2 className="w-8 h-8 text-teal-500 dark:text-teal-400" />,        // global / versatile
+    <Sparkles className="w-8 h-8 text-violet-500 dark:text-violet-400" />   // magic / creative
   ];
   return themeIcons[index % themeIcons.length];
 }
@@ -47,151 +55,203 @@ interface DynamicSectionRendererProps {
   renderFormSection?: React.ReactNode;
 }
 
+// Generic section renderer that can handle any section type
 export function DynamicSectionRenderer({ data, onStartCustomizing, debug = false, sectionsToRender, renderFormSection }: DynamicSectionRendererProps) {
   const { t } = useLanguage();
+  
+  // Define the order of sections we want to display
   const sectionOrder = [
-    'urgency_banner','gallery','hero','demo_video','about','features','adventure_possibilities','book_examples','examples','how_it_works','why_people_love_it','pricing','book_options','testimonials','faq','cta'
+    'urgency_banner',
+    'gallery',
+    'hero',
+    'demo_video',
+  'about',
+  'features', 
+    'adventure_possibilities',
+    'book_examples',
+    'examples',
+    'how_it_works',
+    'why_people_love_it',
+    'pricing',
+    'book_options',
+    'testimonials',
+    'faq',
+    'cta'
   ];
+
+  // Use custom sections if provided, otherwise use default order
   const sectionsToProcess = sectionsToRender || sectionOrder;
+
+  // Get available sections (check both root level and homepage level)
   const availableSections = sectionsToProcess.filter(sectionKey => {
     const currentProduct = getCurrentProduct();
-    if ((sectionKey === 'gallery' || sectionKey === 'demo_video') && currentProduct === 'Button') return true;
+    
+    // Always include gallery and demo_video for Button products
+    if ((sectionKey === 'gallery' || sectionKey === 'demo_video') && currentProduct === 'Button') {
+      return true;
+    }
+    
     return data[sectionKey] || (data.homepage && data.homepage[sectionKey]);
   });
+
+  // Get all sections (both available and debugging)
   const allSections = debug ? sectionsToProcess : availableSections;
-  return (
+
+  // Debug function to analyze data structure
+  const getDataStructure = () => {
+    const structure: Record<string, string> = {};
+    Object.keys(data).forEach(key => {
+      if (data[key] && key !== 'homepage' && key !== 'form') {
+        structure[key] = Array.isArray(data[key]) ? `Array[${data[key].length}]` : typeof data[key];
+      }
+    });
+    
+    // Also check homepage structure
+    if (data.homepage) {
+      Object.keys(data.homepage).forEach(key => {
+        if (data.homepage && data.homepage[key]) {
+          structure[`homepage.${key}`] = Array.isArray(data.homepage[key]) ? `Array[${data.homepage[key].length}]` : typeof data.homepage[key];
+        }
+      });
+    }
+    
+    return structure;
+  };  return (
     <main className="relative main-content-with-header">
       {allSections.map((sectionKey, index) => {
-        if (sectionKey === 'form' && renderFormSection) return <React.Fragment key="form-section">{renderFormSection}</React.Fragment>;
+        if (sectionKey === 'form' && renderFormSection) {
+          return <React.Fragment key="form-section">{renderFormSection}</React.Fragment>;
+        }
+        // Try to get section data from both root level and homepage level
         const sectionData = data[sectionKey] || (data.homepage && data.homepage[sectionKey]);
+        // Some sections (like demo_video) don't require data from content files
         const sectionsWithoutData = ['demo_video'];
         const requiresData = !sectionsWithoutData.includes(sectionKey);
-        if (requiresData && !sectionData && sectionKey !== 'gallery') return null;
-        const persistentSections = ['gallery','demo_video','hero','faq','about','pricing','testimonials','cta','how_it_works','why_people_love_it','features','examples','book_examples','adventure_possibilities'];
+        if (requiresData && !sectionData) return null;
+        // Use a stable key for persistent sections like gallery to prevent remounting
+        const persistentSections = ['gallery', 'demo_video', 'hero', 'faq', 'about', 'pricing', 'testimonials', 'cta', 'how_it_works', 'why_people_love_it', 'features', 'examples', 'book_examples', 'adventure_possibilities'];
         const stableKey = persistentSections.includes(sectionKey) ? sectionKey : `${sectionKey}-${index}`;
         return (
-          <DynamicSection key={stableKey} sectionKey={sectionKey} sectionData={sectionData} onStartCustomizing={onStartCustomizing} index={index} t={t} />
+          <DynamicSection
+            key={stableKey}
+            sectionKey={sectionKey}
+            sectionData={sectionData}
+            onStartCustomizing={onStartCustomizing}
+            index={index}
+            t={t}
+          />
         );
       })}
     </main>
   );
 }
 
-interface DynamicSectionProps { sectionKey: string; sectionData: any; onStartCustomizing: () => void; index: number; t: (k: string)=>string }
+interface DynamicSectionProps {
+  sectionKey: string;
+  sectionData: any;
+  onStartCustomizing: () => void;
+  index: number;
+  t: (key: string) => string;
+}
+
 function DynamicSection({ sectionKey, sectionData, onStartCustomizing, index, t }: DynamicSectionProps) {
   const isEven = index % 2 === 0;
   const bgClass = isEven ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800';
-  if (sectionKey === 'hero') return <HeroSection data={sectionData} onStartCustomizing={onStartCustomizing} t={t} />;
-  if (sectionKey === 'urgency_banner') return <UrgencyBannerSection data={sectionData} />;
-  if (sectionKey === 'gallery') {
-    const currentProduct = getCurrentProduct();
-    if (currentProduct === 'Song') return <SongGallery title={sectionData?.title || 'Audio Samples'} subtitle={sectionData?.subtitle || 'Tap to play / pause'} />;
-    if (currentProduct === 'Button') {
-      const defaultGalleryData = sectionData || { title: 'Button Gallery', subtitle: 'Explore our collection of beautiful custom buttons - scroll horizontally to see more!' };
-      return <ImageGallerySection data={defaultGalleryData} t={t} />;
-    }
-    if (sectionData) return <ImageGallerySection data={sectionData} t={t} />;
-    return null;
-  }
-  if (sectionKey === 'demo_video') {
-    const currentProduct = getCurrentProduct();
-    if (currentProduct === 'Button') return <DemoVideoSection t={t} />;
-    return null;
-  }
-  if (sectionKey === 'features' && sectionData) return <FeaturesSection data={sectionData} />;
-  if ((sectionKey === 'examples' || sectionKey === 'book_examples') && sectionData) return <ExamplesSection data={sectionData} />;
-  if (sectionKey === 'adventure_possibilities' && sectionData) return <AdventurePossibilitiesSection data={sectionData} />;
-  if (sectionKey === 'how_it_works' && sectionData) return <HowItWorksSection data={sectionData} t={t} />;
-  if ((sectionKey === 'pricing' || sectionKey === 'book_options') && sectionData) return <PricingSection data={sectionData} onStartCustomizing={onStartCustomizing} />;
-  if (sectionKey === 'why_people_love_it' && sectionData) return <WhyPeopleLoveItSection data={sectionData} />;
-  if (sectionKey === 'testimonials' && sectionData) return <TestimonialsSection data={sectionData} />;
-  if (sectionKey === 'faq' && Array.isArray(sectionData)) return <FaqSection data={sectionData} />;
-  if (sectionKey === 'cta' && sectionData) return <CtaSection data={sectionData} onStartCustomizing={onStartCustomizing} t={t} />;
-  if (sectionKey === 'about' && sectionData) return <AboutSection data={sectionData} bgClass={bgClass} />;
-  return <GenericSection sectionKey={sectionKey} data={sectionData} bgClass={bgClass} />;
-}
 
-// ================= IMAGE GALLERY (non-Song) =================
-const ImageGallerySection = React.memo(function ImageGallerySection({ data, t }: { data: any; t: (k: string)=>string }) {
-  const [discoveredImages, setDiscoveredImages] = useState<string[]>([]);
-  const [imageStatuses, setImageStatuses] = useState<{ [key: string]: { exists: boolean; path: string } }>({});
-  const [isLoading, setIsLoading] = useState(true);
-  const currentProduct = React.useMemo(() => getCurrentProduct(), []);
-  const currentLanguage = React.useMemo(() => getCurrentLanguage(), []);
-  const recommendations = getRecommendedImageCounts('gallery');
-  useEffect(() => {
-    const discoverImages = async () => {
-      setIsLoading(true);
-      try {
-        const allImages = await getAllImagesInFolder('gallery', currentProduct, currentLanguage);
-        setDiscoveredImages(allImages);
-        const statuses: { [key: string]: { exists: boolean; path: string } } = {};
-        for (const imageName of allImages) {
-          const result = await imageExistsWithFallback(imageName, 'gallery', currentProduct, currentLanguage);
-          statuses[imageName] = result;
-        }
-        setImageStatuses(statuses);
-      } catch (e) {
-        console.error('Error discovering gallery images', e);
-      } finally {
-        setIsLoading(false);
+  // Special handling for hero section (no wrapper needed)
+  if (sectionKey === 'hero') {
+    return <HeroSection data={sectionData} onStartCustomizing={onStartCustomizing} t={t} />;
+  }
+
+  // Special handling for urgency banner (fixed at top)
+  if (sectionKey === 'urgency_banner') {
+    return <UrgencyBannerSection data={sectionData} />;
+  }
+
+  // Wrap all other sections without animation
+  const SectionContent = () => {
+    // Special handling for features (array or object)
+    if (sectionKey === 'features' && sectionData) {
+      return <FeaturesSection data={sectionData} />;
+    }
+
+    // Special handling for examples/book_examples
+    if ((sectionKey === 'examples' || sectionKey === 'book_examples') && sectionData) {
+      return <ExamplesSection data={sectionData} />;
+    }
+
+    // Special handling for adventure_possibilities
+    if (sectionKey === 'adventure_possibilities' && sectionData) {
+      return <AdventurePossibilitiesSection data={sectionData} />;
+    }
+
+    // Special handling for how_it_works
+    if (sectionKey === 'how_it_works' && sectionData) {
+      return <HowItWorksSection data={sectionData} t={t} />;
+    }
+
+    // Special handling for pricing/book_options
+    if ((sectionKey === 'pricing' || sectionKey === 'book_options') && sectionData) {
+      return <PricingSection data={sectionData} onStartCustomizing={onStartCustomizing} />;
+    }
+
+    // Special handling for gallery - ALWAYS show for Button products
+    if (sectionKey === 'gallery') {
+      const currentProduct = getCurrentProduct();
+      if (currentProduct === 'Button') {
+        // Always show the gallery section for Button products, even if no data
+        const defaultGalleryData = sectionData || { 
+          title: 'Button Gallery', 
+          subtitle: 'Explore our collection of beautiful custom buttons - scroll horizontally to see more!' 
+        };
+        return <GallerySection data={defaultGalleryData} t={t} />;
+      } else if (sectionData) {
+        return <GallerySection data={sectionData} t={t} />;
       }
-    };
-    discoverImages();
-  }, [currentProduct, currentLanguage]);
-  return (
-    <section id="gallery" className="py-12 bg-gray-50 dark:bg-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">{data.title || 'Gallery'}</h2>
-          {data.subtitle && <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{data.subtitle}</p>}
-        </div>
-        {isLoading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-400">Discovering gallery images...</p>
-          </div>
-        ) : discoveredImages.length > 0 ? (
-          <>
-            <div className="relative">
-              <div className="overflow-x-auto scrollbar-hide">
-                <div className="flex gap-6 pb-4" style={{ width: 'max-content' }}>
-                  {discoveredImages.map((imageName: string, index: number) => {
-                    const imageStatus = imageStatuses[imageName];
-                    return (
-                      <div key={`${currentLanguage}-${imageName}-${index}`} className="group relative bg-gray-200 dark:bg-gray-700 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-105 flex-shrink-0" style={{ width: '200px', height: '200px' }}>
-                        {imageStatus?.exists ? (
-                          <Image src={`${imageStatus.path}?lang=${currentLanguage}&t=${Date.now()}`} alt={`Gallery image ${index + 1}`} fill className="object-cover" sizes="200px" />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center text-center p-4 text-gray-500 dark:text-gray-400 text-sm">
-                            {imageName}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </>
-        ) : (
-          <div className="text-center py-16 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl">
-            <div className="text-6xl mb-4">📸</div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{data.no_images?.title || 'No Gallery Images Found'}</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">{data.no_images?.subtitle || 'Add images to start building your gallery'}</p>
-            <div className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
-              <p>💡 {data.no_images?.instructions || 'Add images to these folders'}:</p>
-              <p className="font-mono bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded">/public/{currentProduct}/gallery/{currentLanguage}/</p>
-              <p className="font-mono bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded">/public/{currentProduct}/gallery/ (fallback)</p>
-              <p className="mt-2 text-xs">{recommendations.description}</p>
-            </div>
-          </div>
-        )}
-        <div className="text-center mt-12"><p className="text-gray-600 dark:text-gray-400">{t('gallery.loveWhatYouSee')}</p></div>
-      </div>
-    </section>
-  );
-});
+      return null;
+    }
+
+    // Special handling for demo_video - ALWAYS show for Button products
+    if (sectionKey === 'demo_video') {
+      const currentProduct = getCurrentProduct();
+      if (currentProduct === 'Button') {
+        return <DemoVideoSection t={t} />;
+      }
+      return null;
+    }
+
+    // Special handling for why_people_love_it
+    if (sectionKey === 'why_people_love_it' && sectionData) {
+      return <WhyPeopleLoveItSection data={sectionData} />;
+    }
+
+    // Special handling for testimonials
+    if (sectionKey === 'testimonials' && sectionData) {
+      return <TestimonialsSection data={sectionData} />;
+    }
+
+    // Special handling for FAQ
+    if (sectionKey === 'faq' && Array.isArray(sectionData)) {
+      return <FaqSection data={sectionData} />;
+    }
+
+    // Special handling for CTA
+    if (sectionKey === 'cta' && sectionData) {
+      return <CtaSection data={sectionData} onStartCustomizing={onStartCustomizing} t={t} />;
+    }
+
+    // Special handling for About section
+    if (sectionKey === 'about' && sectionData) {
+      return <AboutSection data={sectionData} bgClass={bgClass} />;
+    }
+
+    // Generic section handler for any other section type
+    return <GenericSection sectionKey={sectionKey} data={sectionData} bgClass={bgClass} />;
+  };
+
+  // Return the section without animation wrapper
+  return <SectionContent />;
+}
 
 // Hero Section Component
 function HeroSection({ data, onStartCustomizing, t }: { data: any; onStartCustomizing?: () => void; t: (key: string) => string }) {
@@ -986,7 +1046,630 @@ function UrgencyBannerSection({ data }: { data: any }) {
   );
 }
 
-// (Removed legacy GallerySection with audio logic; Song product now uses separate SongGallery component.)
+// Gallery Section Component (Images for most products, Audio grid for Song)
+const GallerySection = React.memo(function GallerySection({ data, t }: { data: any; t: (key: string) => string }) {
+  const [discoveredImages, setDiscoveredImages] = useState<string[]>([]);
+  const [imageStatuses, setImageStatuses] = useState<{ [key: string]: { exists: boolean; path: string } }>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [audioSources, setAudioSources] = useState<string[]>([]);
+  const initialPlayback = typeof window !== 'undefined' ? getPlaybackState() : { index: null } as any;
+  const [playingIndex, setPlayingIndex] = useState<number | null>(initialPlayback.index);
+  const [durations, setDurations] = useState<number[]>([]);
+  const [positions, setPositions] = useState<number[]>([]);
+  // force re-render on timeUpdate without coupling to playingIndex
+  const [, setTick] = useState<number>(0);
+  const rafRef = React.useRef<number | null>(null);
+  // Single global audio element (not recreated on re-renders)
+  const globalAudioRef = React.useRef<HTMLAudioElement | null>(null);
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !globalAudioRef.current) {
+      globalAudioRef.current = getGlobalAudio();
+      const el = globalAudioRef.current;
+      if (el) {
+        const handleEnded = () => {
+          if (playingIndex != null) {
+            const idx = playingIndex;
+            setPlayingIndex(null);
+            try {
+              const baseName = extractBaseName(audioSources[idx]);
+              comprehensiveTracker.trackAudioEnd(idx, baseName, el.duration || durations[idx] || 0);
+            } catch {}
+          }
+        };
+        const handleLoaded = () => {
+          if (playingIndex != null) {
+            const d = el.duration;
+            setDurations(ds => {
+              if (ds[playingIndex] === d) return ds;
+              const next = [...ds];
+              next[playingIndex] = d;
+              return next;
+            });
+            setTick(t => t + 1);
+          }
+        };
+        const handleTime = () => {
+          if (playingIndex != null) {
+            setTick(t => t + 1);
+            try { setPlaybackState({ time: el.currentTime, index: playingIndex, baseName: extractBaseName(audioSources[playingIndex]) }); } catch {}
+            setPositions(prev => {
+              const length = audioSources.length;
+              if (!length) return prev;
+              const next = prev.length === length ? [...prev] : Array(length).fill(0);
+              next[playingIndex] = el.currentTime || 0;
+              return next;
+            });
+          }
+        };
+        // Extra: requestAnimationFrame loop for smoother progress (timeupdate can be sparse)
+        const startRaf = () => {
+          if (rafRef.current != null) return;
+          const loop = () => {
+            if (el && !el.paused && playingIndex != null) {
+              setTick(t => t + 1);
+              try { setPlaybackState({ time: el.currentTime, index: playingIndex, baseName: extractBaseName(audioSources[playingIndex]) }); } catch {}
+              setPositions(prev => {
+                if (playingIndex == null) return prev;
+                const length = audioSources.length;
+                const next = prev.length === length ? [...prev] : Array(length).fill(0);
+                next[playingIndex] = el.currentTime || 0;
+                return next;
+              });
+              rafRef.current = requestAnimationFrame(loop);
+            } else {
+              rafRef.current = null;
+            }
+          };
+          rafRef.current = requestAnimationFrame(loop);
+        };
+        const handlePlay = () => { startRaf(); };
+        el.addEventListener('play', handlePlay);
+        el.addEventListener('pause', () => { if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; } });
+        // If already playing when mounted
+        if (!el.paused) startRaf();
+        el.addEventListener('ended', handleEnded);
+        el.addEventListener('loadedmetadata', handleLoaded);
+        el.addEventListener('timeupdate', handleTime);
+        return () => {
+          el.removeEventListener('ended', handleEnded);
+          el.removeEventListener('loadedmetadata', handleLoaded);
+          el.removeEventListener('timeupdate', handleTime);
+          el.removeEventListener('play', handlePlay);
+          if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
+        };
+      }
+    }
+  }, [playingIndex, audioSources, durations]);
+
+  // (interval updater moved below after isSong is defined)
+  const currentProduct = React.useMemo(() => getCurrentProduct(), []);
+  const currentLanguage = React.useMemo(() => getCurrentLanguage(), []);
+  const isSong = currentProduct === 'Song';
+  // Fallback interval updater (ensures UI ticks even if timeupdate sparse or RAF throttled)
+  useEffect(() => {
+    if (!isSong) return;
+    const el = globalAudioRef.current;
+    if (!el) return;
+    let interval: number | null = null;
+    if (playingIndex != null) {
+      interval = window.setInterval(() => {
+        if (!el.paused) {
+          setTick(t => t + 1);
+          setPositions(prev => {
+            const len = audioSources.length;
+            if (!len) return prev;
+            const next = prev.length === len ? [...prev] : Array(len).fill(0);
+            next[playingIndex] = el.currentTime || 0;
+            return next;
+          });
+          try { setPlaybackState({ time: el.currentTime, index: playingIndex, baseName: extractBaseName(audioSources[playingIndex]) }); } catch {}
+        }
+      }, 300);
+    }
+    return () => { if (interval) window.clearInterval(interval); };
+  }, [playingIndex, isSong, audioSources]);
+  const horizontalRef = React.useRef<HTMLDivElement | null>(null);
+  const lastScrollPercentRef = React.useRef<number>(-1);
+  const lastScrollTrackTs = React.useRef<number>(0);
+
+  // Discover images (non Song)
+  useEffect(() => {
+    if (isSong) return;
+    const discoverImages = async () => {
+      setIsLoading(true);
+      try {
+        const allImages = await getAllImagesInFolder('gallery', currentProduct, currentLanguage);
+        setDiscoveredImages(allImages);
+        const statuses: { [key: string]: { exists: boolean; path: string } } = {};
+        for (const imageName of allImages) {
+          const result = await imageExistsWithFallback(imageName, 'gallery', currentProduct, currentLanguage);
+          statuses[imageName] = result;
+        }
+        setImageStatuses(statuses);
+      } catch (e) {
+        console.error('Error discovering gallery images', e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    discoverImages();
+  }, [currentProduct, currentLanguage, isSong]);
+
+  // Discover audios (Song)
+  useEffect(() => {
+    if (!isSong) return;
+    const loadAudios = async () => {
+      setIsLoading(true);
+      try {
+  const audios = await getGalleryAudios(24, currentProduct, currentLanguage);
+  setAudioSources(audios);
+  setDurations(prev => audios.length !== prev.length ? Array(audios.length).fill(0) : prev);
+  setPositions(prev => audios.length !== prev.length ? Array(audios.length).fill(0) : prev);
+      } catch (e) {
+        console.error('Error loading gallery audios', e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadAudios();
+  }, [currentProduct, currentLanguage, isSong]);
+
+  // Prefetch metadata with a small concurrency limit to avoid many parallel network requests (faster first paint)
+  useEffect(() => {
+    if (!isSong) return;
+    if (!audioSources.length) return;
+    // Limit initial batch (e.g., first 6) then expand after user interaction/visibility
+    const INITIAL_BATCH = 6;
+    const CONCURRENCY = 3;
+    let active = 0;
+    let index = 0;
+    let cancelled = false;
+    const queue: HTMLAudioElement[] = [];
+    let expanded = false;
+
+    const targetCountRef = { current: Math.min(INITIAL_BATCH, audioSources.length) } as { current: number };
+
+    const launchNext = () => {
+      if (cancelled) return;
+      while (active < CONCURRENCY && index < targetCountRef.current) {
+        const i = index++;
+        if (durations[i]) continue;
+        try {
+          const el = document.createElement('audio');
+          el.preload = 'metadata';
+          el.src = audioSources[i];
+          queue.push(el);
+          active++;
+          const done = () => {
+            if (!cancelled) {
+              if (!isNaN(el.duration) && el.duration > 0) {
+                setDurations(prev => {
+                  if (prev[i]) return prev;
+                  const next = [...prev];
+                  next[i] = el.duration;
+                  return next;
+                });
+              }
+            }
+            el.removeEventListener('loadedmetadata', done);
+            el.removeEventListener('error', done);
+            active--;
+            launchNext();
+          };
+          el.addEventListener('loadedmetadata', done);
+          el.addEventListener('error', done);
+        } catch {
+          active--;
+        }
+      }
+    };
+
+    const expand = () => {
+      if (expanded) return;
+      expanded = true;
+      targetCountRef.current = audioSources.length; // fetch rest
+      launchNext();
+    };
+
+    // Expand on first horizontal scroll or after 4s idle whichever comes first
+    const scrollEl = horizontalRef.current;
+    const onScrollOnce = () => { expand(); scrollEl && scrollEl.removeEventListener('scroll', onScrollOnce); };
+    scrollEl && scrollEl.addEventListener('scroll', onScrollOnce, { passive: true });
+    const timeoutId = window.setTimeout(expand, 4000);
+
+    // Also expand when gallery section enters viewport (IntersectionObserver)
+    const sectionEl = scrollEl; // same container is fine
+    let observer: IntersectionObserver | null = null;
+    if (sectionEl && 'IntersectionObserver' in window) {
+      observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            expand();
+            observer && observer.disconnect();
+          }
+        });
+      }, { threshold: 0.15 });
+      observer.observe(sectionEl);
+    }
+
+    launchNext();
+    return () => {
+      cancelled = true;
+      queue.forEach(a => { try { a.src = ''; } catch {} });
+      scrollEl && scrollEl.removeEventListener('scroll', onScrollOnce);
+      window.clearTimeout(timeoutId);
+      observer && observer.disconnect();
+    };
+  }, [isSong, audioSources, durations]);
+
+  // ===================== PERSIST / RESTORE PLAYBACK =====================
+  const RESTORE_KEY = 'gallery_audio_state_v1';
+  const restoreAttemptedRef = React.useRef(false);
+
+  // On unmount store current playing audio (if any)
+  useEffect(() => {
+    return () => {
+      try {
+        if (playingIndex != null) {
+          const el = globalAudioRef.current;
+          if (el) {
+            const baseName = extractBaseName(audioSources[playingIndex]);
+            sessionStorage.setItem(RESTORE_KEY, JSON.stringify({ baseName, time: el.currentTime || 0, ts: Date.now() }));
+          }
+        } else {
+          sessionStorage.removeItem(RESTORE_KEY);
+        }
+      } catch {}
+    };
+  }, [playingIndex, audioSources]);
+
+  // After audios load, attempt restore once
+  useEffect(() => {
+    if (!isSong) return;
+    if (!audioSources.length) return;
+    if (restoreAttemptedRef.current) return;
+    restoreAttemptedRef.current = true;
+    try {
+      const raw = sessionStorage.getItem(RESTORE_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw) as { baseName: string; time: number; ts: number };
+      // Ignore very old sessions (> 30 min)
+      if (Date.now() - data.ts > 30 * 60 * 1000) { sessionStorage.removeItem(RESTORE_KEY); return; }
+      const idx = audioSources.findIndex(src => extractBaseName(src) === data.baseName);
+      if (idx === -1) return;
+  const el = globalAudioRef.current;
+      if (el) {
+        const applyAndPlay = () => {
+          try { el.currentTime = Math.min(data.time, el.duration || data.time); } catch {}
+          const playAttempt = el.play();
+          if (playAttempt && typeof playAttempt.then === 'function') {
+            playAttempt.then(() => {
+              setPlayingIndex(idx);
+              try { comprehensiveTracker.trackAudioPlay(idx, data.baseName, el.duration || durations[idx] || 0); } catch {}
+            }).catch(() => {});
+          } else {
+            setPlayingIndex(idx);
+          }
+        };
+        if (el.readyState >= 1) {
+          applyAndPlay();
+        } else {
+          el.addEventListener('loadedmetadata', applyAndPlay, { once: true });
+        }
+      }
+    } catch {}
+  }, [audioSources, isSong, durations]);
+
+  const recommendations = getRecommendedImageCounts('gallery');
+
+  const togglePlay = (index: number) => {
+    const el = globalAudioRef.current;
+    if (!el) return;
+    const targetSrc = audioSources[index];
+    // Determine if current element already has this exact track loaded
+    const currentPath = (() => { try { const u = new URL(el.src); return u.pathname; } catch { return el.src; } })();
+    const targetPath = targetSrc; // targetSrc already a path starting with /
+    const sameTrackLoaded = currentPath.endsWith(targetPath);
+    // Only set src when actually different to avoid resetting currentTime & metadata
+    if (!sameTrackLoaded) {
+      try { el.src = targetSrc; } catch {}
+    }
+    // If resuming same paused track, seek to saved time
+    try {
+      const saved = getPlaybackState();
+      if (saved.index === index && saved.time > 0) {
+        // Only apply seek if either we reloaded src or element currentTime is behind saved by >0.25s
+        if (!sameTrackLoaded || Math.abs((el.currentTime || 0) - saved.time) > 0.25) {
+          try { el.currentTime = saved.time; } catch {}
+        }
+      }
+    } catch {}
+    // If same index and currently playing -> pause (preserve time & index)
+    if (playingIndex === index && !el.paused) {
+      el.pause();
+      requestAnimationFrame(() => {
+        if (el.paused) {
+          const baseName = extractBaseName(audioSources[index]);
+          try { setPlaybackState({ index, baseName, time: el.currentTime || 0 }); } catch {}
+          setPlayingIndex(null);
+          try {
+            comprehensiveTracker.trackAudioPause(index, baseName, el.duration || durations[index] || 0, el.currentTime);
+          } catch {}
+        }
+      });
+      return;
+    }
+  // Single element: just play (resume or start)
+    const playAttempt = el.play();
+    if (playAttempt && typeof playAttempt.then === 'function') {
+      playAttempt.then(() => {
+        if (!el.paused) {
+          setPlayingIndex(index);
+          setPlaybackState({ index, baseName: extractBaseName(audioSources[index]), time: el.currentTime || 0 });
+          try {
+            const baseName = extractBaseName(audioSources[index]);
+            comprehensiveTracker.trackAudioPlay(index, baseName, el.duration || durations[index] || 0);
+            // Persist immediately so navigation right after play can restore
+            try { sessionStorage.setItem(RESTORE_KEY, JSON.stringify({ baseName, time: el.currentTime || 0, ts: Date.now() })); } catch {}
+          } catch {}
+        }
+      }).catch(() => { /* autoplay prevented or error */ });
+    } else {
+      if (!el.paused) {
+        setPlayingIndex(index);
+        setPlaybackState({ index, baseName: extractBaseName(audioSources[index]), time: el.currentTime || 0 });
+        try {
+          const baseName = extractBaseName(audioSources[index]);
+          comprehensiveTracker.trackAudioPlay(index, baseName, el.duration || durations[index] || 0);
+          try { sessionStorage.setItem(RESTORE_KEY, JSON.stringify({ baseName, time: el.currentTime || 0, ts: Date.now() })); } catch {}
+        } catch {}
+      }
+    }
+  };
+
+  const extractBaseName = (url: string): string => {
+    try {
+      const u = new URL(url, typeof window !== 'undefined' ? window.location.origin : 'http://localhost');
+      // Legacy (API) mode used ?file= param
+      const qp = u.searchParams.get('file');
+      if (qp) return qp.toString();
+      // Static mode: derive from pathname
+      const segs = u.pathname.split('/').filter(Boolean);
+      const last = segs[segs.length - 1] || '';
+      return last.replace(/\.[a-zA-Z0-9]+$/, '');
+    } catch { return ''; }
+  };
+
+  const handleHorizontalScroll = () => {
+    const el = horizontalRef.current;
+    if (!el) return;
+    const now = Date.now();
+    const totalScrollable = el.scrollWidth - el.clientWidth;
+    if (totalScrollable <= 0) return;
+    const percent = Math.round((el.scrollLeft / totalScrollable) * 100);
+    // Only track meaningful changes (>=5%) and throttle to 1 event / 750ms
+    if (Math.abs(percent - lastScrollPercentRef.current) >= 5 && now - lastScrollTrackTs.current > 750) {
+      lastScrollPercentRef.current = percent;
+      lastScrollTrackTs.current = now;
+      try {
+  comprehensiveTracker.trackAudioGalleryScroll(percent);
+      } catch {}
+    }
+  };
+
+  return (
+    <section id="gallery" className="py-12 bg-gray-50 dark:bg-gray-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            {data.title || (isSong ? 'Audio Samples' : 'Gallery')}
+          </h2>
+          {data.subtitle && (
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{data.subtitle}</p>
+          )}
+        </div>
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">{isSong ? 'Loading audio samples...' : 'Discovering gallery images...'}</p>
+          </div>
+        ) : isSong ? (
+          audioSources.length > 0 ? (
+            <div className="relative">
+              <div ref={horizontalRef} onScroll={handleHorizontalScroll} className="overflow-x-auto flex gap-6 pb-4 pt-2 scrollbar-hide snap-x snap-mandatory px-1" style={{ WebkitOverflowScrolling: 'touch' }}>
+                {audioSources.map((src, i) => {
+                  const ga = globalAudioRef.current;
+                  const isActive = playingIndex === i;
+                  const savedState = getPlaybackState();
+                  const duration = durations[i] || ((isActive || savedState.index === i) && ga ? ga.duration : 0) || 0;
+                  const current = isActive
+                    ? (positions[i] ?? (ga ? ga.currentTime : 0) ?? 0)
+                    : (savedState.index === i ? savedState.time : (positions[i] ?? 0));
+                  const progress = duration ? (current / duration) : 0;
+                  const gradientPalette = [
+                    'from-fuchsia-500 via-pink-500 to-rose-500',
+                    'from-indigo-500 via-violet-500 to-purple-500',
+                    'from-teal-500 via-emerald-500 to-lime-500',
+                    'from-amber-500 via-orange-500 to-red-500',
+                    'from-sky-500 via-cyan-500 to-blue-600',
+                    'from-stone-500 via-gray-600 to-zinc-700'
+                  ];
+                  const gradient = gradientPalette[i % gradientPalette.length];
+                  const format = (sec:number) => {
+                    const m = Math.floor(sec/60); const s = Math.floor(sec%60); return `${m}:${String(s).padStart(2,'0')}`;
+                  };
+                  // isActive already computed above
+                  return (
+                    <div
+                      key={src}
+                      className="snap-start flex-shrink-0 w-48 h-48 sm:w-56 sm:h-56 relative group rounded-2xl overflow-visible"
+                    >
+                      <div className={`absolute inset-0 rounded-2xl overflow-hidden shadow-lg ring-1 ring-black/10 dark:ring-white/10 bg-gradient-to-br text-white`}> 
+                        <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-90 group-hover:opacity-100 transition-opacity`} />
+                        <div
+                          className="absolute inset-0 rounded-2xl pointer-events-none"
+                          style={{
+                            background: `conic-gradient(rgba(255,255,255,0.35) ${progress * 360}deg, rgba(255,255,255,0.1) 0deg)`
+                          }}
+                        />
+                        <div className={`absolute inset-0 transition-transform duration-300 ease-out will-change-transform ${isActive ? 'scale-105' : 'group-hover:scale-105 group-active:scale-105'}`}>
+                          <button
+                            onClick={() => { 
+                              try { 
+                                const baseName = extractBaseName(audioSources[i]); 
+                                comprehensiveTracker.trackAudioCardClick(i, baseName); 
+                              } catch {}
+                              togglePlay(i); 
+                            }}
+                            className={`absolute inset-0 flex flex-col items-center justify-center transition ${isActive ? 'backdrop-blur-sm' : 'backdrop-blur-[2px]'} focus:outline-none`}
+                            aria-label={isActive ? 'Pause sample' : 'Play sample'}
+                          >
+                            <div className={`w-16 h-16 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-md shadow-inner transition transform ${isActive ? 'scale-90' : 'group-hover:scale-105'} border border-white/30`}> 
+                              {isActive ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 9v6m4-6v6" />
+                                </svg>
+                              ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M5 3v18l15-9L5 3z" />
+                                </svg>
+                              )}
+                            </div>
+                            <div className="flex mt-4 gap-1 h-6">
+                              {[0,1,2].map(bar => (
+                                <span
+                                  key={bar}
+                                  className={`w-1.5 rounded-full bg-white/80 origin-bottom ${isActive ? 'animate-[eqBounce_0.9s_ease-in-out_infinite]' : 'opacity-40'} `}
+                                  style={{ animationDelay: `${bar * 0.15}s` }}
+                                />
+                              ))}
+                            </div>
+                          </button>
+                          {/* Timing tape */}
+                          <div className="absolute left-0 right-0 bottom-0 px-2 py-1.5 bg-black/45 backdrop-blur-md text-[11px] font-medium tabular-nums select-none">
+                            <div className="flex items-center justify-between">
+                              <span className="opacity-85 min-w-[32px] text-center">{format(current)}</span>
+                              <div
+                                className="flex-1 mx-2 h-1.5 bg-white/25 hover:bg-white/30 active:bg-white/40 rounded cursor-pointer relative group"
+                                    onClick={(e) => {
+                                      const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+                                      const ratio = (e.clientX - rect.left) / rect.width;
+                                      const audio = globalAudioRef.current;
+                                      if (audio && playingIndex === i && audio.duration) {
+                                        const prev = audio.currentTime;
+                                        const newTime = Math.max(0, Math.min(audio.duration * ratio, audio.duration));
+                                        audio.currentTime = newTime;
+                                        setTick(t => t + 1);
+                                        if (Math.abs(newTime - prev) > 0.5) {
+                                          try {
+                                            const baseName = extractBaseName(audioSources[i]);
+                                            comprehensiveTracker.trackAudioSeek(i, baseName, prev, newTime, audio.duration);
+                                          } catch {}
+                                        }
+                                      }
+                                    }}
+                                aria-label="Seek audio position"
+                                role="slider"
+                                aria-valuemin={0}
+                                aria-valuemax={duration || 0}
+                                aria-valuenow={current || 0}
+                              >
+                                <div className="absolute inset-0">
+                                  <div className="h-full bg-white/90 transition-all" style={{ width: `${progress*100}%` }} />
+                                </div>
+                                <div
+                                  className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow opacity-0 group-hover:opacity-100 transition-opacity"
+                                  style={{ left: `calc(${progress*100}% - 6px)` }}
+                                />
+                              </div>
+                              <span className="opacity-70 min-w-[32px] text-center">{duration ? format(duration) : '--:--'}</span>
+                            </div>
+                          </div>
+                        </div>
+      {/* Per-card audio element removed; using single global hidden audio tag */}
+                      </div>
+                    </div>
+                  );
+                })}
+    {/* Hidden global audio element (exists once) */}
+    <audio data-global-audio-hidden className="hidden" />
+              </div>
+              <style jsx global>{`
+                @keyframes eqBounce { 0%,100%{transform:scaleY(0.3)} 50%{transform:scaleY(1)} }
+              `}</style>
+            </div>
+          ) : (
+            <div className="text-center py-16 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl">
+              <div className="text-6xl mb-4">🎵</div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Audio Samples Found</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">Add MP3 or WAV files to your Song audio gallery.</p>
+              <div className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
+                <p>💡 Place source files in the repository content folder (copied automatically at build):</p>
+                <p className="font-mono bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded">content/Song/Audios/gallery/ENGLISH/</p>
+                <p className="font-mono bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded">content/Song/Audios/gallery/FRENCH/ (etc.)</p>
+                <p>🔁 They are served statically from:</p>
+                <p className="font-mono bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded">/Personalized_Button/content/Song/Audios/gallery/ENGLISH/</p>
+                <p className="text-xs pt-2">Filename pattern: song_gallery_01.wav (or .mp3 / .wov) with 2-digit index up to 30</p>
+              </div>
+            </div>
+          )
+        ) : discoveredImages.length > 0 ? (
+          <>
+            <div className="relative">
+              <div className="overflow-x-auto scrollbar-hide">
+                <div className="flex gap-6 pb-4" style={{ width: 'max-content' }}>
+                  {discoveredImages.map((imageName: string, index: number) => {
+                    const imageStatus = imageStatuses[imageName];
+                    return (
+                      <div key={`${currentLanguage}-${imageName}-${index}`} className="group relative bg-gray-200 dark:bg-gray-700 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-105 flex-shrink-0" style={{ width: '200px', height: '200px' }}>
+                        {imageStatus?.exists ? (
+                          <Image src={`${imageStatus.path}?lang=${currentLanguage}&t=${Date.now()}`} alt={`Gallery image ${index + 1}`} fill className="object-cover" sizes="200px" />
+                        ) : (
+                          <>
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary-blue/20"></div>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="text-center text-gray-500 dark:text-gray-400 p-4">
+                                <div className="text-3xl mb-2">✨</div>
+                                <p className="text-sm font-medium">{imageName}</p>
+                                <p className="text-xs mt-1 opacity-70">{data.gallery_placeholder?.add_to || 'Add to'}:</p>
+                                <p className="text-xs opacity-50">/public/{currentProduct}/gallery/{currentLanguage}/</p>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="flex justify-center mt-6 space-x-2">
+                {Array.from({ length: Math.ceil(discoveredImages.length / 4) }, (_, i) => (
+                  <div key={i} className="w-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+                ))}
+              </div>
+            </div>
+            <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400" />
+          </>
+        ) : (
+          <div className="text-center py-16 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl">
+            <div className="text-6xl mb-4">📸</div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{data.no_images?.title || 'No Gallery Images Found'}</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{data.no_images?.subtitle || 'Add images to start building your gallery'}</p>
+            <div className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
+              <p>💡 {data.no_images?.instructions || 'Add images to these folders'}:</p>
+              <p className="font-mono bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded">/public/{currentProduct}/gallery/{currentLanguage}/</p>
+              <p className="font-mono bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded">/public/{currentProduct}/gallery/ (fallback)</p>
+              <p className="mt-2 text-xs">{recommendations.description}</p>
+            </div>
+          </div>
+        )}
+        <div className="text-center mt-12">
+          <p className="text-gray-600 dark:text-gray-400">{t('gallery.loveWhatYouSee')}</p>
+        </div>
+      </div>
+    </section>
+  );
+});
 
 // Why People Love It Section Component
 function WhyPeopleLoveItSection({ data }: { data: any }) {
@@ -1057,6 +1740,7 @@ function TestimonialsSection({ data }: { data: any }) {
             {data.title}
           </h2>
         </div>
+        
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {data.items.map((testimonial: any, index: number) => (
             <div key={index} className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg">
@@ -1087,4 +1771,3 @@ function TestimonialsSection({ data }: { data: any }) {
     </section>
   );
 }
-

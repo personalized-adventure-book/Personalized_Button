@@ -43,18 +43,6 @@ export function getCurrentLanguage(): string {
 export function getCurrentProduct(): string {
   if (typeof window !== 'undefined') {
     const fullUrl = window.location.href;
-    // First allow explicit query parameter override: ?product=song / branding / book / button
-    try {
-      const usp = new URL(fullUrl).searchParams;
-      const qp = usp.get('product');
-      if (qp) {
-        const norm = qp.toLowerCase();
-        if (norm === 'song') return 'Song';
-        if (norm === 'branding') return 'Branding';
-        if (norm === 'book') return 'Book';
-        if (norm === 'button') return 'Button';
-      }
-    } catch {}
     
     // Look for product IDs with prefixes
     const idMatches = fullUrl.match(/(?:id=|#|\/|-)([A-Z]{2}\d+)/g);
@@ -83,8 +71,6 @@ export function getCurrentProduct(): string {
   
   return 'Button'; // Default to Button
 }
-
-// (Removed legacy debugLoadSongAudios; audio handled by utils/songAudio.ts)
 
 // Map language codes to folder names (same as JSON file mapping)
 function getLanguageFolderName(langCode: string): string {
@@ -283,5 +269,73 @@ export function getRecommendedImageCounts(category?: string): { gallery: number;
   return counts;
 }
 
-// (Legacy audio utilities removed; audio loading now handled by utils/songAudio.ts)
+// ------------------ AUDIO (Song product) ------------------
+// We no longer use dynamic API routes. Audio files live under
+// /public/content/Song/Audios/gallery/<LANG_FOLDER>/song_gallery_XX.(wav|mp3)
+// copyImages.js already copies the entire content folder into public/content
+// at build time so we can reference them directly just like images.
+const BASE_PATH = '/Personalized_Button';
+
+// Get gallery audio path (Song only for now)
+export function getGalleryAudio(audioName: string, product?: string, language?: string): string {
+  const prod = product || getCurrentProduct();
+  if (prod !== 'Song') return '';
+  const lang = language || getCurrentLanguage();
+  const langFolder = getLanguageFolderName(lang).trim();
+  return `${BASE_PATH}/content/Song/Audios/gallery/${langFolder}/${audioName}`;
+}
+
+// Check audio existence (HEAD request)
+export async function audioExists(audioPath: string): Promise<boolean> {
+  if (!audioPath) return false;
+  try {
+    const response = await fetch(audioPath, { method: 'HEAD' });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+export interface DiscoveredAudio { name: string; path: string }
+
+// Discover available gallery audios: probe sequentially; small set so cost is low.
+export async function getAvailableGalleryAudios(product?: string, language?: string, max: number = 30): Promise<DiscoveredAudio[]> {
+  const prod = product || getCurrentProduct();
+  if (prod !== 'Song') return [];
+  const lang = language || getCurrentLanguage();
+  const langFolder = getLanguageFolderName(lang).trim();
+
+  // 1. Try manifest first (fast, no HEAD requests)
+  try {
+    const manifestResp = await fetch('/Personalized_Button/audio-manifest.json', { cache: 'no-store' });
+    if (manifestResp.ok) {
+      const manifest = await manifestResp.json();
+      const list: string[] | undefined = manifest?.Song?.gallery?.[lang];
+      if (Array.isArray(list) && list.length) {
+        return list.slice(0, max).map(name => ({ name, path: `${BASE_PATH}/content/Song/Audios/gallery/${langFolder}/${name}` }));
+      }
+    }
+  } catch (e) {
+    // swallow and fallback
+  }
+
+  // 2. Fallback probing (only if manifest absent): sequential limited HEADs
+  const files: DiscoveredAudio[] = [];
+  const limit = Math.min(max, 30);
+  for (let i = 1; i <= limit; i++) {
+    const num = i.toString().padStart(2, '0');
+    for (const ext of ['.mp3', '.wav', '.wov']) {
+      const name = `song_gallery_${num}${ext}`;
+      const path = `${BASE_PATH}/content/Song/Audios/gallery/${langFolder}/${name}`;
+      try { if (await audioExists(path)) { files.push({ name, path }); break; } } catch {}
+    }
+  }
+  return files;
+}
+
+export async function getGalleryAudios(count: number = 12, product?: string, language?: string): Promise<string[]> {
+  // Slightly overfetch to allow user to scroll without delay
+  const available = await getAvailableGalleryAudios(product, language, Math.max(count + 4, count));
+  return available.slice(0, count).map(a => a.path);
+}
 
