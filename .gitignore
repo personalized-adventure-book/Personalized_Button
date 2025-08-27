@@ -1,4 +1,41 @@
+<<<<<<< HEAD
+# dependencies
 node_modules/
+
+# Next.js build output
 .next/
-.env
+out/
+
+# production
+build/
+
+# misc
+.DS_Store
 *.log
+
+# env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+=======
+# dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# production
+build/
+
+# misc
+.DS_Store
+*.log
+
+# env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+>>>>>>> 6180a7f (Recreate .gitignore to ignore node_modules and .next)
