@@ -1,0 +1,103 @@
+{
+  "homepage": {"menu": {"features": "الميزات","howItWorks": "كيف يعمل","gallery": "المعرض","pricing": "الأسعار","order": "اطلب الآن","orders": "الطلبات","contact": "اتصل بنا","adventures": "أفكار","examples": "أمثلة"},
+    "urgency_banner": {"text": "⚡ كمية محدودة هذا الأسبوع — اطلب الآن!","style": "highlight"},
+    "hero": {"title": "زر MyMood","subtitle": "خصص زر الإضاءة السحري باسمك وألوانك في ثوانٍ!","cta_text": "اطلب الآن"},
+    "about": {
+      "title": "عن أزرارنا",
+      "text": "كل زر مصنوع خصيصًا ليضيء باللون والرسالة التي تختارها. إنه أكثر من منتج – إنه شرارتك الشخصية."
+    },
+    "features": {
+      "title": "المميزات",
+      "subtitle": "لماذا تختار أزرارنا المخصصة",
+      "items": [
+        {
+          "icon": "✨",
+          "title": "يضيء باللمس",
+          "description": "يضيء الزر بلطف عند الضغط عليه، كاشفًا عن تصميمك المخصص."
+        },
+        {
+          "icon": "🎨",
+          "title": "ألوان مخصصة",
+          "description": "اختر من مجموعة واسعة من ألوان LED لتناسب مزاجك أو مناسبتك."
+        },
+        {
+          "icon": "🔋",
+          "title": "بطارية مدمجة",
+          "description": "بطارية طويلة الأمد مدمجة. جاهز للاستخدام فورًا!"
+        }
+      ]
+    },
+    "gallery": {
+      "title": "شاهد السحر أثناء العمل",
+      "subtitle": "أزرار حقيقية، لحظات حقيقية - اسحب لاستكشاف تشكيلتنا!"
+    },
+    "why_people_love_it": {
+      "title": "لماذا زرّنا مميز",
+      "points": [
+        "هدية فريدة لكل مناسبة",
+        "يضيف لمسة شخصية لمساحتك",
+        "مثالي للأطفال، الأزواج، والمبدعين"
+      ]
+    },
+    "shipping_info": {
+      "title": "توصيل سريع وموثوق",
+      "points": [
+        "يُشحن خلال 2–4 أيام عمل",
+        "توصيل مُتابَع إلى جميع أنحاء العالم",
+        "شحن مجاني للطلبات فوق 50€"
+      ]
+    },
+    "testimonials": {
+      "title": "آراء عملائنا",
+      "items": [
+        {
+          "name": "سارة",
+          "comment": "أحببت زر Zen Mode! إنه مريح جدًا.",
+          "rating": 5
+        },
+        {
+          "name": "علي",
+          "comment": "أهديته لشخص — وانبهروا عند رؤيته (حرفيًا!).",
+          "rating": 4.5
+        }
+      ]
+    },
+  "examples": {"title": "التخصيصات الشائعة","items": [{"text": "زر 'أحبك' بضوء وردي"},{"text": "أزرار أسماء لهدايا عيد ميلاد"},{"text": "اقتباس تحفيزي بإضاءة قوس قزح"}]},
+  "how_it_works": {"title": "كيف يعمل","steps": [{"title": "اختر النمط","description": "شكل، لون وتشطيب"},{"title": "أضف رسالتك","description": "اسم أو عبارة"},{"title": "نصنعه لك","description": "بجودة واهتمام"},{"title": "يصل إليك","description": "جاهز للتوهج"},{"title": "اصنعه الآن","description": "دقيقة واحدة فقط"}]},
+  "pricing": {"title": "الأسعار","plans": [{"name": "توهج فردي","price": "€19","features": ["زر مخصص واحد","ألوان قياسية","نقش حتى 12 حرفًا"]},{"name": "توهج مزدوج","price": "€35","features": ["زران مخصصان","أنماط مختلفة","مثالي للأزواج"]},{"name": "حزمة حفلة","price": "€79","features": ["5 أزرار مخصصة","تغليف هدايا","مثالي للمناسبات"]}]},
+    "faq": [
+      {
+        "q": "كم تدوم البطارية؟",
+        "a": "تدوم حتى 3 أشهر مع الاستخدام اليومي العادي ويمكن استبدالها بسهولة."
+      },
+      {
+        "q": "هل يمكنني نقش رسالة معينة؟",
+        "a": "بالتأكيد! ندعم حتى 25 حرفًا لكل زر."
+      },
+      {
+        "q": "ما الألوان المتاحة؟",
+        "a": "يمكنك الاختيار من بين الأزرق، الأحمر، الأخضر، الأصفر، البنفسجي، الأبيض، أو قوس قزح."
+      }
+    ],
+    "footer": {
+      "product": [
+        "كيف يعمل",
+        "أمثلة",
+        "الأسعار"
+      ],
+      "support": [
+        "اتصل بنا",
+        "الأسئلة الشائعة",
+        "التوصيل"
+      ],
+      "company": [
+        "Glowify Co.",
+        "سياسة الخصوصية",
+        "شروط الاستخدام"
+      ],
+      "copyright": "© 2025 زر MyMood"
+    }
+  },
+  "form": {"steps": [{"id": "purpose","title": "Purpose","fields": [{"type": "select_box","name": "purpose","label": "Choose Your Button's Purpose","options": ["Focus Mode","Reading Light","Movie Night","Party Scene","Gaming Session","Meditation","Workout","Study Mode","Relaxation","Sleep Time","Wake Up","Mood Lighting","Custom Purpose"],"required": true},{"type": "text","name": "custom_purpose","label": "Describe your custom purpose","placeholder": "e.g., Evening meditation button, Study alarm...","required": true,"conditional": {"field": "purpose","value": "Custom Purpose"}}]},{"id": "style","title": "Style","fields": [{"type": "select_box","name": "shape","label": "Shape","options": ["Circle","Square","Hexagon","Octagon","Diamond","Star","Triangle","Heart","Oval","Pentagon","Rounded Square","Pill","Cloud","Flower","Lightning","Custom Shape"],"required": true},{"type": "text","name": "custom_shape","label": "Describe your custom shape","placeholder": "e.g., Custom geometric pattern, Logo shape","required": true,"conditional": {"field": "shape","value": "Custom Shape"}},{"type": "select_box","name": "color","label": "Color","options": ["Blue","Purple","Green","Yellow","Pink","Red","Teal","Indigo","Lime","Cyan","Orange","Custom"],"required": true},{"type": "text","name": "custom_color","label": "Describe your custom color","placeholder": "e.g., Gradient blue to purple, Neon green, #FF5733","required": true,"conditional": {"field": "color","value": "Custom"}},{"type": "select_box","name": "finish","label": "Finish","options": ["Matte","Glossy","Satin","Metallic","Pearl","Textured","Carbon Fiber","Soft Touch","Custom Finish"],"required": true},{"type": "text","name": "custom_finish","label": "Describe your custom finish","placeholder": "e.g., Holographic, Glow-in-the-dark, Wood grain","required": true,"conditional": {"field": "finish","value": "Custom Finish"}}]},{"id": "label","title": "Label","fields": [{"type": "choice_text","name": "label_text","label": "Button Text","options": ["I Love You","Focus Mode","Do Not Disturb","Good Luck","Stay Strong","Smile!"],"required": false,"placeholder": "Choose a label or select Custom..."},{"type": "choice_text","name": "text_size","label": "Text Size","options": ["Small (10px)","Medium (14px)","Large (18px)","Extra Large (24px)"],"required": false,"placeholder": "Choose text size"}]},{"id": "customer_info","title": "Customer Info","fields": [{"type": "text","name": "full_name","label": "Full Name","required": true},{"type": "email","name": "email","label": "Email Address","required": true},{"type": "tel","name": "phone","label": "Phone Number (optional)","required": false}]},{"id": "delivery","title": "Delivery","fields": [{"type": "text","name": "street","label": "Street Address","required": true},{"type": "text","name": "city","label": "City","required": true},{"type": "text","name": "state","label": "State/Province","required": false},{"type": "text","name": "zip","label": "Postal Code","required": true},{"type": "choice","name": "country","label": "Country","required": true,"options": ["France","United States","Italy","Saudi Arabia","United Arab Emirates","Algeria","Germany","Canada","Other"]},{"type": "textarea","name": "instructions","label": "Delivery Instructions (optional)","required": false}]}]},
+  "pricing_config": {"base_price": 30,"fields": {"purpose": {"Focus Mode": 0,"Reading Light": 5,"Movie Night": 7,"Party Scene": 12,"Gaming Session": 10,"Meditation": 4,"Workout": 6,"Study Mode": 3,"Relaxation": 4,"Sleep Time": 5,"Wake Up": 5,"Mood Lighting": 8,"Custom Purpose": 15},"shape": {"Circle": 0,"Square": 0,"Hexagon": 6,"Octagon": 8,"Diamond": 5,"Star": 10,"Triangle": 4,"Heart": 9,"Oval": 3,"Pentagon": 6,"Rounded Square": 2,"Pill": 3,"Cloud": 7,"Flower": 11,"Lightning": 12,"Custom Shape": 15},"color": {"Blue": 0,"Purple": 0,"Green": 0,"Yellow": 2,"Pink": 2,"Red": 2,"Teal": 3,"Indigo": 3,"Lime": 2,"Cyan": 2,"Orange": 3,"Custom": 10},"finish": {"Matte": 0,"Glossy": 4,"Satin": 5,"Metallic": 12,"Pearl": 9,"Textured": 6,"Carbon Fiber": 18,"Soft Touch": 7,"Custom Finish": 25},"text_size": {"Small (10px)": 0,"Medium (14px)": 2,"Large (18px)": 4,"Extra Large (24px)": 6}}}
+}

@@ -1,0 +1,37 @@
+name: Sync Google Sheet Content
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch: # allows manual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v3
+
+      - name: 🧰 Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: 📦 Install dependencies
+        run: npm install googleapis
+
+      - name: 📤 Run content export script
+        run: node scripts/exportContentMatrix.js
+        env:
+          GSHEET_SHEET_ID: ${{ secrets.GSHEET_SHEET_ID }}
+          GSHEET_SERVICE_KEY: ${{ secrets.GSHEET_SERVICE_KEY }}
+
+      - name: 📌 Commit and push updated content
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'actions@github.com'
+          git add content/
+          git commit -m "🔄 Sync content from Google Sheets" || echo "No changes"
+          git push origin HEAD

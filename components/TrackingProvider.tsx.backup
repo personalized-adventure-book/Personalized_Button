@@ -1,0 +1,107 @@
+'use client';
+
+import React, { createContext, useContext, useRef, useEffect } from 'react';
+import { comprehensiveTracker } from '@/utils/trackingService';
+import { usePathname } from 'next/navigation';lient";
+
+import React, { createContext, useContext, useEffect, useRef } from 'react';
+import comprehensiveTracker from '@/utils/comprehensiveTracker';
+import { useUrlId } from '../hooks/useUrlIdStatic';
+import { usePathname } from 'next/navigation';
+
+interface TrackingContextType {
+  tracker: typeof comprehensiveTracker;
+  trackPageView: (pageName?: string) => void;
+  trackFormStart: (formData: any) => void;
+  trackFormStep: (stepNumber: number, timeOnStep?: number) => void;
+  trackFormStepStart: (stepNumber: number, totalSteps: number) => void;
+  trackFormSubmission: (formData: any) => void;
+  trackLanguageChange: (from: string, to: string) => void;
+  trackThemeChange: (from: string, to: string) => void;
+  trackDraftSave: (draftData: any) => void;
+  trackDraftLoad: (draftData: any) => void;
+  trackOrderCreation: (orderData: any) => void;
+  trackCancelAction: (reason: string, hasData: boolean) => void;
+  trackModalOpen: (modalType: string) => void;
+  trackModalClose: (modalType: string, action: string) => void;
+  trackSearchAction: (query: string, resultsCount?: number) => void;
+}
+
+const TrackingContext = createContext<TrackingContextType | null>(null);
+
+interface TrackingProviderProps {
+  children: React.ReactNode;
+}
+
+export function TrackingProvider({ children }: TrackingProviderProps) {
+  // Note: Removed useUrlId dependency to avoid useSearchParams issues in static export
+  const pathname = usePathname();
+  const isInitialized = useRef(false);
+
+  useEffect(() => {
+    if (!isInitialized.current) {
+      // Initialize the tracking service
+      comprehensiveTracker.initialize();
+      isInitialized.current = true;
+      
+      // Track initial page view
+      comprehensiveTracker.trackPageView();
+    }
+  }, []);
+
+  // Update URL ID when it changes
+  useEffect(() => {
+    if (urlId) {
+      console.log('🔍 TrackingProvider: Setting URL ID to:', urlId);
+      comprehensiveTracker.setUrlId(urlId);
+    } else {
+      console.log('🔍 TrackingProvider: URL ID is null/undefined, using default');
+      // If no URL ID, try to get it from URL params directly
+      const searchParams = new URLSearchParams(window.location.search);
+      const directId = searchParams.get('id');
+      if (directId) {
+        console.log('🔍 TrackingProvider: Found direct ID from URL:', directId);
+        comprehensiveTracker.setUrlId(directId);
+      }
+    }
+  }, [urlId]);
+
+  // Track page changes
+  useEffect(() => {
+    if (isInitialized.current) {
+      comprehensiveTracker.trackPageView(pathname);
+    }
+  }, [pathname]);
+
+  const contextValue: TrackingContextType = {
+    tracker: comprehensiveTracker,
+    trackPageView: (pageName?: string) => comprehensiveTracker.trackPageView(pageName),
+    trackFormStart: (formData: any) => comprehensiveTracker.trackFormStart(formData),
+    trackFormStep: (stepNumber: number, timeOnStep?: number) => comprehensiveTracker.trackFormStep(stepNumber, timeOnStep),
+    trackFormStepStart: (stepNumber: number, totalSteps: number) => comprehensiveTracker.trackFormStepStart(stepNumber, totalSteps),
+    trackFormSubmission: (formData: any) => comprehensiveTracker.trackFormSubmission(formData),
+    trackLanguageChange: (from: string, to: string) => comprehensiveTracker.trackLanguageChange(from, to),
+    trackThemeChange: (from: string, to: string) => comprehensiveTracker.trackThemeChange(from, to),
+    trackDraftSave: (draftData: any) => comprehensiveTracker.trackDraftSave(draftData),
+    trackDraftLoad: (draftData: any) => comprehensiveTracker.trackDraftLoad(draftData),
+    trackOrderCreation: (orderData: any) => comprehensiveTracker.trackOrderCreation(orderData),
+    trackCancelAction: (reason: string, hasData: boolean) => comprehensiveTracker.trackCancelAction(reason, hasData),
+    trackModalOpen: (modalType: string) => comprehensiveTracker.trackModalOpen(modalType),
+    trackModalClose: (modalType: string, action: string) => comprehensiveTracker.trackModalClose(modalType, action),
+    trackSearchAction: (query: string, resultsCount?: number) => comprehensiveTracker.trackSearchAction(query, resultsCount),
+  };
+
+  return (
+    <TrackingContext.Provider value={contextValue}>
+      {children}
+    </TrackingContext.Provider>
+  );
+}
+
+export function useTracking(): TrackingContextType {
+  const context = useContext(TrackingContext);
+  if (!context) {
+    throw new Error('useTracking must be used within a TrackingProvider');
+  }
+  return context;
+}

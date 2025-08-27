@@ -1,0 +1,20 @@
+/** @type {import('next').NextConfig} */
+const repo = 'Personalized_Button'   // e.g. "Personalized_Button"
+
+module.exports = {
+  // 1. Tell Next to do a static export
+  output: 'export',
+
+  // 2. So every page ends up as `/foo/index.html`
+  trailingSlash: true,
+
+  // 3. Serve from `/YOUR_REPO_SLUG/`
+  basePath: `/${repo}`,
+  assetPrefix: `/${repo}/`,
+
+  // 4. Your existing settings
+  images: { 
+    unoptimized: true,
+    domains: ['localhost'] 
+  },
+}

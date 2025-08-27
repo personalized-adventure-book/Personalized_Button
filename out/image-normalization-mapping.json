@@ -1,0 +1,279 @@
+{
+  "Button": {
+    "gallery": {
+      "ar": [
+        {
+          "original": "ChatGPT Image Jul 18, 2025 at 12_06_18 PM.png",
+          "normalized": "button-gallery-ar-001.png",
+          "language": "ar"
+        },
+        {
+          "original": "ChatGPT Image Jul 18, 2025 at 12_06_22 PM.png",
+          "normalized": "button-gallery-ar-002.png",
+          "language": "ar"
+        },
+        {
+          "original": "ChatGPT Image Jul 18, 2025 at 12_06_26 PM.png",
+          "normalized": "button-gallery-ar-003.png",
+          "language": "ar"
+        },
+        {
+          "original": "Whisk_3868ddd2d4.jpg",
+          "normalized": "button-gallery-ar-004.jpg",
+          "language": "ar"
+        },
+        {
+          "original": "Whisk_5df6d1e099.jpg",
+          "normalized": "button-gallery-ar-005.jpg",
+          "language": "ar"
+        },
+        {
+          "original": "Whisk_88bd857956.jpg",
+          "normalized": "button-gallery-ar-006.jpg",
+          "language": "ar"
+        },
+        {
+          "original": "Whisk_9531b36057.jpg",
+          "normalized": "button-gallery-ar-007.jpg",
+          "language": "ar"
+        },
+        {
+          "original": "Whisk_9801fbbadd.jpg",
+          "normalized": "button-gallery-ar-008.jpg",
+          "language": "ar"
+        },
+        {
+          "original": "Whisk_9a67258d2a.jpg",
+          "normalized": "button-gallery-ar-009.jpg",
+          "language": "ar"
+        },
+        {
+          "original": "Whisk_a127dcfb6e.jpg",
+          "normalized": "button-gallery-ar-010.jpg",
+          "language": "ar"
+        },
+        {
+          "original": "Whisk_a3ca9ca9b1.jpg",
+          "normalized": "button-gallery-ar-011.jpg",
+          "language": "ar"
+        },
+        {
+          "original": "Whisk_cdf9a5b244.jpg",
+          "normalized": "button-gallery-ar-012.jpg",
+          "language": "ar"
+        },
+        {
+          "original": "Whisk_e8291f1a6e.jpg",
+          "normalized": "button-gallery-ar-013.jpg",
+          "language": "ar"
+        },
+        {
+          "original": "Whisk_f792776e1f.jpg",
+          "normalized": "button-gallery-ar-014.jpg",
+          "language": "ar"
+        }
+      ],
+      "en": [
+        {
+          "original": "ChatGPT Image Jul 18, 2025 at 12_06_18 PM.png",
+          "normalized": "button-gallery-en-001.png",
+          "language": "en"
+        },
+        {
+          "original": "ChatGPT Image Jul 18, 2025 at 12_06_22 PM.png",
+          "normalized": "button-gallery-en-002.png",
+          "language": "en"
+        },
+        {
+          "original": "ChatGPT Image Jul 18, 2025 at 12_06_26 PM.png",
+          "normalized": "button-gallery-en-003.png",
+          "language": "en"
+        },
+        {
+          "original": "Whisk_3868ddd2d4.jpg",
+          "normalized": "button-gallery-en-004.jpg",
+          "language": "en"
+        },
+        {
+          "original": "Whisk_5df6d1e099.jpg",
+          "normalized": "button-gallery-en-005.jpg",
+          "language": "en"
+        },
+        {
+          "original": "Whisk_88bd857956.jpg",
+          "normalized": "button-gallery-en-006.jpg",
+          "language": "en"
+        },
+        {
+          "original": "Whisk_9531b36057.jpg",
+          "normalized": "button-gallery-en-007.jpg",
+          "language": "en"
+        },
+        {
+          "original": "Whisk_9801fbbadd.jpg",
+          "normalized": "button-gallery-en-008.jpg",
+          "language": "en"
+        },
+        {
+          "original": "Whisk_9a67258d2a.jpg",
+          "normalized": "button-gallery-en-009.jpg",
+          "language": "en"
+        },
+        {
+          "original": "Whisk_a127dcfb6e.jpg",
+          "normalized": "button-gallery-en-010.jpg",
+          "language": "en"
+        },
+        {
+          "original": "Whisk_a3ca9ca9b1.jpg",
+          "normalized": "button-gallery-en-011.jpg",
+          "language": "en"
+        },
+        {
+          "original": "Whisk_cdf9a5b244.jpg",
+          "normalized": "button-gallery-en-012.jpg",
+          "language": "en"
+        },
+        {
+          "original": "Whisk_e8291f1a6e.jpg",
+          "normalized": "button-gallery-en-013.jpg",
+          "language": "en"
+        },
+        {
+          "original": "Whisk_f792776e1f.jpg",
+          "normalized": "button-gallery-en-014.jpg",
+          "language": "en"
+        }
+      ],
+      "fr": [
+        {
+          "original": "ChatGPT Image Jul 18, 2025 at 12_06_18 PM.png",
+          "normalized": "button-gallery-fr-001.png",
+          "language": "fr"
+        },
+        {
+          "original": "ChatGPT Image Jul 18, 2025 at 12_06_22 PM.png",
+          "normalized": "button-gallery-fr-002.png",
+          "language": "fr"
+        },
+        {
+          "original": "ChatGPT Image Jul 18, 2025 at 12_06_26 PM.png",
+          "normalized": "button-gallery-fr-003.png",
+          "language": "fr"
+        },
+        {
+          "original": "Whisk_06e09b631b.jpg",
+          "normalized": "button-gallery-fr-004.jpg",
+          "language": "fr"
+        },
+        {
+          "original": "Whisk_1e421f94d4.jpg",
+          "normalized": "button-gallery-fr-005.jpg",
+          "language": "fr"
+        },
+        {
+          "original": "Whisk_51b96482a2.jpg",
+          "normalized": "button-gallery-fr-006.jpg",
+          "language": "fr"
+        },
+        {
+          "original": "Whisk_6808c3d089.jpg",
+          "normalized": "button-gallery-fr-007.jpg",
+          "language": "fr"
+        },
+        {
+          "original": "Whisk_8733356f6f.jpg",
+          "normalized": "button-gallery-fr-008.jpg",
+          "language": "fr"
+        },
+        {
+          "original": "Whisk_ab02a32ea3.jpg",
+          "normalized": "button-gallery-fr-009.jpg",
+          "language": "fr"
+        },
+        {
+          "original": "Whisk_ae7893fc77.jpg",
+          "normalized": "button-gallery-fr-010.jpg",
+          "language": "fr"
+        },
+        {
+          "original": "Whisk_c715805f8c.jpg",
+          "normalized": "button-gallery-fr-011.jpg",
+          "language": "fr"
+        },
+        {
+          "original": "Whisk_c7fcc07770.jpg",
+          "normalized": "button-gallery-fr-012.jpg",
+          "language": "fr"
+        }
+      ],
+      "it": [
+        {
+          "original": "ChatGPT Image Jul 18, 2025 at 12_06_18 PM.png",
+          "normalized": "button-gallery-it-001.png",
+          "language": "it"
+        },
+        {
+          "original": "ChatGPT Image Jul 18, 2025 at 12_06_22 PM.png",
+          "normalized": "button-gallery-it-002.png",
+          "language": "it"
+        },
+        {
+          "original": "ChatGPT Image Jul 18, 2025 at 12_06_26 PM.png",
+          "normalized": "button-gallery-it-003.png",
+          "language": "it"
+        },
+        {
+          "original": "Whisk_24388c6477.jpg",
+          "normalized": "button-gallery-it-004.jpg",
+          "language": "it"
+        },
+        {
+          "original": "Whisk_400689aa45.jpg",
+          "normalized": "button-gallery-it-005.jpg",
+          "language": "it"
+        },
+        {
+          "original": "Whisk_4eefda139c.jpg",
+          "normalized": "button-gallery-it-006.jpg",
+          "language": "it"
+        },
+        {
+          "original": "Whisk_752acff453.jpg",
+          "normalized": "button-gallery-it-007.jpg",
+          "language": "it"
+        },
+        {
+          "original": "Whisk_d3e1170e74.jpg",
+          "normalized": "button-gallery-it-008.jpg",
+          "language": "it"
+        },
+        {
+          "original": "Whisk_e9caf4702a.jpg",
+          "normalized": "button-gallery-it-009.jpg",
+          "language": "it"
+        },
+        {
+          "original": "Whisk_edf6f3545c.jpg",
+          "normalized": "button-gallery-it-010.jpg",
+          "language": "it"
+        },
+        {
+          "original": "Whisk_ee470afd11.jpg",
+          "normalized": "button-gallery-it-011.jpg",
+          "language": "it"
+        },
+        {
+          "original": "Whisk_f3ebaad5f5.jpg",
+          "normalized": "button-gallery-it-012.jpg",
+          "language": "it"
+        },
+        {
+          "original": "Whisk_f69105fb94.jpg",
+          "normalized": "button-gallery-it-013.jpg",
+          "language": "it"
+        }
+      ]
+    }
+  }
+}

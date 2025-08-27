@@ -1,0 +1,490 @@
+{
+  "homepage": {
+    "urgency_banner": {
+      "text": "⚡ Limited stock this week — order now before they're gone!",
+      "style": "highlight"
+    },
+    "menu": {
+      "features": "Features",
+      "howItWorks": "How It Works",
+      "gallery": "Gallery",
+      "pricing": "Pricing",
+      "order": "Order Now",
+      "orders": "Orders",
+      "contact": "Contact Us",
+      "adventures": "Ideas",
+      "examples": "Examples"
+    },
+    "hero": {
+      "title": "MyMood Button",
+      "subtitle": "Customize your own magical light-up button with your name, colors & sparkles — in just seconds!",
+      "cta_text": "Order Now"
+    },
+    "about": {
+      "title": "About Our Buttons",
+      "text": "Each button is uniquely crafted to light up with the color and message you choose. It’s more than a product – it's your personal spark."
+    },
+    "features": {
+      "title": "Features",
+      "subtitle": "Why Choose Our Custom Buttons",
+      "items": [
+        {
+          "icon": "✨",
+          "title": "Glows With a Tap",
+          "text": "Our button lights up gently when pressed, revealing your custom design."
+        },
+        {
+          "icon": "🎨",
+          "title": "Custom Colors",
+          "text": "Choose from a rainbow of LED colors to match your mood or occasion."
+        },
+        {
+          "icon": "🔋",
+          "title": "Battery Included",
+          "text": "Long-lasting battery built in. Ready to use right out of the box!"
+        }
+      ]
+    },
+    "examples": {
+      "title": "Popular Customizations",
+      "items": [
+        {
+          "text": "‘I Love You’ button with pink light"
+        },
+        {
+          "text": "Name buttons for birthday gifts"
+        },
+        {
+          "text": "Motivational quote with rainbow LED"
+        }
+      ]
+    },
+    "gallery": {
+      "title": "MyMood Button",
+      "subtitle": "Real buttons, real moments!"
+    },
+    "how_it_works": {
+      "title": "How It Works",
+      "steps": [
+        {
+          "title": "Pick Your Style",
+          "description": "Choose shape, color, and finish to reflect your personality."
+        },
+        {
+          "title": "Add Your Message",
+          "description": "Personalize it with a name or inspiring phrase."
+        },
+        {
+          "title": "We Build It",
+          "description": "Our team creates your button with love and magic."
+        },
+        {
+          "title": "Delivered to You",
+          "description": "We ship it straight to your door, ready to glow."
+        },
+        {
+          "title": "Make Yours Now",
+          "description": "Click below to start creating your button — it only takes a minute!"
+        }
+      ]
+    },
+    "why_people_love_it": {
+      "title": "Why Our Button Matters",
+      "points": [
+        "A unique gift for any occasion",
+        "Brings personality to your space",
+        "Perfect for kids, couples, and creators"
+      ]
+    },
+    "pricing": {
+      "title": "Pricing",
+      "plans": [
+        {
+          "name": "Single Glow",
+          "price": "€19",
+          "features": [
+            "One custom button",
+            "Standard colors",
+            "Engraving up to 12 characters"
+          ]
+        },
+        {
+          "name": "Glow Duo",
+          "price": "€35",
+          "features": [
+            "Two custom buttons",
+            "Choose different styles",
+            "Great for couples"
+          ]
+        },
+        {
+          "name": "Party Pack",
+          "price": "€79",
+          "features": [
+            "5 custom buttons",
+            "Gift-ready packaging",
+            "Perfect for events"
+          ]
+        }
+      ]
+    },
+    "faq": [
+      {
+        "q": "How long does the battery last?",
+        "a": "It lasts up to 3 months with normal daily use and can be replaced easily."
+      },
+      {
+        "q": "Can I get a specific message engraved?",
+        "a": "Absolutely! We support up to 25 characters per button."
+      },
+      {
+        "q": "What color lights are available?",
+        "a": "You can choose from blue, red, green, yellow, purple, white, or rainbow."
+      }
+    ],
+    "testimonials": {
+      "title": "What Our Customers Say",
+      "items": [
+        {
+          "name": "Sarah",
+          "comment": "Absolutely love my Zen Mode button! It’s so calming.",
+          "rating": 5
+        },
+        {
+          "name": "Ali",
+          "comment": "Gave it as a gift — they lit up when they saw it (literally!).",
+          "rating": 4.5
+        }
+      ]
+    },
+    "footer": {
+      "company_name": "Glowify Co.",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Use",
+      "contact": "Contact",
+      "copyright": "© 2025 MyMood Button"
+    }
+  },
+  "form": {
+    "steps": [
+      {
+        "id": "purpose",
+        "title": "Purpose",
+        "fields": [
+          {
+            "type": "select_box",
+            "name": "purpose",
+            "label": "Choose Your Button's Purpose",
+            "options": [
+              "Focus Mode",
+              "Reading Light",
+              "Movie Night",
+              "Party Scene",
+              "Gaming Session",
+              "Meditation",
+              "Workout",
+              "Study Mode",
+              "Relaxation",
+              "Sleep Time",
+              "Wake Up",
+              "Mood Lighting",
+              "Custom Purpose"
+            ],
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "custom_purpose",
+            "label": "Describe your custom purpose",
+            "placeholder": "e.g., Evening meditation button, Study alarm...",
+            "required": true,
+            "conditional": {
+              "field": "purpose",
+              "value": "Custom Purpose"
+            }
+          }
+        ]
+      },
+      {
+        "id": "style",
+        "title": "Style",
+        "fields": [
+          {
+            "type": "select_box",
+            "name": "shape",
+            "label": "Shape",
+            "options": [
+              "Circle",
+              "Square",
+              "Hexagon",
+              "Octagon",
+              "Diamond",
+              "Star",
+              "Triangle",
+              "Heart",
+              "Oval",
+              "Pentagon",
+              "Rounded Square",
+              "Pill",
+              "Cloud",
+              "Flower",
+              "Lightning",
+              "Custom Shape"
+            ],
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "custom_shape",
+            "label": "Describe your custom shape",
+            "placeholder": "e.g., Custom geometric pattern, Logo shape",
+            "required": true,
+            "conditional": {
+              "field": "shape",
+              "value": "Custom Shape"
+            }
+          },
+          {
+            "type": "select_box",
+            "name": "color",
+            "label": "Color",
+            "options": [
+              "Blue",
+              "Purple",
+              "Green",
+              "Yellow",
+              "Pink",
+              "Red",
+              "Teal",
+              "Indigo",
+              "Lime",
+              "Cyan",
+              "Orange",
+              "Custom"
+            ],
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "custom_color",
+            "label": "Describe your custom color",
+            "placeholder": "e.g., Gradient blue to purple, Neon green, #FF5733",
+            "required": true,
+            "conditional": {
+              "field": "color",
+              "value": "Custom"
+            }
+          },
+          {
+            "type": "select_box",
+            "name": "finish",
+            "label": "Finish",
+            "options": [
+              "Matte",
+              "Glossy",
+              "Satin",
+              "Metallic",
+              "Pearl",
+              "Textured",
+              "Carbon Fiber",
+              "Soft Touch",
+              "Custom Finish"
+            ],
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "custom_finish",
+            "label": "Describe your custom finish",
+            "placeholder": "e.g., Holographic, Glow-in-the-dark, Wood grain",
+            "required": true,
+            "conditional": {
+              "field": "finish",
+              "value": "Custom Finish"
+            }
+          }
+        ]
+      },
+      {
+        "id": "label",
+        "title": "Label",
+        "fields": [
+          {
+            "type": "choice_text",
+            "name": "label_text",
+            "label": "Button Text",
+            "options": [
+              "I Love You",
+              "Focus Mode",
+              "Do Not Disturb",
+              "Good Luck",
+              "Stay Strong",
+              "Smile!"
+            ],
+            "required": false,
+            "placeholder": "Choose a label or select Custom..."
+          },
+          {
+            "type": "choice_text",
+            "name": "text_size",
+            "label": "Text Size",
+            "options": [
+              "Small (10px)",
+              "Medium (14px)",
+              "Large (18px)",
+              "Extra Large (24px)"
+            ],
+            "required": false,
+            "placeholder": "Choose text size"
+          }
+        ]
+      },
+            {
+        "id": "customer_info",
+        "title": "Customer Info",
+        "fields": [
+          {
+            "type": "text",
+            "name": "full_name",
+            "label": "Full Name",
+            "required": true
+          },
+          {
+            "type": "email",
+            "name": "email",
+            "label": "Email Address",
+            "required": true
+          },
+          {
+            "type": "tel",
+            "name": "phone",
+            "label": "Phone Number (optional)",
+            "required": false
+          }
+        ]
+      },
+      {
+        "id": "delivery",
+        "title": "Delivery",
+        "fields": [
+          {
+            "type": "text",
+            "name": "street",
+            "label": "Street Address",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "city",
+            "label": "City",
+            "required": true
+          },
+          {
+            "type": "text",
+            "name": "state",
+            "label": "State/Province",
+            "required": false
+          },
+          {
+            "type": "text",
+            "name": "zip",
+            "label": "Postal Code",
+            "required": true
+          },
+          {
+            "type": "choice",
+            "name": "country",
+            "label": "Country",
+            "required": true,
+            "options": [
+              "France",
+              "United States",
+              "Italy",
+              "Saudi Arabia",
+              "United Arab Emirates",
+              "Algeria",
+              "Germany",
+              "Canada",
+              "Other"
+            ]
+          },
+          {
+            "type": "textarea",
+            "name": "instructions",
+            "label": "Delivery Instructions (optional)",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  "pricing_config": {
+    "base_price": 30,
+    "fields": {
+      "purpose": {
+        "Focus Mode": 0,
+        "Reading Light": 5,
+        "Movie Night": 7,
+        "Party Scene": 12,
+        "Gaming Session": 10,
+        "Meditation": 4,
+        "Workout": 6,
+        "Study Mode": 3,
+        "Relaxation": 4,
+        "Sleep Time": 5,
+        "Wake Up": 5,
+        "Mood Lighting": 8,
+  "Custom Purpose": 15
+      },
+      "shape": {
+        "Circle": 0,
+        "Square": 0,
+        "Hexagon": 6,
+        "Octagon": 8,
+        "Diamond": 5,
+        "Star": 10,
+        "Triangle": 4,
+        "Heart": 9,
+        "Oval": 3,
+        "Pentagon": 6,
+        "Rounded Square": 2,
+        "Pill": 3,
+        "Cloud": 7,
+        "Flower": 11,
+        "Lightning": 12,
+        "Custom Shape": 15
+      },
+      "color": {
+        "Blue": 0,
+        "Purple": 0,
+        "Green": 0,
+        "Yellow": 2,
+        "Pink": 2,
+        "Red": 2,
+        "Teal": 3,
+        "Indigo": 3,
+        "Lime": 2,
+        "Cyan": 2,
+        "Orange": 3,
+        "Custom": 10
+      },
+      "finish": {
+        "Matte": 0,
+        "Glossy": 4,
+        "Satin": 5,
+        "Metallic": 12,
+        "Pearl": 9,
+        "Textured": 6,
+        "Carbon Fiber": 18,
+        "Soft Touch": 7,
+  "Custom Finish": 25
+      },
+      "text_size": {
+        "Small (10px)": 0,
+        "Medium (14px)": 2,
+        "Large (18px)": 4,
+        "Extra Large (24px)": 6
+      }
+    }
+  }
+}

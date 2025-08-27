@@ -1,0 +1,248 @@
+{
+  "homepage": {
+    "urgency_banner": {
+      "text": "🎶 Limited creative slots this week — reserve your custom song now!",
+      "style": "highlight",
+      "contact": "Contact Us",
+      "adventures": "Ideas",
+      "examples": "Examples"
+    },
+    "about": {
+      "title": "About Your Custom Song",
+      "text": "We craft original mini songs (60–120s) based on the mood, story, and style you choose. Perfect for gifts, proposals, birthdays, motivation or just for fun."
+    },
+    "features": {
+      "title": "Features",
+      "subtitle": "Why People Love These Songs",
+      "items": [
+        { "icon": "🎵", "title": "Original Composition", "text": "Every song is written & produced from scratch." },
+        { "icon": "💌", "title": "Emotion First", "text": "We focus on the story you want to tell." },
+  { "icon": "⚡", "title": "Fast Preparation", "text": "Prepared in 3 days max (sent via email)." }
+      ]
+    },
+    "examples": {
+      "title": "Sample Themes",
+      "items": [
+        { "text": "Upbeat birthday pop track" },
+        { "text": "Romantic acoustic love song" },
+        { "text": "Epic cinematic motivational piece" }
+      ]
+    },
+    "gallery": {
+      "title": "Personalized Song",
+      "subtitle": "A custom original song — your story, mood & style in music."
+    },
+    "how_it_works": {
+      "title": "How It Works",
+      "steps": [
+        { "title": "Tell Us the Story", "description": "Share the mood, who it's for, and any key phrases." },
+        { "title": "We Write & Produce", "description": "Professional songwriter + AI assisted inspiration." },
+        { "title": "You Review", "description": "Optional revision on higher tiers." },
+  { "title": "Preparation", "description": "Prepared in up to 3 days — email with MP3 + WAV (tier-based) plus lyrics PDF or optional lyric video." },
+        { "title": "Make Yours", "description": "Start now — it only takes a minute." }
+      ]
+    },
+    "why_people_love_it": {
+      "title": "Why It Matters",
+      "points": [
+        "A unique emotional gift",
+        "Captures memory in music",
+        "Reusable for slideshows & events"
+      ]
+    },
+    "pricing": {
+      "title": "Pricing",
+      "plans": [
+        { "name": "Starter", "price": "€49", "features": ["~60s length", "1 mood/style", "Lyrics included", "MP3 delivery"] },
+        { "name": "Pro", "price": "€89", "features": ["75–90s length", "2 moods/styles blend", "1 revision", "MP3 + WAV", "Basic mixing polish" ] },
+        { "name": "Ultimate", "price": "€149", "features": ["Up to 120s length", "Complex arrangement", "2 revisions", "HQ WAV stems", "Priority delivery"] }
+      ]
+    },
+    "testimonials": {
+      "title": "What People Say",
+      "items": [
+        { "name": "Elena", "comment": "I cried listening — it felt like us.", "rating": 5 },
+        { "name": "Marco", "comment": "Perfect surprise gift, super professional sound.", "rating": 4.5 }
+      ]
+    },
+    "faq": [
+      { "q": "Can I use the song commercially?", "a": "Personal use by default. Ask us for a commercial upgrade option." },
+      { "q": "What genres can I pick?", "a": "Pop, acoustic, cinematic, piano, EDM-lite, lofi, ambient, epic and more." },
+      { "q": "Do I own the lyrics?", "a": "Yes for personal use; we retain composition rights unless upgraded." }
+    ],
+    "cta": {
+      "title": "Ready to Hear Your Story in Music?",
+      "description": "Start your personalized song now — the first step takes less than a minute.",
+      "button": "Start Creating"
+    },
+    "footer": {
+      "company_name": "CustomSound Lab",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Use",
+      "contact": "Contact",
+      "copyright": "© 2025 Personalized Song"
+    }
+  },
+  "form": {
+    "steps": [
+      {
+        "id": "song_purpose",
+        "title": "Occasion & Recipient",
+        "fields": [
+          { "type": "select_box", "name": "occasion", "label": "Occasion", "required": true, "options": ["Birthday", "Anniversary", "Proposal", "Motivation", "Friendship", "Just Because", "Custom..."] },
+          { "type": "text", "name": "custom_occasion", "label": "Custom Occasion", "required": false, "conditional": { "field": "occasion", "value": "Custom..." } },
+          { "type": "text", "name": "recipient_name", "label": "Recipient Name", "placeholder": "Name of who the song is for (you or someone else)", "required": false }
+          
+        ]
+      },
+      {
+        "id": "style",
+        "title": "Style & Mood",
+        "fields": [
+          { "type": "select_box", "name": "primary_style", "label": "Primary Style", "required": true, "options": ["Pop", "Acoustic", "Piano", "Cinematic", "Lofi", "Ambient", "Electronic", "Folk", "Epic", "Orchestral", "Jazz", "Chill", "Trap", "Rock", "Custom Style"] },
+          { "type": "text", "name": "custom_style", "label": "Describe Custom Style", "required": true, "placeholder": "e.g., Retro synthwave + orchestral", "conditional": { "field": "primary_style", "value": "Custom Style" } },
+          { "type": "select_box", "name": "mood", "label": "Main Mood", "required": true, "options": ["Happy", "Romantic", "Melancholic", "Empowering", "Inspiring", "Calm", "Energetic", "Uplifting", "Dreamy", "Custom Mood"] },
+          { "type": "text", "name": "custom_mood", "label": "Custom Mood", "required": false, "conditional": { "field": "mood", "value": "Custom Mood" } },
+          { "type": "select_box", "name": "lyric_focus", "label": "Lyric Focus", "required": true, "options": ["Names", "Storytelling", "Message Emphasis", "Minimal Lyrics", "Instrumental", "Custom Focus"] },
+          { "type": "text", "name": "custom_focus", "label": "Custom Lyric Focus", "required": false, "conditional": { "field": "lyric_focus", "value": "Custom Focus" } }
+        ]
+      },
+      {
+        "id": "extras",
+        "title": "Extras",
+        "fields": [
+          { "type": "select_box", "name": "length", "label": "Song Length", "required": true, "options": ["~60s", "~90s", "Up to 120s"] }
+        ]
+      },
+      {
+        "id": "story_details",
+        "title": "Story / Key Details",
+        "fields": [
+          { "type": "suggestion_textarea", "name": "story", "label": "Story / Key Details", "suggestions": [
+            "Best friend turning 30 – loves hiking & coffee",
+            "Romantic 5th anniversary – include 'forever my home'",
+            "Birthday hype for my brother (just graduated)",
+            "Motivation: overcoming challenges & staying resilient",
+            "Lullaby for baby niece Lina (gentle, soothing)",
+            "Proposal build up ending with 'Will you marry me?'",
+            "Include inside joke about 'midnight noodle runs'",
+            "Add hopeful tone about new beginnings in 2025"
+          ], "placeholder": "Write a few lines about the context, feelings, names, phrases...", "helper": "Click suggestions to append. Add names, emotions, inside jokes, key phrases.", "maxLength": 600, "required": false }
+        ]
+      },
+      {
+        "id": "voice",
+        "title": "Voice & Lyrics",
+        "description": "Optional voice cloning (1–2 min spoken sample). We only use the sample to generate THIS song and do not store, sell, or misuse your voice.",
+        "fields": [
+          { "type": "binary_cards", "name": "voice_option", "label": "Voice Option", "required": true, "helper": "Custom voice adds cloning of your tone from a short spoken sample.", "options": [
+            { "label": "Standard Voice", "value": "Standard Voice", "description": "Professionally produced vocal in a fitting style." },
+            { "label": "Custom Voice (Your Voice)", "value": "Custom Voice (Your Voice)", "description": "We recreate your vocal timbre. Sample deleted after rendering.", "badge": "+50€", "icon": "mic" }
+          ] },
+          { "type": "file", "name": "voice_sample", "label": "Upload Voice Sample (1–2 min speaking)", "required": false, "accept": "audio/*", "multiple": false, "conditional": { "field": "voice_option", "value": "Custom Voice (Your Voice)" } },
+          { "type": "binary_cards", "name": "lyric_video", "label": "Lyric Video", "required": true, "helper": "Choose whether you want a lyric video.", "options": [
+            { "label": "No Video", "value": "No Video", "description": "Just audio + lyrics PDF." },
+            { "label": "Lyric Video", "value": "Lyric Video", "description": "We create a simple lyric video.", "icon": "video" }
+          ] },
+          { "type": "file", "name": "lyric_video_cover", "label": "Lyric Video Cover Image (optional)", "required": false, "accept": "image/*", "multiple": false, "helper": "Upload an image if you selected lyric video.", "conditional": { "field": "lyric_video", "value": "Lyric Video" } },
+          { "type": "binary_cards", "name": "lyrics_source", "label": "Lyrics Source", "required": true, "helper": "Provide yours if you already wrote lines; otherwise let us craft them.", "options": [
+            { "label": "We generate the lyrics", "value": "We generate the lyrics", "description": "We write original lyrics based on your inputs." },
+            { "label": "I will provide the lyrics", "value": "I will provide the lyrics", "description": "You paste draft or full lyrics (we may lightly adapt).", "badge": "-5€", "icon": "star" }
+          ] },
+            { "type": "textarea", "name": "provided_lyrics", "label": "Enter Lyrics (draft / key lines)", "required": false, "placeholder": "Paste your lyrics or outline...", "conditional": { "field": "lyrics_source", "value": "I will provide the lyrics" } },
+          { "type": "textarea", "name": "voice_note", "label": "Additional Notes (voice / pronunciation)", "required": false, "placeholder": "Pronunciations, names, accents, pacing..." }
+        ]
+      },
+      {
+        "id": "customer_info",
+        "title": "Your Info",
+        "fields": [
+          { "type": "text", "name": "full_name", "label": "Full Name", "required": true },
+          { "type": "email", "name": "email", "label": "Email Address", "required": true },
+          { "type": "tel", "name": "phone", "label": "Phone Number (optional)", "required": false }
+        ]
+      },
+      {
+        "id": "delivery",
+        "title": "Delivery",
+        "fields": [
+          { "type": "text", "name": "street", "label": "Street Address", "required": true },
+          { "type": "text", "name": "city", "label": "City", "required": true },
+          { "type": "text", "name": "state", "label": "State/Province", "required": false },
+          { "type": "text", "name": "zip", "label": "Postal Code", "required": true },
+          { "type": "choice", "name": "country", "label": "Country", "required": true, "options": ["France", "United States", "Italy", "Saudi Arabia", "United Arab Emirates", "Algeria", "Germany", "Canada", "Other"] },
+          { "type": "textarea", "name": "instructions", "label": "Delivery Instructions (optional)", "required": false }
+        ]
+      }
+    ]
+  },
+  "pricing_config": {
+    "base_price": 49,
+    "fields": {
+      "occasion": {
+        "Birthday": 0,
+        "Anniversary": 5,
+        "Proposal": 15,
+        "Motivation": 5,
+        "Friendship": 0,
+        "Just Because": 0,
+        "Custom...": 10
+      },
+      "primary_style": {
+        "Pop": 0,
+        "Acoustic": 0,
+        "Piano": 4,
+        "Cinematic": 12,
+        "Lofi": 2,
+        "Ambient": 3,
+        "Electronic": 6,
+        "Folk": 2,
+        "Epic": 14,
+        "Orchestral": 16,
+        "Jazz": 10,
+        "Chill": 3,
+        "Trap": 6,
+        "Rock": 8,
+        "Custom Style": 18
+      },
+      "mood": {
+        "Happy": 0,
+        "Romantic": 4,
+        "Melancholic": 5,
+        "Empowering": 6,
+        "Inspiring": 5,
+        "Calm": 2,
+        "Energetic": 6,
+        "Uplifting": 4,
+        "Dreamy": 3,
+        "Custom Mood": 8
+      },
+      "lyric_focus": {
+        "Names": 0,
+        "Storytelling": 6,
+        "Message Emphasis": 4,
+        "Minimal Lyrics": -2,
+        "Instrumental": -5,
+        "Custom Focus": 8
+      },
+      "delivery_speed": {
+        "Standard (3 days)": 0,
+        "Express (48h)": 15,
+        "Rush (24h)": 35
+      },
+      "length": {
+        "~60s": 0,
+        "~90s": 15,
+        "Up to 120s": 35
+      },
+      "voice_option": {
+        "Standard Voice": 0,
+        "Custom Voice (Your Voice)": 50
+      },
+      "lyrics_source": {
+        "We generate the lyrics": 0,
+        "I will provide the lyrics": -5
+      }
+    }
+  }
+}

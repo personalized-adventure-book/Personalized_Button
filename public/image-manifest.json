@@ -1,0 +1,86 @@
+{
+  "Button": {
+    "gallery": {
+      "ar": [
+        "gallery_01.png",
+        "gallery_02.jpg",
+        "gallery_03.jpg",
+        "gallery_04.jpg",
+        "gallery_05.jpg",
+        "gallery_06.jpg",
+        "gallery_07.jpg",
+        "gallery_08.jpg",
+        "gallery_09.jpg",
+        "gallery_10.jpg",
+        "gallery_11.jpg",
+        "gallery_12.jpg",
+        "gallery_13.png",
+        "gallery_14.png"
+      ],
+      "en": [
+        "gallery_01.png",
+        "gallery_02.jpg",
+        "gallery_03.jpg",
+        "gallery_04.jpg",
+        "gallery_05.jpg",
+        "gallery_06.jpg",
+        "gallery_07.jpg",
+        "gallery_08.jpg",
+        "gallery_09.jpg",
+        "gallery_10.jpg",
+        "gallery_11.jpg",
+        "gallery_12.jpg",
+        "gallery_13.png",
+        "gallery_14.png"
+      ],
+      "fr": [
+        "gallery_01.png",
+        "gallery_02.jpg",
+        "gallery_03.jpg",
+        "gallery_04.jpg",
+        "gallery_05.jpg",
+        "gallery_06.jpg",
+        "gallery_07.jpg",
+        "gallery_08.jpg",
+        "gallery_09.jpg",
+        "gallery_10.jpg",
+        "gallery_11.png",
+        "gallery_12.png"
+      ],
+      "it": [
+        "gallery_01.png",
+        "gallery_02.jpg",
+        "gallery_03.jpg",
+        "gallery_04.jpg",
+        "gallery_05.jpg",
+        "gallery_06.jpg",
+        "gallery_07.jpg",
+        "gallery_08.jpg",
+        "gallery_09.jpg",
+        "gallery_10.jpg",
+        "gallery_11.jpg",
+        "gallery_12.png",
+        "gallery_13.png"
+      ]
+    },
+    "hero": {},
+    "features": {},
+    "demo": {
+      "files": [
+        "Demo.mov"
+      ]
+    }
+  },
+  "Book": {
+    "gallery": {},
+    "hero": {},
+    "features": {},
+    "demo": {}
+  },
+  "Branding": {
+    "gallery": {},
+    "hero": {},
+    "features": {},
+    "demo": {}
+  }
+}

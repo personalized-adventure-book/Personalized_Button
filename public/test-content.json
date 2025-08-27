@@ -1,0 +1,40 @@
+{
+  "hero": {
+    "title": "Create Your Perfect Custom Button",
+    "subtitle": "Design personalized buttons with our intuitive builder. Choose from multiple shapes, colors, and styles.",
+    "background_image": "hero-bg.jpg",
+    "primary_cta": {
+      "text": "Start Creating",
+      "link": "/customize"
+    },
+    "secondary_cta": {
+      "text": "View Gallery",
+      "link": "/gallery"
+    }
+  },
+  "gallery": {
+    "title": "Button Gallery",
+    "subtitle": "Explore our collection of beautiful custom buttons - scroll horizontally to see more!"
+  },
+  "features": {
+    "title": "Why Choose Our Buttons",
+    "subtitle": "Premium quality with endless customization options",
+    "items": [
+      {
+        "icon": "✨",
+        "title": "Premium Materials",
+        "description": "High-quality materials that last long and look professional"
+      },
+      {
+        "icon": "🎨",
+        "title": "Custom Design",
+        "description": "Fully customizable designs to match your brand and style"
+      },
+      {
+        "icon": "🚚",
+        "title": "Fast Delivery",
+        "description": "Quick processing and shipping to get your buttons fast"
+      }
+    ]
+  }
+}

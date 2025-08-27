@@ -1,0 +1,202 @@
+{
+  "homepage": {
+    "urgency_banner": { "text": "🎶 Posti creativi limitati – prenota la tua canzone!", "style": "highlight", "contact": "Contatto", "adventures": "Idee", "examples": "Esempi" },
+    "about": { "title": "Informazioni", "text": "Mini canzone 60–120s basata su stile e stato d'animo scelti." },
+    "features": { "title": "Caratteristiche", "subtitle": "Perché piace", "items": [
+      { "icon": "🎵", "title": "Composizione originale", "text": "Scritta da zero per te." },
+      { "icon": "💌", "title": "Emozione al centro", "text": "La storia guida la musica." },
+  { "icon": "⚡", "title": "Preparazione rapida", "text": "Preparazione entro 3 giorni max (invio via email)." }
+    ] },
+    "examples": { "title": "Temi", "items": [
+      { "text": "Brano pop energico di compleanno" },
+      { "text": "Ballata acustica romantica" },
+      { "text": "Pezzo epico cinematografico motivazionale" }
+    ] },
+    "gallery": { "title": "Canzone Personalizzata", "subtitle": "Una canzone originale basata sulla tua storia ed emozione" },
+    "how_it_works": { "title": "Come Funziona", "steps": [
+      { "title": "Racconta la storia", "description": "Occasione, persona, dettagli." },
+      { "title": "Scriviamo & produciamo", "description": "Autore + ispirazione assistita." },
+      { "title": "Revisione", "description": "Opzionale nei piani superiori." },
+  { "title": "Preparazione", "description": "Preparata entro 3 giorni max — email con MP3 + WAV (se incluso) e testo PDF o lyric video." },
+      { "title": "Inizia ora", "description": "Serve meno di un minuto." }
+    ] },
+    "why_people_love_it": { "title": "Perché Importa", "points": [
+      "Regalo emozionale unico",
+      "Cattura un ricordo in musica",
+      "Perfetto per video ed eventi"
+    ] },
+    "pricing": { "title": "Prezzi", "plans": [
+      { "name": "Start", "price": "€49", "features": ["~60s", "1 stile", "Testo incluso", "MP3"] },
+      { "name": "Pro", "price": "€89", "features": ["75–90s", "Blend 2 stili", "1 revisione", "MP3 + WAV", "Mix base"] },
+      { "name": "Ultimate", "price": "€149", "features": ["Fino a 120s", "Arrangiamento complesso", "2 revisioni", "Stems WAV HQ", "Prioritario"] }
+    ] },
+    "testimonials": { "title": "Recensioni", "items": [
+      { "name": "Elena", "comment": "Mi ha commosso, sembrava la nostra storia.", "rating": 5 },
+      { "name": "Marco", "comment": "Regalo perfetto, suono professionale.", "rating": 4.5 }
+    ] },
+    "faq": [
+      { "q": "Uso commerciale?", "a": "Uso personale di default. Licenza extra su richiesta." },
+      { "q": "Generi disponibili?", "a": "Pop, acustico, cinematografico, piano, lofi, ambient, epico..." },
+      { "q": "Testo di chi è?", "a": "Disponibile per uso personale; diritti completi opzionali." }
+    ],
+    "cta": { "title": "Pronto?", "description": "Inizia ora.", "button": "Inizia" },
+    "footer": { "company_name": "CustomSound Lab", "privacy": "Privacy", "terms": "Termini", "contact": "Contatto", "copyright": "© 2025 Personalized Song" }
+  },
+  "form": {
+    "steps": [
+      {
+        "id": "song_purpose",
+        "title": "Occasione & Destinatario",
+        "fields": [
+          { "type": "select_box", "name": "occasion", "label": "Occasione", "required": true, "options": ["Compleanno", "Anniversario", "Proposta", "Motivazione", "Amicizia", "Perché no", "Personalizzata..."] },
+          { "type": "text", "name": "custom_occasion", "label": "Occasione personalizzata", "required": false, "conditional": { "field": "occasion", "value": "Personalizzata..." } },
+          { "type": "text", "name": "recipient_name", "label": "Nome destinatario", "placeholder": "Nome della persona (tu o altri)", "required": false }
+          
+        ]
+      },
+      {
+        "id": "style",
+        "title": "Stile & Mood",
+        "fields": [
+          { "type": "select_box", "name": "primary_style", "label": "Stile principale", "required": true, "options": ["Pop", "Acustico", "Pianoforte", "Cinematico", "Lofi", "Ambient", "Elettronico", "Folk", "Epico", "Orchestrale", "Jazz", "Rilassato", "Trap", "Rock", "Stile personalizzato"] },
+          { "type": "text", "name": "custom_style", "label": "Descrivi stile personalizzato", "required": true, "placeholder": "es: Synthwave retrò + orchestrale", "conditional": { "field": "primary_style", "value": "Stile personalizzato" } },
+          { "type": "select_box", "name": "mood", "label": "Mood principale", "required": true, "options": ["Felice", "Romantico", "Malinconico", "Potenziante", "Ispirante", "Calmo", "Energico", "Esaltante", "Sognante", "Mood personalizzato"] },
+          { "type": "text", "name": "custom_mood", "label": "Mood personalizzato", "required": false, "conditional": { "field": "mood", "value": "Mood personalizzato" } },
+          { "type": "select_box", "name": "lyric_focus", "label": "Focus del testo", "required": true, "options": ["Nomi", "Storytelling", "Messaggio", "Testo minimale", "Strumentale", "Focus personalizzato"] },
+          { "type": "text", "name": "custom_focus", "label": "Focus personalizzato", "required": false, "conditional": { "field": "lyric_focus", "value": "Focus personalizzato" } }
+        ]
+      },
+      {
+        "id": "extras",
+        "title": "Extra",
+        "fields": [
+          { "type": "select_box", "name": "length", "label": "Durata", "required": true, "options": ["~60s", "~90s", "Fino a 120s"] }
+        ]
+      },
+      {
+        "id": "story_details",
+        "title": "Storia / Dettagli",
+        "fields": [
+          { "type": "suggestion_textarea", "name": "story", "label": "Storia / Dettagli", "suggestions": [
+            "Amica 30 anni – ama trekking & caffè",
+            "Romantico 5º anniversario – includere 'per sempre casa mia'",
+            "Compleanno fratello laureato – energia positiva",
+            "Motivazionale personale – superare sfide & resilienza",
+            "Ninna nanna dolce per nipotina Lina",
+            "Crescita verso proposta di matrimonio",
+            "Aggiungi battuta interna 'pasta di mezzanotte'",
+            "Sfumatura di speranza per nuovi inizi 2025"
+          ], "placeholder": "Scrivi alcune righe su contesto, emozioni, nomi, frasi...", "helper": "Clic per aggiungere. Inserisci nomi, ricordi, battute interne, parole chiave.", "maxLength": 600, "required": false }
+        ]
+      },
+      {
+        "id": "voice",
+        "title": "Voce & Personalizzazione",
+  "description": "Replica voce opzionale (campione parlato 1–2 minuti). Usiamo il campione solo per creare questa canzone e non lo conserviamo, riutilizziamo o vendiamo.",
+        "fields": [
+          { "type": "binary_cards", "name": "voice_option", "label": "Voce", "required": true, "helper": "La replica usa un breve campione parlato per ricreare il tuo timbro.", "options": [
+            { "label": "Voce standard", "value": "Voce standard", "description": "Voce prodotta professionalmente adatta allo stile." },
+            { "label": "Replica voce personalizzata", "value": "Replica voce personalizzata", "description": "Rigeneriamo il tuo timbro. Campione eliminato dopo il rendering.", "badge": "+50€", "icon": "mic" }
+          ] },
+          { "type": "file", "name": "voice_sample", "label": "Carica campione voce (1–2 min parlato)", "required": false, "accept": "audio/*", "multiple": false, "conditional": { "field": "voice_option", "value": "Replica voce personalizzata" } },
+          { "type": "binary_cards", "name": "lyric_video", "label": "Lyric Video", "required": true, "helper": "Scegli se desideri un lyric video.", "options": [
+            { "label": "Nessun video", "value": "Nessun video", "description": "Solo audio + PDF testo." },
+            { "label": "Lyric video", "value": "Lyric video", "description": "Creiamo un semplice lyric video.", "icon": "video" }
+          ] },
+          { "type": "file", "name": "lyric_video_cover", "label": "Immagine copertina lyric video (opzionale)", "required": false, "accept": "image/*", "multiple": false, "helper": "Carica se hai scelto lyric video.", "conditional": { "field": "lyric_video", "value": "Lyric video" } },
+          { "type": "binary_cards", "name": "lyrics_source", "label": "Testo", "required": true, "helper": "Fornisci il testo se già scritto; altrimenti lo creiamo noi.", "options": [
+            { "label": "Scriveteli voi", "value": "Scriveteli voi", "description": "Scriviamo testi originali dalle tue informazioni." },
+            { "label": "Li fornisco io", "value": "Li fornisco io", "description": "Incolli bozze o testo completo (piccoli adattamenti possibili).", "badge": "-5€", "icon": "star" }
+          ] },
+          { "type": "textarea", "name": "provided_lyrics", "label": "Inserisci il testo (bozza / frasi chiave)", "required": false, "placeholder": "Incolla testo o punti principali", "conditional": { "field": "lyrics_source", "value": "Li fornisco io" } },
+          { "type": "textarea", "name": "voice_note", "label": "Note aggiuntive (voce / pronuncia)", "required": false, "placeholder": "Accenti, nomi, pronunce particolari..." }
+        ]
+      },
+      {
+        "id": "customer_info",
+        "title": "I tuoi dati",
+        "fields": [
+          { "type": "text", "name": "full_name", "label": "Nome completo", "required": true },
+          { "type": "email", "name": "email", "label": "Email", "required": true },
+          { "type": "tel", "name": "phone", "label": "Telefono (opzionale)", "required": false }
+        ]
+      },
+      {
+        "id": "delivery",
+        "title": "Consegna",
+        "fields": [
+          { "type": "text", "name": "street", "label": "Indirizzo", "required": true },
+          { "type": "text", "name": "city", "label": "Città", "required": true },
+          { "type": "text", "name": "state", "label": "Provincia", "required": false },
+          { "type": "text", "name": "zip", "label": "CAP", "required": true },
+          { "type": "choice", "name": "country", "label": "Paese", "required": true, "options": ["Francia", "Stati Uniti", "Italia", "Arabia Saudita", "Emirati Arabi Uniti", "Algeria", "Germania", "Canada", "Altro"] },
+          { "type": "textarea", "name": "instructions", "label": "Istruzioni di consegna (opzionale)", "required": false }
+        ]
+      }
+    ]
+  },
+  "pricing_config": {
+    "base_price": 49,
+    "fields": {
+      "occasion": {
+        "Compleanno": 0,
+        "Anniversario": 5,
+        "Proposta": 15,
+        "Motivazione": 5,
+        "Amicizia": 0,
+        "Perché no": 0,
+        "Personalizzata...": 10
+      },
+      "primary_style": {
+        "Pop": 0,
+        "Acustico": 0,
+        "Pianoforte": 4,
+        "Cinematico": 12,
+        "Lofi": 2,
+        "Ambient": 3,
+        "Elettronico": 6,
+        "Folk": 2,
+        "Epico": 14,
+        "Orchestrale": 16,
+        "Jazz": 10,
+        "Rilassato": 3,
+        "Trap": 6,
+        "Rock": 8,
+        "Stile personalizzato": 18
+      },
+      "mood": {
+        "Felice": 0,
+        "Romantico": 4,
+        "Malinconico": 5,
+        "Potenziante": 6,
+        "Ispirante": 5,
+        "Calmo": 2,
+        "Energico": 6,
+        "Esaltante": 4,
+        "Sognante": 3,
+        "Mood personalizzato": 8
+      },
+      "lyric_focus": {
+        "Nomi": 0,
+        "Storytelling": 6,
+        "Messaggio": 4,
+        "Testo minimale": -2,
+        "Strumentale": -5,
+        "Focus personalizzato": 8
+      },
+      "length": {
+        "~60s": 0,
+        "~90s": 15,
+        "Fino a 120s": 35
+      },
+      "voice_option": {
+        "Voce standard": 0,
+        "Replica voce personalizzata": 50
+      },
+      "lyrics_source": {
+        "Scriveteli voi": 0,
+        "Li fornisco io": -5
+      }
+    }
+  }
+}
