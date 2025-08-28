@@ -43,6 +43,18 @@ export function getCurrentLanguage(): string {
 export function getCurrentProduct(): string {
   if (typeof window !== 'undefined') {
     const fullUrl = window.location.href;
+    // First allow explicit query parameter override: ?product=song / branding / book / button
+    try {
+      const usp = new URL(fullUrl).searchParams;
+      const qp = usp.get('product');
+      if (qp) {
+        const norm = qp.toLowerCase();
+        if (norm === 'song') return 'Song';
+        if (norm === 'branding') return 'Branding';
+        if (norm === 'book') return 'Book';
+        if (norm === 'button') return 'Button';
+      }
+    } catch {}
     
     // Look for product IDs with prefixes
     const idMatches = fullUrl.match(/(?:id=|#|\/|-)([A-Z]{2}\d+)/g);
@@ -70,6 +82,25 @@ export function getCurrentProduct(): string {
   }
   
   return 'Button'; // Default to Button
+}
+
+// Debug helper: force load song gallery audios even if page product detection failed
+export async function debugLoadSongAudios(max: number = 24) {
+  try {
+    const list = await getGalleryAudios(max, 'Song', getCurrentLanguage());
+    if (typeof window !== 'undefined') {
+      (window as any).AUDIO_SOURCES = list;
+      console.log('[debugLoadSongAudios] Loaded', list.length, 'audio sources');
+    }
+    return list;
+  } catch (e) {
+    console.error('[debugLoadSongAudios] failed', e);
+    return [];
+  }
+}
+
+if (typeof window !== 'undefined') {
+  try { (window as any).debugLoadSongAudios = debugLoadSongAudios; } catch {}
 }
 
 // Map language codes to folder names (same as JSON file mapping)
@@ -358,22 +389,31 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
         }
         const dirChosen = (window as any).__AUDIO_DIR_CASING__ || 'Audios';
         const resolved: { name: string; path: string }[] = [];
+        const statusLog: any[] = [];
         for (const originalName of list.slice(0, max)) {
           const baseDir = `${chosen || ''}/content/Song/${dirChosen}/gallery/${langFolder}`;
           const primaryPath = `${baseDir}/${originalName}`;
           // If primary extension fails HEAD, try alt (.mp3<->.wav)
           let finalPath = primaryPath;
+          let primaryOk: boolean | null = null;
+          let finalOk: boolean | null = null;
           try {
             const r = await fetch(primaryPath, { method: 'HEAD' });
+            primaryOk = r.ok;
             if (!r.ok) {
               const altName = originalName.endsWith('.wav') ? originalName.replace(/\.wav$/, '.mp3') : originalName.replace(/\.mp3$/, '.wav');
               if (altName !== originalName) {
                 const altPath = `${baseDir}/${altName}`;
-                try { const r2 = await fetch(altPath, { method: 'HEAD' }); if (r2.ok) finalPath = altPath; } catch {}
+                try { const r2 = await fetch(altPath, { method: 'HEAD' }); if (r2.ok) { finalPath = altPath; finalOk = true; } else { finalOk = false; } } catch { finalOk = false; }
               }
             }
+            if (finalOk == null) finalOk = primaryOk;
           } catch {}
           resolved.push({ name: originalName, path: finalPath });
+          statusLog.push({ originalName, primaryPath, finalPath, primaryOk, finalOk });
+        }
+        if (typeof window !== 'undefined') {
+          try { (window as any).AUDIO_FILE_STATUS = statusLog; } catch {}
         }
         return resolved;
       }
