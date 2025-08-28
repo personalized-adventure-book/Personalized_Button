@@ -280,7 +280,8 @@ function resolveBasePath(): string {
       const ap = (window as any)?.__NEXT_DATA__?.assetPrefix;
       if (ap) return String(ap).replace(/\/$/, '');
       // If site served at root (custom domain) but code still has old default, allow ''
-      // by detecting presence of audio-manifest without base path (async heuristic omitted here).
+  // Heuristic: if current location pathname does NOT start with the default base, prefer ''
+  if (!window.location.pathname.startsWith(DEFAULT_BASE_PATH + '/')) return '';
     }
   } catch {}
   return DEFAULT_BASE_PATH;
@@ -328,8 +329,28 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
       const manifest = await manifestResp.json();
       const list: string[] | undefined = manifest?.Song?.gallery?.[lang];
       if (Array.isArray(list) && list.length) {
-        const base2 = resolveBasePath();
-        return list.slice(0, max).map(name => ({ name, path: `${base2}/content/Song/Audios/gallery/${langFolder}/${name}` }));
+        let base2 = resolveBasePath();
+        let mapped = list.slice(0, max).map(name => ({ name, path: `${base2}/content/Song/Audios/gallery/${langFolder}/${name}` }));
+        // Quick verification: if first URL 404s, attempt root ('') fallback once
+        try {
+          if (mapped.length) {
+            const testUrl = mapped[0].path;
+            const headOk = await (async () => {
+              try { const r = await fetch(testUrl, { method: 'HEAD' }); return r.ok; } catch { return false; }})();
+            if (!headOk && base2) {
+              // Retry with root
+              const alt = list.slice(0, max).map(name => ({ name, path: `/content/Song/Audios/gallery/${langFolder}/${name}` }));
+              // Verify alt first
+              if (alt.length) {
+                try {
+                  const r2 = await fetch(alt[0].path, { method: 'HEAD' });
+                  if (r2.ok) return alt;
+                } catch {}
+              }
+            }
+          }
+        } catch {}
+        return mapped;
       }
     }
   } catch (e) {
