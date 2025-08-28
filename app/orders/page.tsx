@@ -16,7 +16,7 @@ function LoadingSpinner() {
 
 // Main orders content
 function OrdersPageContent() {
-  const { navigateWithId, id, mounted, getCurrentId, parseId } = useUrlId();
+  const { navigateWithId, id, mounted } = useUrlId();
   const { getContent, loading } = useStaticContent();
   const { trackPageView, trackDraftLoad, trackModalOpen, trackModalClose } = useTracking();
   const { t } = useLanguage();
@@ -32,18 +32,16 @@ function OrdersPageContent() {
   const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!mounted) return;
     // Load orders from cookies
     const loadOrders = () => {
-      const currentId = (getCurrentId() || 'BT1').toUpperCase();
+      const currentId = id || '1';
       const allOrders = orderStorage.getCompletedOrders();
-      const { productType } = parseId(currentId);
-      const ordersForProduct = allOrders.filter(o => o.id?.toUpperCase().startsWith(productType));
-
+      const ordersForCurrentId = orderStorage.getOrdersForId(currentId);
+      
       console.log('📋 All orders:', allOrders);
-      console.log('🧩 Product type', productType, '→ Orders:', ordersForProduct);
-
-      setOrders(ordersForProduct);
+      console.log('🆔 Orders for ID', currentId, ':', ordersForCurrentId);
+      
+      setOrders(ordersForCurrentId);
       setIsLoading(false);
     };
 
@@ -130,7 +128,7 @@ function OrdersPageContent() {
     
     // Track page view
     trackPageView('orders');
-  }, [mounted, id, getCurrentId, trackPageView]);
+  }, [id, trackPageView]);
 
   const handleDeleteOrder = (orderNumber: string) => {
     setOrderToDelete(orderNumber);
@@ -154,12 +152,9 @@ function OrdersPageContent() {
       }
       
       // Refresh the display
-      const currentId = (getCurrentId() || 'BT1').toUpperCase();
-      const { productType } = parseId(currentId);
-      const updatedOrdersForProduct = orderStorage
-        .getCompletedOrders()
-        .filter(o => o.id?.toUpperCase().startsWith(productType));
-      setOrders(updatedOrdersForProduct);
+      const currentId = id || '1';
+      const updatedOrdersForId = orderStorage.getOrdersForId(currentId);
+      setOrders(updatedOrdersForId);
       setSelectedOrder(null);
     }
     
@@ -200,18 +195,6 @@ function OrdersPageContent() {
     // Update local state
     const updatedDrafts = drafts.filter(draft => draft.id !== draftId);
     setDrafts(updatedDrafts);
-
-    // If no drafts remain, signal the homepage to reset its form and ensure cookie is cleared
-    try {
-      if (updatedDrafts.length === 0) {
-        // Clear homepage draft cookie defensively
-        document.cookie = 'mymood-home-form-draft=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;';
-        // Broadcast a reset signal; homepage listens for this and clears form state
-        localStorage.setItem('homeFormReset', String(Date.now()));
-      }
-    } catch (e) {
-      console.error('Error broadcasting home form reset:', e);
-    }
   };
 
   const handleResumeDraft = (draftId: string) => {
@@ -228,9 +211,9 @@ function OrdersPageContent() {
       localStorage.setItem('loadDraftData', JSON.stringify(draftToResume));
       navigateWithId('/customize');
     } else if (draftToResume.sourceKey === 'mymood-drafts') {
-      // Legacy drafts: pass the object directly for robust restore
-      localStorage.setItem('loadDraftData', JSON.stringify(draftToResume));
-      navigateWithId('/customize');
+      // For button builder drafts, navigate with draft parameter
+      const currentId = id || '1';
+      window.location.href = `/customize?id=${currentId}&draft=${draftId}`;
     } else if (draftToResume.sourceKey === 'homepage-cookie') {
       // Navigate back to homepage; it will auto-restore from cookie
       try {
@@ -562,6 +545,7 @@ Your personalized button will be created and shipped soon.
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
                   {`You have completed `}<strong>{orders.length}</strong>{` order${orders.length !== 1 ? 's' : ''}`}
+                  {id && ` for ID ${id}`}
                 </p>
                 <button
                   onClick={() => navigateWithId('/customize')}
