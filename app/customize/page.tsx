@@ -124,7 +124,7 @@ function CustomizePageContent() {
     document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
   };
 
-  // Restore draft once
+  // Restore draft once (from cookie or loadDraftData) and set step to last filled
   useEffect(() => {
     if (!mounted) return;
     if (!formData || !formData.steps.length) return;
@@ -136,9 +136,25 @@ function CustomizePageContent() {
       const parsed = JSON.parse(decodeURIComponent(cookieVal));
       if (parsed && parsed.values) {
         Object.entries(parsed.values).forEach(([k, v]) => updateFormValue(k, v));
+        // Determine last filled step: prefer parsed.step if valid; otherwise compute
+        let targetStep = 0;
         if (typeof parsed.step === 'number' && parsed.step >= 0 && parsed.step < formData.steps.length) {
-          setCurrentStep(parsed.step);
+          targetStep = parsed.step;
+        } else {
+          // Compute the highest step index where at least one field has data
+          for (let i = 0; i < formData.steps.length; i++) {
+            const step = formData.steps[i];
+            const hasAny = step.fields?.some((f: any) => {
+              const val = parsed.values?.[f.name];
+              if (val === undefined || val === null || val === '') return false;
+              if (Array.isArray(val)) return val.length > 0;
+              if (typeof val === 'object') return Object.keys(val).length > 0;
+              return true;
+            });
+            if (hasAny) targetStep = i;
+          }
         }
+        setCurrentStep(targetStep);
         if (typeof parsed.scrollPct === 'number') {
           setTimeout(() => {
             const target = Math.min(Math.max(parsed.scrollPct, 0), 1) * (document.documentElement.scrollHeight - window.innerHeight);
@@ -218,8 +234,25 @@ function CustomizePageContent() {
         Object.keys(draft.formData || {}).forEach(key => {
           updateFormValue(key, draft.formData[key]);
         });
-        // Set current step from draft
-        setCurrentStep(draft.currentStep || 0);
+        // Set current step from draft (compute fallback if missing/invalid)
+        let targetStep = Number.isInteger(draft.currentStep) ? draft.currentStep : -1;
+        if (!(targetStep >= 0 && targetStep < (formData?.steps?.length || 0))) {
+          targetStep = 0;
+          if (formData?.steps?.length) {
+            for (let i = 0; i < formData.steps.length; i++) {
+              const step = formData.steps[i];
+              const hasAny = step.fields?.some((f: any) => {
+                const val = (draft.formData || {})[f.name];
+                if (val === undefined || val === null || val === '') return false;
+                if (Array.isArray(val)) return val.length > 0;
+                if (typeof val === 'object') return Object.keys(val).length > 0;
+                return true;
+              });
+              if (hasAny) targetStep = i;
+            }
+          }
+        }
+        setCurrentStep(targetStep);
         // Clear the draft data from localStorage
         localStorage.removeItem('loadDraftData');
         console.log('Loaded draft data:', draft);

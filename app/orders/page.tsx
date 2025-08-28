@@ -16,7 +16,7 @@ function LoadingSpinner() {
 
 // Main orders content
 function OrdersPageContent() {
-  const { navigateWithId, id, mounted } = useUrlId();
+  const { navigateWithId, id, mounted, getCurrentId, parseId } = useUrlId();
   const { getContent, loading } = useStaticContent();
   const { trackPageView, trackDraftLoad, trackModalOpen, trackModalClose } = useTracking();
   const { t } = useLanguage();
@@ -32,16 +32,18 @@ function OrdersPageContent() {
   const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!mounted) return;
     // Load orders from cookies
     const loadOrders = () => {
-      const currentId = id || '1';
+      const currentId = (getCurrentId() || 'BT1').toUpperCase();
       const allOrders = orderStorage.getCompletedOrders();
-      const ordersForCurrentId = orderStorage.getOrdersForId(currentId);
-      
+      const { productType } = parseId(currentId);
+      const ordersForProduct = allOrders.filter(o => o.id?.toUpperCase().startsWith(productType));
+
       console.log('📋 All orders:', allOrders);
-      console.log('🆔 Orders for ID', currentId, ':', ordersForCurrentId);
-      
-      setOrders(ordersForCurrentId);
+      console.log('🧩 Product type', productType, '→ Orders:', ordersForProduct);
+
+      setOrders(ordersForProduct);
       setIsLoading(false);
     };
 
@@ -128,7 +130,7 @@ function OrdersPageContent() {
     
     // Track page view
     trackPageView('orders');
-  }, [id, trackPageView]);
+  }, [mounted, id, getCurrentId, trackPageView]);
 
   const handleDeleteOrder = (orderNumber: string) => {
     setOrderToDelete(orderNumber);
@@ -152,9 +154,12 @@ function OrdersPageContent() {
       }
       
       // Refresh the display
-      const currentId = id || '1';
-      const updatedOrdersForId = orderStorage.getOrdersForId(currentId);
-      setOrders(updatedOrdersForId);
+      const currentId = (getCurrentId() || 'BT1').toUpperCase();
+      const { productType } = parseId(currentId);
+      const updatedOrdersForProduct = orderStorage
+        .getCompletedOrders()
+        .filter(o => o.id?.toUpperCase().startsWith(productType));
+      setOrders(updatedOrdersForProduct);
       setSelectedOrder(null);
     }
     
@@ -195,6 +200,21 @@ function OrdersPageContent() {
     // Update local state
     const updatedDrafts = drafts.filter(draft => draft.id !== draftId);
     setDrafts(updatedDrafts);
+
+    // Signal the homepage to reset when the homepage draft is deleted,
+    // and also if no drafts remain as a defensive fallback
+    try {
+      if (sourceKey === 'homepage-cookie') {
+        // Explicit reset if the in-progress homepage draft was removed
+        localStorage.setItem('homeFormReset', String(Date.now()));
+      } else if (updatedDrafts.length === 0) {
+        // Defensive: if user cleared all drafts, ensure homepage resets too
+        document.cookie = 'mymood-home-form-draft=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;';
+        localStorage.setItem('homeFormReset', String(Date.now()));
+      }
+    } catch (e) {
+      console.error('Error broadcasting home form reset:', e);
+    }
   };
 
   const handleResumeDraft = (draftId: string) => {
@@ -211,9 +231,9 @@ function OrdersPageContent() {
       localStorage.setItem('loadDraftData', JSON.stringify(draftToResume));
       navigateWithId('/customize');
     } else if (draftToResume.sourceKey === 'mymood-drafts') {
-      // For button builder drafts, navigate with draft parameter
-      const currentId = id || '1';
-      window.location.href = `/customize?id=${currentId}&draft=${draftId}`;
+      // Legacy drafts: pass the object directly for robust restore
+      localStorage.setItem('loadDraftData', JSON.stringify(draftToResume));
+      navigateWithId('/customize');
     } else if (draftToResume.sourceKey === 'homepage-cookie') {
       // Navigate back to homepage; it will auto-restore from cookie
       try {
@@ -227,41 +247,83 @@ function OrdersPageContent() {
     }
   };
 
-  const handleDownloadReceipt = (order: CompletedOrder) => {
-    const receipt = `
-ORDER CONFIRMATION
-==================
-Order #: ${order.orderNumber}
-Date: ${new Date(order.timestamp).toLocaleDateString()}
-Time: ${new Date(order.timestamp).toLocaleTimeString()}
+  const handleDownloadReceipt = async (order: CompletedOrder) => {
+    try {
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const left = 48;
+      const right = 560; // ~page width - margin
+      let y = 64;
+      const bottom = 800;
 
-ORDER DETAILS:
-${Object.entries(order.orderData)
-  .filter(([key, value]) => value && key !== 'experiences')
-  .map(([key, value]) => `${key.replace(/_/g, ' ').toUpperCase()}: ${value}`)
-  .join('\n')}
+      const ensureSpace = (advance = 18) => {
+        if (y + advance > bottom) {
+          doc.addPage();
+          y = 64;
+        }
+      };
 
-${order.orderData.experiences ? `
-EXPERIENCES:
-${order.orderData.experiences.map((exp: any, index: number) => `
-${index + 1}. ${exp.activity_name || 'Unnamed Experience'}
-   Details: ${exp.experience_details || 'No details provided'}
-   Characters: ${exp.characters_involved || 'None specified'}
-`).join('')}` : ''}
+      const line = (text: string, opts?: { bold?: boolean; size?: number }) => {
+        const { bold, size } = opts || {};
+        doc.setFontSize(size ?? 12);
+        doc.setFont('helvetica', bold ? 'bold' : 'normal');
+        const split = doc.splitTextToSize(text, right - left);
+        split.forEach((t: string) => {
+          ensureSpace();
+          doc.text(t, left, y);
+          y += 18;
+        });
+      };
 
-Thank you for your order!
-Your personalized button will be created and shipped soon.
-    `.trim();
+      // Header
+      doc.setFontSize(18); doc.setFont('helvetica', 'bold');
+      doc.text('Order Confirmation', left, y); y += 28;
+      doc.setFontSize(12); doc.setFont('helvetica', 'normal');
+      line(`Order #: ${order.orderNumber}`, { bold: true });
+      line(`Date: ${new Date(order.timestamp).toLocaleDateString()}  Time: ${new Date(order.timestamp).toLocaleTimeString()}`);
+      if (order.id) line(`Product ID: ${order.id}`);
+      y += 8;
 
-    const blob = new Blob([receipt], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `order-${order.orderNumber}-receipt.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+      // Customer
+      line('Customer', { bold: true });
+      const customer = order.orderData?.full_name || order.orderData?.customer_name || 'Customer';
+      line(String(customer));
+      y += 8;
+
+      // Order details
+      line('Order Details', { bold: true });
+      Object.entries(order.orderData || {})
+        .filter(([k, v]) => v && k !== 'experiences')
+        .forEach(([k, v]) => {
+          const value = typeof v === 'object' ? JSON.stringify(v) : String(v);
+          line(`${k.replace(/_/g, ' ').toUpperCase()}: ${value}`);
+        });
+      y += 8;
+
+      // Experiences
+      const exps = (order.orderData as any)?.experiences;
+      if (Array.isArray(exps) && exps.length) {
+        line('Experiences', { bold: true });
+        exps.forEach((exp: any, idx: number) => {
+          line(`${idx + 1}. ${exp?.activity_name || 'Unnamed Experience'}`, { bold: true });
+          if (exp?.experience_details) line(`Details: ${exp.experience_details}`);
+          if (exp?.characters_involved) line(`Characters: ${exp.characters_involved}`);
+          y += 6;
+        });
+      }
+      y += 12;
+      line('Thank you for your order! Your personalized item will be created and shipped soon.');
+
+      doc.save(`order-${order.orderNumber}-receipt.pdf`);
+    } catch (e) {
+      console.error('PDF generation failed, falling back to text:', e);
+      const receipt = `Order #${order.orderNumber}`;
+      const blob = new Blob([receipt], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `order-${order.orderNumber}-receipt.txt`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
   };
 
   if (!mounted || isLoading || loading) {
@@ -545,7 +607,6 @@ Your personalized button will be created and shipped soon.
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
                   {`You have completed `}<strong>{orders.length}</strong>{` order${orders.length !== 1 ? 's' : ''}`}
-                  {id && ` for ID ${id}`}
                 </p>
                 <button
                   onClick={() => navigateWithId('/customize')}

@@ -317,6 +317,12 @@ const useTranslations = (language: Language) => {
       // Order Confirmation Modal
       "confirmation.title": "Order Confirmed!",
       "confirmation.orderNumber": "Order #",
+      // Product-specific thank you messages
+      "confirmation.thankYou.button": "Thank you for your order! Your custom MyMood Button is now being prepared.",
+      "confirmation.thankYou.book": "Thank you for your order! Your personalized MyMood Book is now being prepared.",
+      "confirmation.thankYou.branding": "Thank you for your order! Your personalized MyMood Branding package is now being prepared.",
+      "confirmation.thankYou.song": "Thank you for your order! Your personalized MyMood Song is now being prepared.",
+      // Generic fallback
       "confirmation.thankYou":
         "Thank you for your order! Your custom MyMood Button is now being prepared.",
       "confirmation.emailSent": "📧 Confirmation email sent to your inbox",
@@ -705,10 +711,16 @@ const useTranslations = (language: Language) => {
       "review.standaloneMode": "Mode autonome",
 
       // Order Confirmation Modal
-      "confirmation.title": "Commande Confirmée !",
-      "confirmation.orderNumber": "Commande #",
-      "confirmation.thankYou":
-        "Merci pour votre commande ! Votre bouton MyMood personnalisé est maintenant en préparation.",
+  "confirmation.title": "Commande Confirmée !",
+  "confirmation.orderNumber": "Commande #",
+  // Product-specific thank you messages
+  "confirmation.thankYou.button": "Merci pour votre commande ! Votre bouton MyMood personnalisé est maintenant en préparation.",
+  "confirmation.thankYou.book": "Merci pour votre commande ! Votre livre MyMood personnalisé est maintenant en préparation.",
+  "confirmation.thankYou.branding": "Merci pour votre commande ! Votre pack de branding MyMood personnalisé est maintenant en préparation.",
+  "confirmation.thankYou.song": "Merci pour votre commande ! Votre chanson MyMood personnalisée est maintenant en préparation.",
+  // Generic fallback
+  "confirmation.thankYou": "Merci pour votre commande ! Votre bouton MyMood personnalisé est maintenant en préparation.",
+
       "confirmation.emailSent":
         "📧 Email de confirmation envoyé dans votre boîte de réception",
       "confirmation.whatNext": "Que se passe-t-il ensuite ?",
@@ -1026,8 +1038,8 @@ const useTranslations = (language: Language) => {
       "review.wifiEnabled": "WiFi habilitado con funciones inteligentes",
       "review.standaloneMode": "Modo independiente",
 
-      // Order Confirmation Modal
-      "confirmation.title": "¡Pedido Confirmado!",
+  // Order Confirmation Modal
+  "confirmation.title": "¡Pedido Confirmado!",
       "confirmation.orderNumber": "Pedido #",
       "confirmation.thankYou":
         "¡Gracias por tu pedido! Tu botón MyMood personalizado está ahora en preparación.",
@@ -1385,6 +1397,15 @@ const useTranslations = (language: Language) => {
   "orders.characters": "Personaggi",
   "orders.unnamedExperience": "Esperienza senza nome",
 
+  // Product-specific thank you messages (IT)
+  "confirmation.thankYou.button": "Grazie per il tuo ordine! Il tuo pulsante MyMood personalizzato è ora in preparazione.",
+  "confirmation.thankYou.book": "Grazie per il tuo ordine! Il tuo libro MyMood personalizzato è ora in preparazione.",
+  "confirmation.thankYou.branding": "Grazie per il tuo ordine! Il tuo pacchetto di branding MyMood personalizzato è ora in preparazione.",
+  "confirmation.thankYou.song": "Grazie per il tuo ordine! La tua canzone MyMood personalizzata è ora in preparazione.",
+  // Generic fallback (IT)
+  "confirmation.thankYou": "Grazie per il tuo ordine! Il tuo pulsante MyMood personalizzato è ora in preparazione.",
+
+  // Product-specific thank you messages (IT)
   "confirmation.downloadReceipt": "Scarica ricevuta",
   "confirmation.shareOrder": "Condividi ordine",
   "confirmation.confirmedProcessing": "Confermato e in lavorazione",
@@ -1748,8 +1769,7 @@ const useTranslations = (language: Language) => {
       // Order Confirmation Modal
       "confirmation.title": "تم تأكيد الطلب!",
       "confirmation.orderNumber": "طلب #",
-      "confirmation.thankYou":
-        "شكراً لطلبك! زر MyMood المخصص الآن قيد التحضير.",
+  // Note: Product-specific thank you messages are defined below with a fallback; no duplicate generic above.
       "confirmation.emailSent": "📧 تم إرسال رسالة تأكيد إلى بريدك الإلكتروني",
       "confirmation.whatNext": "ما الذي يحدث بعد ذلك؟",
       "confirmation.orderConfirmed": "تم تأكيد الطلب",
@@ -1853,6 +1873,14 @@ const useTranslations = (language: Language) => {
   "orders.customer": "العميل",
   "orders.characters": "الشخصيات",
   "orders.unnamedExperience": "تجربة بدون اسم",
+
+  // Product-specific thank you messages (AR)
+  "confirmation.thankYou.button": "شكراً لطلبك! زر MyMood المخصص الآن قيد التحضير.",
+  "confirmation.thankYou.book": "شكراً لطلبك! كتاب MyMood المخصص الآن قيد التحضير.",
+  "confirmation.thankYou.branding": "شكراً لطلبك! حزمة العلامة التجارية MyMood المخصصة الآن قيد التحضير.",
+  "confirmation.thankYou.song": "شكراً لطلبك! أغنيتك MyMood المخصصة الآن قيد التحضير.",
+  // Generic fallback (AR)
+  "confirmation.thankYou": "شكراً لطلبك! زر MyMood المخصص الآن قيد التحضير.",
 
   "confirmation.downloadReceipt": "تحميل الإيصال",
   "confirmation.shareOrder": "مشاركة الطلب",

@@ -14,13 +14,14 @@ function LoadingSpinner() {
 
 // Main order confirmation content
 function OrderConfirmationContent() {
-  const { navigateWithId, id, mounted } = useUrlId();
+  const { navigateWithId, id, mounted, getCurrentId, getProductTypeFromId } = useUrlId();
   const { getContent, loading } = useStaticContent();
   const { t } = useLanguage();
   const [orderData, setOrderData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [orderNumber] = useState(() => `ORD-${Date.now().toString().slice(-6)}`);
   const [orderSavedToCookies, setOrderSavedToCookies] = useState(false);
+  const [showDetails, setShowDetails] = useState(true);
 
   // Function to clear form data from localStorage and sessionStorage
   const clearFormData = () => {
@@ -64,6 +65,7 @@ function OrderConfirmationContent() {
   };
 
   useEffect(() => {
+    if (!mounted) return;
     // Get order data from localStorage (stored when form was completed)
     const savedOrderData = localStorage.getItem('completedOrderData');
     
@@ -72,9 +74,18 @@ function OrderConfirmationContent() {
         const parsedData = JSON.parse(savedOrderData);
         setOrderData(parsedData);
         
-        // Save order to cookies for the orders page
-        const currentId = id || '1';
-        const success = orderStorage.saveCompletedOrder(orderNumber, parsedData, currentId);
+        // Save order to cookies for the orders page using stable ID
+  const currentIdStable = getCurrentId() || 'BT1';
+  // Normalize saved id to product-type scope, so orders persist across language switches
+  const productScopedId = currentIdStable.substring(0, 2); // e.g., BT, BK, BR
+        // Avoid duplicate save if already present
+        const alreadySaved = orderStorage
+          .getCompletedOrders()
+          .some((o) => o.orderNumber === orderNumber);
+        let success = true;
+        if (!alreadySaved) {
+          success = orderStorage.saveCompletedOrder(orderNumber, parsedData, productScopedId);
+        }
         setOrderSavedToCookies(success);
         
         // Clear all form data immediately after saving to cookies
@@ -121,7 +132,7 @@ function OrderConfirmationContent() {
       // If no order data found, show message and let user decide
       setIsLoading(false);
     }
-  }, []);
+  }, [mounted]);
 
   const handleBackToHome = () => {
     // Clear the form data when going back to home
@@ -139,42 +150,59 @@ function OrderConfirmationContent() {
     navigateWithId('/orders');
   };
 
-  const handleDownloadReceipt = () => {
-    // Create a simple text receipt
-    const receipt = `
-ORDER CONFIRMATION
-==================
-Order #: ${orderNumber}
-Date: ${new Date().toLocaleDateString()}
-Time: ${new Date().toLocaleTimeString()}
-
-ORDER DETAILS:
-${orderData ? Object.entries(orderData)
-  .filter(([key, value]) => value && key !== 'experiences')
-  .map(([key, value]) => `${key.replace(/_/g, ' ').toUpperCase()}: ${value}`)
-  .join('\n') : 'No order details available'}
-
-${orderData?.experiences ? `
-EXPERIENCES:
-${orderData.experiences.map((exp: any, index: number) => `
-${index + 1}. ${exp.activity_name || 'Unnamed Experience'}
-   Details: ${exp.experience_details || 'No details provided'}
-   Characters: ${exp.characters_involved || 'None specified'}
-`).join('')}` : ''}
-
-Thank you for your order!
-Your personalized button will be created and shipped soon.
-    `.trim();
-
-    const blob = new Blob([receipt], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `order-${orderNumber}-receipt.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const handleDownloadReceipt = async () => {
+    try {
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const left = 48;
+      let y = 64;
+      const line = (text: string, opts?: { bold?: boolean; size?: number }) => {
+        const { bold, size } = opts || {};
+        if (size) doc.setFontSize(size); else doc.setFontSize(12);
+        doc.setFont('helvetica', bold ? 'bold' : 'normal');
+        const split = doc.splitTextToSize(text, 520);
+        split.forEach((t: string) => { doc.text(t, left, y); y += 18; });
+      };
+      // Header
+      doc.setFontSize(18); doc.setFont('helvetica', 'bold');
+      doc.text('Order Confirmation', left, y); y += 28;
+      doc.setFontSize(12); doc.setFont('helvetica', 'normal');
+      line(`Order #: ${orderNumber}`, { bold: true });
+      line(`Date: ${new Date().toLocaleDateString()}  Time: ${new Date().toLocaleTimeString()}`);
+      y += 8;
+      // Customer
+      line('Customer', { bold: true });
+      line(String(orderData?.full_name || orderData?.customer_name || 'Customer'));
+      y += 8;
+      // Order details
+      line('Order Details', { bold: true });
+      Object.entries(orderData || {})
+        .filter(([k, v]) => v && k !== 'experiences')
+        .forEach(([k, v]) => line(`${k.replace(/_/g, ' ').toUpperCase()}: ${typeof v === 'object' ? JSON.stringify(v) : String(v)}`));
+      y += 8;
+      // Experiences
+      if (orderData?.experiences?.length) {
+        line('Experiences', { bold: true });
+        orderData.experiences.forEach((exp: any, idx: number) => {
+          line(`${idx + 1}. ${exp.activity_name || 'Unnamed Experience'}`, { bold: true });
+          if (exp.experience_details) line(`Details: ${exp.experience_details}`);
+          if (exp.characters_involved) line(`Characters: ${exp.characters_involved}`);
+          y += 6;
+        });
+      }
+      y += 12;
+      line('Thank you for your order! Your personalized item will be created and shipped soon.');
+      doc.save(`order-${orderNumber}-receipt.pdf`);
+  } catch (e) {
+      console.error('PDF generation failed, falling back to text:', e);
+      // Fallback to original text receipt if PDF fails
+      const receipt = `Order #${orderNumber}`;
+      const blob = new Blob([receipt], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+      a.href = url; a.download = `order-${orderNumber}-receipt.txt`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
   };
 
   const handleShare = async () => {
@@ -254,7 +282,14 @@ Your personalized button will be created and shipped soon.
               {t('confirmation.title')}
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 animate-fade-in">
-              {t('confirmation.thankYou')}
+              {(() => {
+                const currentId = getCurrentId();
+                const productType = getProductTypeFromId(currentId);
+                const productKey = (productType || 'Button').toLowerCase();
+                const specificKey = `confirmation.thankYou.${productKey}`;
+                const translated = t(specificKey);
+                return translated === specificKey ? t('confirmation.thankYou') : translated;
+              })()}
             </p>
           </div>
         </div>
@@ -313,11 +348,20 @@ Your personalized button will be created and shipped soon.
             </div>
           </div>
 
-          {/* Order Details */}
+          {/* Order Details (toggleable) */}
           {orderData && (
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">{t('confirmation.orderDetails')}</h3>
-              
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('confirmation.orderDetails')}</h3>
+                <button
+                  onClick={() => setShowDetails((v) => !v)}
+                  className="text-sm px-3 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  {showDetails ? t('orders.hideDetails') : t('orders.viewDetails')}
+                </button>
+              </div>
+              {showDetails ? (
+              <div>
               <div className="grid md:grid-cols-2 gap-6">
                 {Object.entries(orderData)
                   .filter(([key, value]) => value && key !== 'experiences')
@@ -332,7 +376,7 @@ Your personalized button will be created and shipped soon.
                     </div>
                   ))}
               </div>
-
+              
               {/* Experiences Section */}
               {orderData.experiences && orderData.experiences.length > 0 && (
                 <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-600">
@@ -358,6 +402,8 @@ Your personalized button will be created and shipped soon.
                   </div>
                 </div>
               )}
+              </div>
+              ) : null}
             </div>
           )}
 
@@ -435,16 +481,10 @@ Your personalized button will be created and shipped soon.
               </p>
               <div className="flex flex-wrap gap-3">
                 <button
-                  onClick={() => navigateWithId('/support')}
+                  onClick={() => navigateWithId('/contact')}
                   className="text-sm bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-3 py-1 rounded border border-gray-300 dark:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-500 transition-colors"
                 >
                   {t('footer.contactUs')}
-                </button>
-                <button
-                  onClick={() => navigateWithId('/faq')}
-                  className="text-sm bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-3 py-1 rounded border border-gray-300 dark:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-500 transition-colors"
-                >
-                  {t('footer.faq')}
                 </button>
               </div>
             </div>
