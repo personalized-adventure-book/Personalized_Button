@@ -344,18 +344,11 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
   const limit = Math.min(max, 30);
   for (let i = 1; i <= limit; i++) {
     const num = i.toString().padStart(2, '0');
-    for (const ext of ['.mp3', '.wav', '.wov']) {
+  for (const ext of ['.wav', '.mp3', '.wov']) { // preserve order but no cross-extension substitution later
       const name = `song_gallery_${num}${ext}`;
       let path = `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}`;
       try {
-        if (await audioExists(path)) { files.push({ name, path }); break; }
-        // Try alternate extension if original missing (.wav->.mp3 or .mp3->.wav)
-        const altExt = ext === '.wav' ? '.mp3' : ext === '.mp3' ? '.wav' : '';
-        if (altExt) {
-          const altName = `song_gallery_${num}${altExt}`;
-          const altPath = `${prefix}/content/Song/Audios/gallery/${langFolder}/${altName}`;
-          if (await audioExists(altPath)) { files.push({ name: altName, path: altPath }); break; }
-        }
+    if (await audioExists(path)) { files.push({ name, path }); break; }
       } catch {}
     }
   }
