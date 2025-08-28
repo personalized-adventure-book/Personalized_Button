@@ -1,2 +1,2 @@
-*.wav filter=lfs diff=lfs merge=lfs -text
+# Removed wav from LFS so GitHub Pages serves real binary audio files
 *.mov filter=lfs diff=lfs merge=lfs -text
