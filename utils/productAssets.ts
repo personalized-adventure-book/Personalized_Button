@@ -357,7 +357,25 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
           } catch {}
         }
         const dirChosen = (window as any).__AUDIO_DIR_CASING__ || 'Audios';
-        return list.slice(0, max).map(name => ({ name, path: `${chosen || ''}/content/Song/${dirChosen}/gallery/${langFolder}/${name}` }));
+        const resolved: { name: string; path: string }[] = [];
+        for (const originalName of list.slice(0, max)) {
+          const baseDir = `${chosen || ''}/content/Song/${dirChosen}/gallery/${langFolder}`;
+          const primaryPath = `${baseDir}/${originalName}`;
+          // If primary extension fails HEAD, try alt (.mp3<->.wav)
+          let finalPath = primaryPath;
+          try {
+            const r = await fetch(primaryPath, { method: 'HEAD' });
+            if (!r.ok) {
+              const altName = originalName.endsWith('.wav') ? originalName.replace(/\.wav$/, '.mp3') : originalName.replace(/\.mp3$/, '.wav');
+              if (altName !== originalName) {
+                const altPath = `${baseDir}/${altName}`;
+                try { const r2 = await fetch(altPath, { method: 'HEAD' }); if (r2.ok) finalPath = altPath; } catch {}
+              }
+            }
+          } catch {}
+          resolved.push({ name: originalName, path: finalPath });
+        }
+        return resolved;
       }
     }
   } catch (e) {
