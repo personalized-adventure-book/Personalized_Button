@@ -1215,6 +1215,37 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     loadAudios();
   }, [currentProduct, currentLanguage, isSong]);
 
+  // Debug: fetch first bytes of each audio to verify correct RIFF header when ?audioDebug=1
+  useEffect(() => {
+    if (!isSong) return;
+    if (!audioSources.length) return;
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has('audioDebug')) return;
+    (async () => {
+      console.log('[AudioDebug] Inspecting first 32 bytes of each audio file');
+      for (let i = 0; i < audioSources.length; i++) {
+        const src = audioSources[i];
+        try {
+          const res = await fetch(src, { headers: { 'Range': 'bytes=0-31' } });
+          if (!res.ok && res.status !== 206) {
+            console.warn('[AudioDebug] Non-OK status', res.status, 'for', src);
+            continue;
+          }
+          const buf = new Uint8Array(await res.arrayBuffer());
+          const hex = Array.from(buf).map(b=>b.toString(16).padStart(2,'0')).join(' ');
+          const ascii = Array.from(buf).map(b => (b>=32 && b<=126)? String.fromCharCode(b) : '.').join('');
+          console.log(`[AudioDebug] #${i+1} ${src} bytes=`, hex, ' ascii=', ascii);
+          if (!(ascii.startsWith('RIFF') && ascii.includes('WAVE'))) {
+            console.warn('[AudioDebug] Missing RIFF/WAVE header (possibly HTML?) for', src);
+          }
+        } catch (e) {
+          console.warn('[AudioDebug] Failed to fetch bytes for', src, e);
+        }
+      }
+    })();
+  }, [audioSources, isSong]);
+
   // Prefetch metadata with a small concurrency limit to avoid many parallel network requests (faster first paint)
   useEffect(() => {
     if (!isSong) return;
