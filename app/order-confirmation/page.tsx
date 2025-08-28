@@ -14,7 +14,7 @@ function LoadingSpinner() {
 
 // Main order confirmation content
 function OrderConfirmationContent() {
-  const { navigateWithId, id, mounted, getCurrentId, getProductTypeFromId } = useUrlId();
+  const { navigateWithId, id, mounted, getCurrentId } = useUrlId();
   const { getContent, loading } = useStaticContent();
   const { t } = useLanguage();
   const [orderData, setOrderData] = useState<any>(null);
@@ -282,14 +282,7 @@ function OrderConfirmationContent() {
               {t('confirmation.title')}
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 animate-fade-in">
-              {(() => {
-                const currentId = getCurrentId();
-                const productType = getProductTypeFromId(currentId);
-                const productKey = (productType || 'Button').toLowerCase();
-                const specificKey = `confirmation.thankYou.${productKey}`;
-                const translated = t(specificKey);
-                return translated === specificKey ? t('confirmation.thankYou') : translated;
-              })()}
+              {t('confirmation.thankYou')}
             </p>
           </div>
         </div>
@@ -481,10 +474,16 @@ function OrderConfirmationContent() {
               </p>
               <div className="flex flex-wrap gap-3">
                 <button
-                  onClick={() => navigateWithId('/contact')}
+                  onClick={() => navigateWithId('/support')}
                   className="text-sm bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-3 py-1 rounded border border-gray-300 dark:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-500 transition-colors"
                 >
                   {t('footer.contactUs')}
+                </button>
+                <button
+                  onClick={() => navigateWithId('/faq')}
+                  className="text-sm bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-3 py-1 rounded border border-gray-300 dark:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-500 transition-colors"
+                >
+                  {t('footer.faq')}
                 </button>
               </div>
             </div>

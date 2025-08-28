@@ -107,10 +107,10 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 pt-20 md:pt-24">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-secondary-blue/5 to-secondary-purple/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center space-y-8">
             <h1 className="font-cal-sans text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white">
               Get in{" "}
@@ -127,8 +127,8 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Form & Info */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-        <div className="grid gap-10 md:gap-12 lg:grid-cols-2">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="grid lg:grid-cols-2 gap-12">
           {/* Contact Form */}
           <div className="space-y-8">
             <div>
@@ -161,7 +161,7 @@ export default function ContactPage() {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     First Name *
@@ -274,32 +274,30 @@ export default function ContactPage() {
             </div>
 
             <div className="space-y-6">
-              {contactInfo
-                .filter((info) => (info.href || '').startsWith('mailto:'))
-                .map((info, index) => {
+              {contactInfo.map((info, index) => {
                 const IconComponent = info.icon;
                 return (
-                  <div key={index} className="flex flex-col sm:flex-row sm:items-start gap-4">
+                  <div key={index} className="flex items-start space-x-4">
                     <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
                       <IconComponent className="w-6 h-6 text-primary" />
                     </div>
-                    <div className="min-w-0">
+                    <div>
                       <h3 className="font-semibold text-gray-900 dark:text-white">
                         {info.title}
                       </h3>
                       {info.href !== "#" ? (
                         <a
                           href={info.href}
-                          className="text-primary hover:text-primary/80 font-medium break-words inline-block"
+                          className="text-primary hover:text-primary/80 font-medium"
                         >
                           {info.value}
                         </a>
                       ) : (
-                        <p className="font-medium text-gray-900 dark:text-white break-words">
+                        <p className="font-medium text-gray-900 dark:text-white">
                           {info.value}
                         </p>
                       )}
-                      <p className="text-sm text-gray-600 dark:text-gray-400 break-words">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         {info.description}
                       </p>
                     </div>
@@ -308,11 +306,74 @@ export default function ContactPage() {
               })}
             </div>
 
-            {/* Map removed as per request: keep only the email contact info */}
+            {/* Map Placeholder */}
+            <div className="bg-gray-100 dark:bg-gray-800 rounded-xl h-64 flex items-center justify-center">
+              <div className="text-center space-y-2">
+                <MapPin className="w-8 h-8 mx-auto text-gray-400" />
+                <p className="text-gray-500 dark:text-gray-400">
+                  Interactive Map
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
-      {/* FAQ section removed as requested */}
+
+      {/* FAQ Section */}
+      <section className="bg-gray-50 dark:bg-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="font-cal-sans text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              Quick Answers
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Looking for immediate help? Check these common questions first.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+                How long does shipping take?
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Custom buttons typically ship within 2-3 weeks. We'll send
+                tracking information once your order ships.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+                Can I modify my order after placing it?
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Orders can be modified within 24 hours of placement. Contact us
+                immediately for any changes.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+                Do you offer bulk discounts?
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Yes! Contact us for special pricing on orders of 10 or more
+                buttons for businesses or events.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+                What's your return policy?
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                We offer a 30-day return policy for unused items. Custom designs
+                may have different terms.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

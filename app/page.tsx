@@ -205,56 +205,6 @@ function HomePageContent() {
     });
   };
 
-  // Always persist homepage scroll percentage for return navigation
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const onScroll = () => {
-      const doc = document.documentElement;
-      const maxScroll = doc.scrollHeight - window.innerHeight;
-      if (maxScroll <= 0) return;
-      const pct = window.scrollY / maxScroll;
-      try { sessionStorage.setItem('homeScrollPct', String(pct)); } catch {}
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  // Helper: robust scroll restore (retry until content height stabilizes)
-  const restoreScrollFromPct = useCallback((pct: number, initialDelay = 250, tries = 10, spacing = 150) => {
-    const apply = (attempt: number) => {
-      const doc = document.documentElement;
-      const maxScroll = doc.scrollHeight - window.innerHeight;
-      if (maxScroll > 0) {
-        const clamped = Math.min(Math.max(pct, 0), 1);
-        const target = clamped * maxScroll;
-        window.scrollTo({ top: target, behavior: 'instant' as ScrollBehavior });
-        return; // done
-      }
-      if (attempt < tries) {
-        setTimeout(() => apply(attempt + 1), spacing);
-      }
-    };
-    setTimeout(() => apply(0), initialDelay);
-  }, []);
-
-  // If reset was requested while away (from Orders page), apply it immediately on mount
-  useEffect(() => {
-    if (!shouldShowFormInHomepage) return;
-    if (!mounted) return;
-    try {
-      const marker = localStorage.getItem('homeFormReset');
-      if (marker) {
-        // Clear cookie + all storages and in-memory state before any restore runs
-        clearHomepageDraft();
-        clearAllFormData();
-        localStorage.removeItem('homeFormReset');
-        lastSavedHashRef.current = '';
-      }
-    } catch (e) {
-      console.error('Error applying deferred homepage reset:', e);
-    }
-  }, [shouldShowFormInHomepage, mounted, clearAllFormData]);
-
   // Restore draft from cookie (runs once after mount & form data available), then enable persisting
   useEffect(() => {
     if (!shouldShowFormInHomepage) return;
@@ -272,25 +222,14 @@ function HomePageContent() {
             setCurrentStep(parsed.step);
           }
           if (parsed && typeof parsed.scrollPct === 'number') {
-            restoreScrollFromPct(parsed.scrollPct, 300);
-          } else {
-            // Fallback: use session stored scroll percentage if cookie lacks scrollPct
-            const ss = sessionStorage.getItem('homeScrollPct');
-            if (ss) {
-              const pct = parseFloat(ss);
-              restoreScrollFromPct(pct, 300);
-            }
+            setTimeout(() => {
+              const target = Math.min(Math.max(parsed.scrollPct, 0), 1) * (document.documentElement.scrollHeight - window.innerHeight);
+              window.scrollTo({ top: target, behavior: 'instant' as ScrollBehavior });
+            }, 300);
           }
           setShowProgressRestored(true);
           setTimeout(() => setShowProgressRestored(false), 4000);
           console.log('✅ Restored homepage form draft from cookie');
-    } else {
-          // No cookie to restore; apply session-based scroll position if available
-          const ss = sessionStorage.getItem('homeScrollPct');
-          if (ss) {
-      const pct = parseFloat(ss);
-      restoreScrollFromPct(pct, 300);
-          }
         }
         restoredOnceRef.current = true;
       }
@@ -301,19 +240,6 @@ function HomePageContent() {
       initPersistReadyRef.current = true;
     }
   }, [shouldShowFormInHomepage, mounted, formData, setCurrentStep, updateFormValue]);
-
-  // Restore scroll position when homepage doesn't show the embedded form
-  useEffect(() => {
-    if (shouldShowFormInHomepage) return; // handled above with cookie/session fallback
-    if (!mounted) return;
-    try {
-      const ss = sessionStorage.getItem('homeScrollPct');
-      if (ss) {
-    const pct = parseFloat(ss);
-    restoreScrollFromPct(pct, 200);
-      }
-    } catch {}
-  }, [shouldShowFormInHomepage, mounted, restoreScrollFromPct]);
 
   // Track scroll percentage (throttled) when form visible
   useEffect(() => {
@@ -407,11 +333,15 @@ function HomePageContent() {
     const onStorage = (e: StorageEvent) => {
       if (e.key === 'homeFormReset') {
         try {
-    // Clear cookie and fully reset all form state (values across all steps, storages, and step index)
-    clearHomepageDraft();
-    clearAllFormData();
-    // Ensure local autosave hash is reset so no stale writes occur
-    lastSavedHashRef.current = '';
+          clearHomepageDraft();
+          // Clear form values and reset to first step
+          if (formData) {
+            formData.steps[currentStep]?.fields?.forEach((field: any) => {
+              updateFormValue(field.name, undefined);
+            });
+          }
+          setCurrentStep(0);
+          lastSavedHashRef.current = '';
         } catch (err) {
           console.error('Failed to reset home form after drafts cleared:', err);
         }
@@ -419,7 +349,7 @@ function HomePageContent() {
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
-  }, [shouldShowFormInHomepage, clearAllFormData]);
+  }, [shouldShowFormInHomepage, formData, currentStep, updateFormValue, setCurrentStep]);
 
   // Function to validate current step and scroll to first invalid field
   const validateStepAndScroll = useCallback(() => {

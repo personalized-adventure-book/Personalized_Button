@@ -447,31 +447,26 @@ export function Header() {
               {theme === "light" ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
             </button>
 
-            {/* Mobile Menu Button (use pointerdown for snappier touch response) */}
+            {/* Mobile Menu Button */}
             <button
-              onPointerDown={(e) => {
-                // Prevent potential 300ms click delay on some browsers
-                e.preventDefault();
-                setIsMenuOpen((v) => !v);
-              }}
-              className="lg:hidden p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-100 touch-manipulation select-none"
+              onClick={() => setIsMenuOpen((v) => !v)}
+              className="lg:hidden p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-100 touch-manipulation select-none active:scale-95"
               aria-label="Toggle menu"
-              aria-expanded={isMenuOpen}
-              aria-controls="mobile-navigation"
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation Menu (instant mount/unmount for zero lag) */}
-        {isMenuOpen && (
-          <div
-            id="mobile-navigation"
-            ref={mobileMenuRef}
-            className="lg:hidden border-t border-gray-200 dark:border-gray-700 py-3"
-          >
-            <nav className="flex flex-col space-y-4">
+        {/* Mobile Navigation Menu */}
+        <div
+          ref={mobileMenuRef}
+          className={`lg:hidden border-t border-gray-200 dark:border-gray-700 overflow-hidden transform transition-all duration-200 ease-out origin-top will-change-[max-height,opacity,transform] ${
+            isMenuOpen ? 'max-h-[600px] opacity-100 scale-y-100 py-4' : 'max-h-0 opacity-0 scale-y-95 py-0 pointer-events-none'
+          }`}
+          aria-hidden={!isMenuOpen}
+        >
+            <nav className={`flex flex-col transition-opacity duration-200 ${isMenuOpen ? 'opacity-100' : 'opacity-0'} space-y-4`}>
               {navigation.map((item, index) => (
                 <Link
                   key={item.name}
@@ -482,21 +477,23 @@ export function Header() {
                     } else {
                       handleNavClick(e, item.href);
                     }
-                    // Close immediately to keep UI responsive
-                    setIsMenuOpen(false);
+                    // Close smoothly after short delay so scroll/nav can kick in
+                    setTimeout(() => setIsMenuOpen(false), 50);
                   }}
-                  className="text-gray-700 dark:text-gray-300 hover:text-primary font-medium transition-colors duration-150 py-2"
+                  className="text-gray-700 dark:text-gray-300 hover:text-primary font-medium transition-colors duration-200 py-2"
                 >
                   {item.name}
                 </Link>
               ))}
-
+              
               {/* Mobile Language Selector */}
               <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-start">
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("header.language")}</span>
                   <div
-                    className={`flex items-center ${language === '🇸🇦' ? 'flex-row-reverse mr-4' : 'ml-4'} gap-1 overflow-x-auto scrollbar-none max-w-full`}
+                    className={
+                      `flex items-center ${language === '🇸🇦' ? 'flex-row-reverse mr-4' : 'ml-4'} gap-1 overflow-x-auto scrollbar-none max-w-full`
+                    }
                     style={{ WebkitOverflowScrolling: 'touch' }}
                   >
                     {languageOptions.map((option) => (
@@ -506,11 +503,12 @@ export function Header() {
                           const oldLanguage = language;
                           setLanguage(option.value as Language);
                           trackLanguageChange(oldLanguage, option.code);
+                          // Auto-close hamburger on selection
                           setIsMenuOpen(false);
                         }}
                         className={`px-2 py-0.5 rounded text-xs flex items-center gap-1 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50 whitespace-nowrap ${
-                          language === option.value
-                            ? 'bg-primary text-white'
+                          language === option.value 
+                            ? 'bg-primary text-white' 
                             : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                         }`}
                         aria-pressed={language === option.value}
@@ -523,9 +521,8 @@ export function Header() {
                   </div>
                 </div>
               </div>
-            </nav>
-          </div>
-        )}
+      </nav>
+    </div>
       </div>
     </header>
   );
