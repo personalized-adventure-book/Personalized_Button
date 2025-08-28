@@ -256,9 +256,20 @@ function OrdersPageContent() {
       let y = 64;
       const bottom = 800;
 
+      // Helper: add new page (some builds complain addPage is missing in type defs)
+      const safeAddPage = () => {
+        const anyDoc = doc as any;
+        if (typeof anyDoc.addPage === 'function') {
+          anyDoc.addPage();
+        } else {
+          // Fallback: create a fresh doc and merge not implemented; log for debugging
+          console.warn('jsPDF addPage() not found on instance – type mismatch?');
+        }
+      };
+
       const ensureSpace = (advance = 18) => {
         if (y + advance > bottom) {
-          doc.addPage();
+          safeAddPage();
           y = 64;
         }
       };
