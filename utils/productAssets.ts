@@ -306,20 +306,9 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
   if (prod !== 'Song') return [];
   const lang = language || getCurrentLanguage();
   const langFolder = getLanguageFolderName(lang).trim();
-  // Helper to detect if basePath should be enforced (GitHub Pages: always yes)
-  const shouldForceBase = () => {
-    try {
-      if (typeof window === 'undefined') return true; // SSR: keep
-      // Next.js exposes basePath via __NEXT_DATA__ when set
-      const anyWin: any = window as any;
-      const fromNext = anyWin.__NEXT_DATA__?.assetPrefix || '';
-      if (fromNext.includes(BASE_PATH)) return true;
-      // If current pathname already contains BASE_PATH, enforce it
-      if (window.location.pathname.startsWith(BASE_PATH)) return true;
-      return false;
-    } catch { return true; }
-  };
-  const forceBase = shouldForceBase();
+  // Deployment policy: ALWAYS use BASE_PATH (GitHub Pages). Allow explicit opt-out via env.
+  const FORCE_ROOT = typeof process !== 'undefined' && (process as any).env?.NEXT_PUBLIC_FORCE_ROOT === '1';
+  const prefix = FORCE_ROOT ? '' : BASE_PATH;
 
   // 1. Try manifest first (fast, no HEAD requests)
   try {
@@ -328,22 +317,7 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
       const manifest = await manifestResp.json();
       const list: string[] | undefined = manifest?.Song?.gallery?.[lang];
       if (Array.isArray(list) && list.length) {
-        const baseFiles = list.slice(0, max).map(name => ({ name, path: `${BASE_PATH}/content/Song/Audios/gallery/${langFolder}/${name}` }));
-        if (forceBase) return baseFiles;
-        // Optional: test if root path exists; only then strip
-        try {
-          if (typeof window !== 'undefined' && baseFiles.length) {
-            const test = await fetch(baseFiles[0].path, { method: 'HEAD' });
-            if (test.ok) return baseFiles; // works with base
-            const rootVariant = baseFiles[0].path.replace(BASE_PATH, '');
-            const testRoot = await fetch(rootVariant, { method: 'HEAD' });
-            if (testRoot.ok) {
-              console.warn('[AudioGallery] Using root-relative audio paths (basePath not present at runtime).');
-              return baseFiles.map(f => ({ ...f, path: f.path.replace(BASE_PATH, '') }));
-            }
-          }
-        } catch {}
-        return baseFiles; // default keep base
+  return list.slice(0, max).map(name => ({ name, path: `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}` }));
       }
     }
   } catch (e) {
@@ -357,13 +331,9 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
     const num = i.toString().padStart(2, '0');
     for (const ext of ['.mp3', '.wav', '.wov']) {
       const name = `song_gallery_${num}${ext}`;
-      let path = `${BASE_PATH}/content/Song/Audios/gallery/${langFolder}/${name}`;
+      let path = `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}`;
       try {
         if (await audioExists(path)) { files.push({ name, path }); break; }
-        if (!forceBase && path.startsWith(BASE_PATH)) {
-          const fallback = path.replace(BASE_PATH, '');
-          if (await audioExists(fallback)) { files.push({ name, path: fallback }); break; }
-        }
       } catch {}
     }
   }
