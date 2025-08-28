@@ -270,11 +270,21 @@ export function getRecommendedImageCounts(category?: string): { gallery: number;
 }
 
 // ------------------ AUDIO (Song product) ------------------
-// We no longer use dynamic API routes. Audio files live under
-// /public/content/Song/Audios/gallery/<LANG_FOLDER>/song_gallery_XX.(wav|mp3)
-// copyImages.js already copies the entire content folder into public/content
-// at build time so we can reference them directly just like images.
-const BASE_PATH = '/Personalized_Button';
+// Audio files are copied into: /<basePath>/content/Song/Audios/gallery/<LANG_FOLDER>/song_gallery_XX.(wav|mp3)
+// We derive basePath at runtime (client) to avoid hard‑coding so deployment under a
+// different mount (custom domain vs repo slug) still works. Fallback keeps previous default.
+const DEFAULT_BASE_PATH = '/Personalized_Button';
+function resolveBasePath(): string {
+  try {
+    if (typeof window !== 'undefined') {
+      const ap = (window as any)?.__NEXT_DATA__?.assetPrefix;
+      if (ap) return String(ap).replace(/\/$/, '');
+      // If site served at root (custom domain) but code still has old default, allow ''
+      // by detecting presence of audio-manifest without base path (async heuristic omitted here).
+    }
+  } catch {}
+  return DEFAULT_BASE_PATH;
+}
 
 // Get gallery audio path (Song only for now)
 export function getGalleryAudio(audioName: string, product?: string, language?: string): string {
@@ -282,7 +292,8 @@ export function getGalleryAudio(audioName: string, product?: string, language?: 
   if (prod !== 'Song') return '';
   const lang = language || getCurrentLanguage();
   const langFolder = getLanguageFolderName(lang).trim();
-  return `${BASE_PATH}/content/Song/Audios/gallery/${langFolder}/${audioName}`;
+  const base = resolveBasePath();
+  return `${base}/content/Song/Audios/gallery/${langFolder}/${audioName}`;
 }
 
 // Check audio existence (HEAD request)
@@ -307,12 +318,18 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
 
   // 1. Try manifest first (fast, no HEAD requests)
   try {
-    const manifestResp = await fetch('/Personalized_Button/audio-manifest.json', { cache: 'no-store' });
+    const base = resolveBasePath();
+    let manifestResp = await fetch(`${base}/audio-manifest.json`, { cache: 'no-store' });
+    if (!manifestResp.ok && base && base !== '/' && base !== '') {
+      // Retry without base path in case site is now deployed at root (custom domain)
+      try { manifestResp = await fetch('/audio-manifest.json', { cache: 'no-store' }); } catch {}
+    }
     if (manifestResp.ok) {
       const manifest = await manifestResp.json();
       const list: string[] | undefined = manifest?.Song?.gallery?.[lang];
       if (Array.isArray(list) && list.length) {
-        return list.slice(0, max).map(name => ({ name, path: `${BASE_PATH}/content/Song/Audios/gallery/${langFolder}/${name}` }));
+        const base2 = resolveBasePath();
+        return list.slice(0, max).map(name => ({ name, path: `${base2}/content/Song/Audios/gallery/${langFolder}/${name}` }));
       }
     }
   } catch (e) {
@@ -326,7 +343,7 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
     const num = i.toString().padStart(2, '0');
     for (const ext of ['.mp3', '.wav', '.wov']) {
       const name = `song_gallery_${num}${ext}`;
-      const path = `${BASE_PATH}/content/Song/Audios/gallery/${langFolder}/${name}`;
+  const path = `${resolveBasePath()}/content/Song/Audios/gallery/${langFolder}/${name}`;
       try { if (await audioExists(path)) { files.push({ name, path }); break; } } catch {}
     }
   }
