@@ -377,14 +377,9 @@ function HomePageContent() {
     if (!initPersistReadyRef.current) return;
     const newHash = computeStateHash(formValues, currentStep);
     if (newHash !== lastSavedHashRef.current) {
-      // On the last step, persist immediately so final choices are never lost
-      if (currentStep === (totalSteps - 1)) {
-        try { persistDraft(); } catch {}
-      } else {
-        scheduleDraftSave();
-      }
+      scheduleDraftSave();
     }
-  }, [formValues, currentStep, totalSteps, shouldShowFormInHomepage, mounted]);
+  }, [formValues, currentStep, shouldShowFormInHomepage, mounted]);
 
   // Persist immediately when step changes to capture progress even with no field changes
   useEffect(() => {
@@ -401,23 +396,6 @@ function HomePageContent() {
     const handler = () => { try { persistDraft(); } catch {} };
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
-  }, [formValues, currentStep, shouldShowFormInHomepage]);
-
-  // Also persist when page is hidden or navigating away (better on mobile)
-  useEffect(() => {
-    if (!shouldShowFormInHomepage) return;
-    const onVisibility = () => {
-      try {
-        if (document.visibilityState === 'hidden') persistDraft();
-      } catch {}
-    };
-    const onPageHide = () => { try { persistDraft(); } catch {} };
-    document.addEventListener('visibilitychange', onVisibility);
-    window.addEventListener('pagehide', onPageHide);
-    return () => {
-      document.removeEventListener('visibilitychange', onVisibility);
-      window.removeEventListener('pagehide', onPageHide);
-    };
   }, [formValues, currentStep, shouldShowFormInHomepage]);
 
   // Clear cookie on successful completion (handled in handleComplete)
