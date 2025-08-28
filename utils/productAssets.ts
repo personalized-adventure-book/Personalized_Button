@@ -329,28 +329,21 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
       const manifest = await manifestResp.json();
       const list: string[] | undefined = manifest?.Song?.gallery?.[lang];
       if (Array.isArray(list) && list.length) {
-        let base2 = resolveBasePath();
-        let mapped = list.slice(0, max).map(name => ({ name, path: `${base2}/content/Song/Audios/gallery/${langFolder}/${name}` }));
-        // Quick verification: if first URL 404s, attempt root ('') fallback once
-        try {
-          if (mapped.length) {
-            const testUrl = mapped[0].path;
-            const headOk = await (async () => {
-              try { const r = await fetch(testUrl, { method: 'HEAD' }); return r.ok; } catch { return false; }})();
-            if (!headOk && base2) {
-              // Retry with root
-              const alt = list.slice(0, max).map(name => ({ name, path: `/content/Song/Audios/gallery/${langFolder}/${name}` }));
-              // Verify alt first
-              if (alt.length) {
-                try {
-                  const r2 = await fetch(alt[0].path, { method: 'HEAD' });
-                  if (r2.ok) return alt;
-                } catch {}
-              }
-            }
-          }
-        } catch {}
-        return mapped;
+        // Probe candidate base paths (resolved + root) to pick a working one
+        const candidates = Array.from(new Set([resolveBasePath(), '']));
+        let chosen = candidates[0];
+        for (const cand of candidates) {
+          if (cand === '' && chosen === '') break;
+          const testUrl = `${cand || ''}/content/Song/Audios/gallery/${langFolder}/${list[0]}`.replace(/\\+/g,'/');
+          try {
+            const r = await fetch(testUrl, { method: 'HEAD' });
+            if (r.ok) { chosen = cand; break; }
+          } catch { /* try next */ }
+        }
+        if (typeof window !== 'undefined') {
+          try { (window as any).__AUDIO_BASE_CHOSEN__ = chosen; } catch {}
+        }
+        return list.slice(0, max).map(name => ({ name, path: `${chosen || ''}/content/Song/Audios/gallery/${langFolder}/${name}` }));
       }
     }
   } catch (e) {
@@ -364,7 +357,8 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
     const num = i.toString().padStart(2, '0');
     for (const ext of ['.mp3', '.wav', '.wov']) {
       const name = `song_gallery_${num}${ext}`;
-  const path = `${resolveBasePath()}/content/Song/Audios/gallery/${langFolder}/${name}`;
+  const dynamicBase = (typeof window !== 'undefined' && (window as any).__AUDIO_BASE_CHOSEN__) || resolveBasePath();
+  const path = `${dynamicBase || ''}/content/Song/Audios/gallery/${langFolder}/${name}`;
       try { if (await audioExists(path)) { files.push({ name, path }); break; } } catch {}
     }
   }
