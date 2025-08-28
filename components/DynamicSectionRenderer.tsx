@@ -1395,127 +1395,59 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   const recommendations = getRecommendedImageCounts('gallery');
 
   const togglePlay = (index: number) => {
-    if (failedAudio.has(index)) {
-      console.warn('[GalleryAudio] Skipping previously failed audio index', index);
-      return;
-    }
     const el = globalAudioRef.current;
     if (!el) return;
     const targetSrc = audioSources[index];
-    // Determine if current element already has this exact track loaded
-    const currentPath = (() => { try { const u = new URL(el.src); return u.pathname; } catch { return el.src; } })();
-    const targetPath = targetSrc; // targetSrc already a path starting with /
-    const sameTrackLoaded = currentPath.endsWith(targetPath);
-    // Only set src when actually different to avoid resetting currentTime & metadata
-    if (!sameTrackLoaded) {
-      try { el.src = targetSrc; } catch {}
-    }
-    // If resuming same paused track, seek to saved time
-    try {
-      const saved = getPlaybackState();
-      if (saved.index === index && saved.time > 0) {
-        // Only apply seek if either we reloaded src or element currentTime is behind saved by >0.25s
-        if (!sameTrackLoaded || Math.abs((el.currentTime || 0) - saved.time) > 0.25) {
-          try { el.currentTime = saved.time; } catch {}
-        }
-      }
-    } catch {}
-    // If same index and currently playing -> pause (preserve time & index)
+    // Pause any current playback first to avoid overlapping state changes
+    try { el.pause(); } catch {}
+    // If clicking the same index while playing -> treat as pause toggle
     if (playingIndex === index && !el.paused) {
-      el.pause();
-      requestAnimationFrame(() => {
-        if (el.paused) {
-          const baseName = extractBaseName(audioSources[index]);
-          try { setPlaybackState({ index, baseName, time: el.currentTime || 0 }); } catch {}
-          setPlayingIndex(null);
-          try {
-            comprehensiveTracker.trackAudioPause(index, baseName, el.duration || durations[index] || 0, el.currentTime);
-          } catch {}
-        }
-      });
-      return;
+      return; // already paused above
     }
-  // Single element: just play (resume or start)
+    // Always reset src to ensure clean load (cache bust via index to avoid Safari reusing stale buffer)
+    try { el.src = `${targetSrc}?v=${index}`; } catch {}
+    // Clear previous error attempt flags for new source
+    (el as any)._altTried = false;
+    (el as any)._blobFallbackTried = false;
+    const baseName = extractBaseName(targetSrc);
+    // Attempt to play
     const playAttempt = el.play();
     if (playAttempt && typeof playAttempt.then === 'function') {
       playAttempt.then(() => {
         if (!el.paused) {
           setPlayingIndex(index);
-          setPlaybackState({ index, baseName: extractBaseName(audioSources[index]), time: el.currentTime || 0 });
-          try {
-            const baseName = extractBaseName(audioSources[index]);
-            comprehensiveTracker.trackAudioPlay(index, baseName, el.duration || durations[index] || 0);
-            // Persist immediately so navigation right after play can restore
-            try { sessionStorage.setItem(RESTORE_KEY, JSON.stringify({ baseName, time: el.currentTime || 0, ts: Date.now() })); } catch {}
-          } catch {}
-        }
-      }).catch(() => { /* autoplay prevented or error */ });
-    } else {
-      if (!el.paused) {
-        setPlayingIndex(index);
-        setPlaybackState({ index, baseName: extractBaseName(audioSources[index]), time: el.currentTime || 0 });
-        try {
-          const baseName = extractBaseName(audioSources[index]);
-          comprehensiveTracker.trackAudioPlay(index, baseName, el.duration || durations[index] || 0);
+          setPlaybackState({ index, baseName, time: el.currentTime || 0 });
+          try { comprehensiveTracker.trackAudioPlay(index, baseName, el.duration || durations[index] || 0); } catch {}
           try { sessionStorage.setItem(RESTORE_KEY, JSON.stringify({ baseName, time: el.currentTime || 0, ts: Date.now() })); } catch {}
-        } catch {}
-      }
+        }
+      }).catch(() => {});
+    } else if (!el.paused) {
+      setPlayingIndex(index);
+      setPlaybackState({ index, baseName, time: el.currentTime || 0 });
     }
-    // Attach one-time error handler to capture 404s in production (only once per src)
-    // Basic one-time error logger (no fallback stripping basePath to avoid 404 loops)
+    // One-time robust error handler (determine failing index by matching currentSrc)
     if (!(el as any)._errorBound) {
       (el as any)._errorBound = true;
       el.addEventListener('error', () => {
         try {
-          const mediaErr = (el as any).error;
           const failing = el.currentSrc;
-          console.warn('[GalleryAudio] Playback error', mediaErr?.code, 'for', failing);
-          const idx = playingIndex;
-          if (idx != null) setFailedAudio(prev => new Set(prev).add(idx));
-          // Attempt one-time alternate extension fallback (.wav <-> .mp3)
-          if (!(el as any)._altTried && failing) {
-            (el as any)._altTried = true;
-            const url = new URL(failing);
-            const parts = url.pathname.split('.');
-            if (parts.length > 1) {
-              const ext = parts.pop()!.toLowerCase();
-              const base = parts.join('.');
-              const alt = ext === 'wav' ? base + '.mp3' : ext === 'mp3' ? base + '.wav' : null;
-              if (alt) {
-                const altFull = url.origin + alt + url.search;
-                fetch(altFull, { method: 'HEAD' }).then(r => {
-                  if (r.ok) {
-                    console.log('[GalleryAudio] Trying alternate format', altFull);
-                    el.src = altFull.replace(url.origin, '');
-                    el.play().catch(()=>{});
-                  }
-                }).catch(()=>{});
+          const mediaErr = (el as any).error;
+          const failingIdx = audioSources.findIndex(s => failing.endsWith(s) || failing.includes(s + '?v='));
+          console.warn('[GalleryAudio] Playback error', mediaErr?.code, 'for', failing, 'resolvedIndex=', failingIdx);
+          if (failingIdx >= 0) {
+            // Do NOT permanently mark failed unless repeated
+            setFailedAudio(prev => {
+              const next = new Set(prev);
+              const key = failingIdx;
+              if (next.has(key)) {
+                // repeated failure – keep it
+              } else {
+                next.add(key);
+                // Schedule a retry clearing after short delay (transient errors)
+                setTimeout(() => setFailedAudio(p => { const n = new Set(p); n.delete(key); return n; }), 3000);
               }
-            }
-          } else if (!(el as any)._blobFallbackTried && failing) {
-            // Fallback: fetch as ArrayBuffer & create object URL
-            (el as any)._blobFallbackTried = true;
-            try {
-              fetch(failing).then(res => res.ok ? res.arrayBuffer() : Promise.reject()).then(buf => {
-                // Attempt decode to validate
-                try {
-                  const AC = (window as any).AudioContext || (window as any).webkitAudioContext;
-                  if (AC) {
-                    const ctx = new AC();
-                    ctx.decodeAudioData(buf.slice(0), () => {
-                      console.log('[GalleryAudio] decodeAudioData success for', failing);
-                    }, () => {
-                      console.warn('[GalleryAudio] decodeAudioData failed for', failing);
-                    });
-                  }
-                } catch {}
-                const blob = new Blob([buf]);
-                const objectUrl = URL.createObjectURL(blob);
-                console.log('[GalleryAudio] Using blob object URL fallback');
-                el.src = objectUrl;
-                el.play().catch(()=>{});
-              }).catch(()=>{});
-            } catch {}
+              return next;
+            });
           }
         } catch {}
       });

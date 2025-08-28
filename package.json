@@ -6,12 +6,12 @@
   "scripts": {
     "dev": "next dev",
   "verify:assets": "node scripts/verifyStaticAssets.js && node scripts/checkAudioIntegrity.js",
-  "export": "node scripts/removeDynamicAudioRoutes.js && node scripts/generateImageManifest.js && node scripts/generateAudioManifest.js && node scripts/copyImages.js && node scripts/verifyStaticAssets.js && next build",
-  "build": "node scripts/removeDynamicAudioRoutes.js && node scripts/generateImageManifest.js && node scripts/generateAudioManifest.js && node scripts/copyImages.js && node scripts/verifyStaticAssets.js && next build",
+  "export": "ASSET_STRICT=1 node scripts/removeDynamicAudioRoutes.js && node scripts/generateImageManifest.js && node scripts/generateAudioManifest.js && node scripts/copyImages.js && node scripts/verifyStaticAssets.js && next build",
+  "build": "ASSET_STRICT=1 node scripts/removeDynamicAudioRoutes.js && node scripts/generateImageManifest.js && node scripts/generateAudioManifest.js && node scripts/copyImages.js && node scripts/verifyStaticAssets.js && next build",
     "start": "next start",
     "lint": "next lint",
   "inspect:wav": "node scripts/inspectWavHeaders.js",
-  "deploy": "node scripts/generateImageManifest.js && node scripts/generateAudioManifest.js && node scripts/copyImages.js && node scripts/verifyStaticAssets.js && next build && touch out/.nojekyll && gh-pages -d out"
+  "deploy": "ASSET_STRICT=1 node scripts/generateImageManifest.js && node scripts/generateAudioManifest.js && node scripts/copyImages.js && node scripts/verifyStaticAssets.js && next build && touch out/.nojekyll && gh-pages -d out"
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.7",

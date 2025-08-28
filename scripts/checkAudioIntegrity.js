@@ -12,6 +12,10 @@ const path = require('path');
 function isLikelyWav(buf){
   return buf.length >= 12 && buf.toString('ascii',0,4)==='RIFF' && buf.toString('ascii',8,12)==='WAVE';
 }
+function isGitLFSPointer(content){
+  // Pointer files start with: version https://git-lfs.github.com/spec/v1\n
+  return content.startsWith('version https://git-lfs.github.com/spec/v1');
+}
 function isLikelyMp3(buf){
   if (buf.length < 3) return false;
   if (buf.toString('ascii',0,3)==='ID3') return true;
@@ -32,12 +36,18 @@ function scan(){
       try {
         const stat = fs.statSync(full);
         const buf = fs.readFileSync(full,{encoding:null});
-        const head = buf.subarray(0, 16);
+        const head = buf.subarray(0, 32);
+        const asciiHead = head.toString('ascii');
+        if (isGitLFSPointer(buf.toString('ascii',0, 80))) {
+          bad.push({file: full, size: stat.size, head: 'GIT_LFS_POINTER', note: 'Git LFS pointer file – real binary not embedded. Remove LFS tracking for this file type for GitHub Pages.'});
+          checked++;
+          continue;
+        }
         let ok = false;
         if (ext==='wav') ok = isLikelyWav(head);
         if (ext==='mp3') ok = isLikelyMp3(head);
         if (!ok || stat.size < 1024){
-          bad.push({file: full, size: stat.size, head: head.toString('hex')});
+          bad.push({file: full, size: stat.size, head: head.toString('hex'), ascii: asciiHead});
         }
         checked++;
       } catch(e){
