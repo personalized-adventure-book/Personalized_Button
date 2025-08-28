@@ -274,7 +274,9 @@ export function getRecommendedImageCounts(category?: string): { gallery: number;
 // /public/content/Song/Audios/gallery/<LANG_FOLDER>/song_gallery_XX.(wav|mp3)
 // copyImages.js already copies the entire content folder into public/content
 // at build time so we can reference them directly just like images.
-const BASE_PATH = '/Personalized_Button';
+// Base path (matches next.config.js basePath) – exported so components can build
+// fallback paths if a deployment environment rewrites or strips the basePath.
+export const BASE_PATH = '/Personalized_Button';
 
 // Get gallery audio path (Song only for now)
 export function getGalleryAudio(audioName: string, product?: string, language?: string): string {
