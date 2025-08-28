@@ -1432,7 +1432,41 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       el.addEventListener('error', () => {
         try {
           const mediaErr = (el as any).error;
-          console.warn('[GalleryAudio] Playback error', mediaErr?.code, 'for', el.currentSrc || targetSrc);
+          const failing = el.currentSrc;
+          console.warn('[GalleryAudio] Playback error', mediaErr?.code, 'for', failing);
+          // Attempt one-time alternate extension fallback (.wav <-> .mp3)
+          if (!(el as any)._altTried && failing) {
+            (el as any)._altTried = true;
+            const url = new URL(failing);
+            const parts = url.pathname.split('.');
+            if (parts.length > 1) {
+              const ext = parts.pop()!.toLowerCase();
+              const base = parts.join('.');
+              const alt = ext === 'wav' ? base + '.mp3' : ext === 'mp3' ? base + '.wav' : null;
+              if (alt) {
+                const altFull = url.origin + alt + url.search;
+                fetch(altFull, { method: 'HEAD' }).then(r => {
+                  if (r.ok) {
+                    console.log('[GalleryAudio] Trying alternate format', altFull);
+                    el.src = altFull.replace(url.origin, '');
+                    el.play().catch(()=>{});
+                  }
+                }).catch(()=>{});
+              }
+            }
+          } else if (!(el as any)._blobFallbackTried && failing) {
+            // Fallback: fetch as ArrayBuffer & create object URL
+            (el as any)._blobFallbackTried = true;
+            try {
+              fetch(failing).then(res => res.ok ? res.arrayBuffer() : Promise.reject()).then(buf => {
+                const blob = new Blob([buf]);
+                const objectUrl = URL.createObjectURL(blob);
+                console.log('[GalleryAudio] Using blob object URL fallback');
+                el.src = objectUrl;
+                el.play().catch(()=>{});
+              }).catch(()=>{});
+            } catch {}
+          }
         } catch {}
       });
     }
