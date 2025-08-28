@@ -346,7 +346,15 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
         }
         if (!(window as any).__AUDIO_DIR_CASING__) (window as any).__AUDIO_DIR_CASING__ = 'Audios';
         if (typeof window !== 'undefined') {
-          try { (window as any).__AUDIO_BASE_CHOSEN__ = chosen; (window as any).__AUDIO_DEBUG__ = attempts; } catch {}
+          try {
+            (window as any).__AUDIO_BASE_CHOSEN__ = chosen;
+            (window as any).__AUDIO_DIR_CASING__ = (window as any).__AUDIO_DIR_CASING__ || 'Audios';
+            (window as any).__AUDIO_DEBUG__ = attempts;
+            // Aliases without underscores for easier console access
+            (window as any).AUDIO_BASE_CHOSEN = (window as any).__AUDIO_BASE_CHOSEN__;
+            (window as any).AUDIO_DIR_CASING = (window as any).__AUDIO_DIR_CASING__;
+            (window as any).AUDIO_DEBUG = (window as any).__AUDIO_DEBUG__;
+          } catch {}
         }
         const dirChosen = (window as any).__AUDIO_DIR_CASING__ || 'Audios';
         return list.slice(0, max).map(name => ({ name, path: `${chosen || ''}/content/Song/${dirChosen}/gallery/${langFolder}/${name}` }));
