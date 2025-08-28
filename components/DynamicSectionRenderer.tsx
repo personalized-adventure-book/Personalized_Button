@@ -1056,6 +1056,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   const [playingIndex, setPlayingIndex] = useState<number | null>(initialPlayback.index);
   const [durations, setDurations] = useState<number[]>([]);
   const [positions, setPositions] = useState<number[]>([]);
+  const [failedAudio, setFailedAudio] = useState<Set<number>>(() => new Set());
   // force re-render on timeUpdate without coupling to playingIndex
   const [, setTick] = useState<number>(0);
   const rafRef = React.useRef<number | null>(null);
@@ -1363,6 +1364,10 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   const recommendations = getRecommendedImageCounts('gallery');
 
   const togglePlay = (index: number) => {
+    if (failedAudio.has(index)) {
+      console.warn('[GalleryAudio] Skipping previously failed audio index', index);
+      return;
+    }
     const el = globalAudioRef.current;
     if (!el) return;
     const targetSrc = audioSources[index];
@@ -1434,6 +1439,8 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
           const mediaErr = (el as any).error;
           const failing = el.currentSrc;
           console.warn('[GalleryAudio] Playback error', mediaErr?.code, 'for', failing);
+          const idx = playingIndex;
+          if (idx != null) setFailedAudio(prev => new Set(prev).add(idx));
           // Attempt one-time alternate extension fallback (.wav <-> .mp3)
           if (!(el as any)._altTried && failing) {
             (el as any)._altTried = true;
@@ -1459,6 +1466,18 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
             (el as any)._blobFallbackTried = true;
             try {
               fetch(failing).then(res => res.ok ? res.arrayBuffer() : Promise.reject()).then(buf => {
+                // Attempt decode to validate
+                try {
+                  const AC = (window as any).AudioContext || (window as any).webkitAudioContext;
+                  if (AC) {
+                    const ctx = new AC();
+                    ctx.decodeAudioData(buf.slice(0), () => {
+                      console.log('[GalleryAudio] decodeAudioData success for', failing);
+                    }, () => {
+                      console.warn('[GalleryAudio] decodeAudioData failed for', failing);
+                    });
+                  }
+                } catch {}
                 const blob = new Blob([buf]);
                 const objectUrl = URL.createObjectURL(blob);
                 console.log('[GalleryAudio] Using blob object URL fallback');
