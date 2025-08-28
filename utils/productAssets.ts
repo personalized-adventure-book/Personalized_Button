@@ -317,7 +317,22 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
       const manifest = await manifestResp.json();
       const list: string[] | undefined = manifest?.Song?.gallery?.[lang];
       if (Array.isArray(list) && list.length) {
-  return list.slice(0, max).map(name => ({ name, path: `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}` }));
+        let files = list.slice(0, max).map(name => ({ name, path: `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}` }));
+        // Verify existence (HEAD) to avoid unusable sources producing media error 4
+        try {
+          const checks = await Promise.all(files.map(async f => {
+            try {
+              const res = await fetch(f.path, { method: 'HEAD' });
+              return res.ok ? f : null;
+            } catch { return null; }
+          }));
+          const filtered = checks.filter(Boolean) as DiscoveredAudio[];
+          if (filtered.length && filtered.length !== files.length) {
+            console.warn('[AudioGallery] Filtered missing audio files:', files.filter(f => !filtered.find(x => x.name===f.name)).map(f=>f.name));
+          }
+          if (filtered.length) files = filtered;
+        } catch {}
+        return files;
       }
     }
   } catch (e) {
@@ -334,6 +349,13 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
       let path = `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}`;
       try {
         if (await audioExists(path)) { files.push({ name, path }); break; }
+        // Try alternate extension if original missing (.wav->.mp3 or .mp3->.wav)
+        const altExt = ext === '.wav' ? '.mp3' : ext === '.mp3' ? '.wav' : '';
+        if (altExt) {
+          const altName = `song_gallery_${num}${altExt}`;
+          const altPath = `${prefix}/content/Song/Audios/gallery/${langFolder}/${altName}`;
+          if (await audioExists(altPath)) { files.push({ name: altName, path: altPath }); break; }
+        }
       } catch {}
     }
   }
