@@ -401,6 +401,11 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
 export async function getGalleryAudios(count: number = 12, product?: string, language?: string): Promise<string[]> {
   // Slightly overfetch to allow user to scroll without delay
   const available = await getAvailableGalleryAudios(product, language, Math.max(count + 4, count));
-  return available.slice(0, count).map(a => a.path);
+  const list = available.slice(0, count).map(a => a.path);
+  // Expose for runtime diagnostics (non-breaking)
+  if (typeof window !== 'undefined') {
+    try { (window as any).AUDIO_SOURCES = list; } catch {}
+  }
+  return list;
 }
 
