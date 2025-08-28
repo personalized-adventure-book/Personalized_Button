@@ -306,18 +306,20 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
   if (prod !== 'Song') return [];
   const lang = language || getCurrentLanguage();
   const langFolder = getLanguageFolderName(lang).trim();
-  // Determine if current location actually includes the configured BASE_PATH (runtime check on client)
-  let runtimeBaseOk = true;
-  try {
-    if (typeof window !== 'undefined') {
-      // If site is served at root ("/" or without BASE_PATH) then absolute URLs with BASE_PATH will 404
-      runtimeBaseOk = window.location.pathname.startsWith(BASE_PATH);
-      // Special case: on a page inside the app the pathname might be like /Personalized_Button/xyz OR /xyz
-      if (!runtimeBaseOk && window.location.pathname === '/' && window.location.href.includes(BASE_PATH)) {
-        runtimeBaseOk = true; // e.g., custom domain with path rewriting
-      }
-    }
-  } catch {}
+  // Helper to detect if basePath should be enforced (GitHub Pages: always yes)
+  const shouldForceBase = () => {
+    try {
+      if (typeof window === 'undefined') return true; // SSR: keep
+      // Next.js exposes basePath via __NEXT_DATA__ when set
+      const anyWin: any = window as any;
+      const fromNext = anyWin.__NEXT_DATA__?.assetPrefix || '';
+      if (fromNext.includes(BASE_PATH)) return true;
+      // If current pathname already contains BASE_PATH, enforce it
+      if (window.location.pathname.startsWith(BASE_PATH)) return true;
+      return false;
+    } catch { return true; }
+  };
+  const forceBase = shouldForceBase();
 
   // 1. Try manifest first (fast, no HEAD requests)
   try {
@@ -326,26 +328,22 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
       const manifest = await manifestResp.json();
       const list: string[] | undefined = manifest?.Song?.gallery?.[lang];
       if (Array.isArray(list) && list.length) {
-        let files = list.slice(0, max).map(name => ({ name, path: `${BASE_PATH}/content/Song/Audios/gallery/${langFolder}/${name}` }));
-        // Proactively validate first file if basePath might be wrong in deployment
-        if (typeof window !== 'undefined' && files.length && runtimeBaseOk) {
-          try {
-            const head = await fetch(files[0].path, { method: 'HEAD' });
-            if (!head.ok && files[0].path.startsWith(BASE_PATH)) {
-              // Attempt fallback variant without BASE_PATH (GitHub Pages mis-match / custom domain)
-              const fallbackPath = files[0].path.replace(BASE_PATH, '');
-              const head2 = await fetch(fallbackPath, { method: 'HEAD' });
-              if (head2.ok) {
-                files = files.map(f => ({ ...f, path: f.path.replace(BASE_PATH, '') }));
-                console.warn('[AudioGallery] BASE_PATH paths invalid; switched to root-relative audio URLs.');
-              }
+        const baseFiles = list.slice(0, max).map(name => ({ name, path: `${BASE_PATH}/content/Song/Audios/gallery/${langFolder}/${name}` }));
+        if (forceBase) return baseFiles;
+        // Optional: test if root path exists; only then strip
+        try {
+          if (typeof window !== 'undefined' && baseFiles.length) {
+            const test = await fetch(baseFiles[0].path, { method: 'HEAD' });
+            if (test.ok) return baseFiles; // works with base
+            const rootVariant = baseFiles[0].path.replace(BASE_PATH, '');
+            const testRoot = await fetch(rootVariant, { method: 'HEAD' });
+            if (testRoot.ok) {
+              console.warn('[AudioGallery] Using root-relative audio paths (basePath not present at runtime).');
+              return baseFiles.map(f => ({ ...f, path: f.path.replace(BASE_PATH, '') }));
             }
-          } catch {}
-        } else if (typeof window !== 'undefined' && files.length && !runtimeBaseOk) {
-          // If runtime indicates basePath not present, strip immediately
-            files = files.map(f => ({ ...f, path: f.path.replace(BASE_PATH, '') }));
-        }
-        return files;
+          }
+        } catch {}
+        return baseFiles; // default keep base
       }
     }
   } catch (e) {
@@ -362,8 +360,7 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
       let path = `${BASE_PATH}/content/Song/Audios/gallery/${langFolder}/${name}`;
       try {
         if (await audioExists(path)) { files.push({ name, path }); break; }
-        // Try fallback w/o BASE_PATH if first fails
-        if (path.startsWith(BASE_PATH)) {
+        if (!forceBase && path.startsWith(BASE_PATH)) {
           const fallback = path.replace(BASE_PATH, '');
           if (await audioExists(fallback)) { files.push({ name, path: fallback }); break; }
         }
