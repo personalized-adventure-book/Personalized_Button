@@ -1366,17 +1366,6 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     const el = globalAudioRef.current;
     if (!el) return;
     const targetSrc = audioSources[index];
-    // If a previous error flag exists for this source, try a basePath-stripped fallback once
-    if ((el as any)._lastErrorSrc === targetSrc) {
-      // Attempt fallback only if original contained the configured BASE_PATH
-      try {
-        if (targetSrc.startsWith('/Personalized_Button/')) {
-          const fallback = targetSrc.replace('/Personalized_Button', '');
-          (el as any)._attemptedFallback = true;
-          el.src = fallback;
-        }
-      } catch {}
-    }
     // Determine if current element already has this exact track loaded
     const currentPath = (() => { try { const u = new URL(el.src); return u.pathname; } catch { return el.src; } })();
     const targetPath = targetSrc; // targetSrc already a path starting with /
@@ -1437,24 +1426,13 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       }
     }
     // Attach one-time error handler to capture 404s in production (only once per src)
+    // Basic one-time error logger (no fallback stripping basePath to avoid 404 loops)
     if (!(el as any)._errorBound) {
       (el as any)._errorBound = true;
       el.addEventListener('error', () => {
         try {
-          (el as any)._lastErrorSrc = targetSrc;
           const mediaErr = (el as any).error;
           console.warn('[GalleryAudio] Playback error', mediaErr?.code, 'for', el.currentSrc || targetSrc);
-          // If we have not tried fallback yet and path contains basePath, schedule fallback
-          if (!(el as any)._attemptedFallback && targetSrc.startsWith('/Personalized_Button/')) {
-            setTimeout(() => {
-              try {
-                const fallback = targetSrc.replace('/Personalized_Button', '');
-                console.log('[GalleryAudio] Retrying without basePath ->', fallback);
-                el.src = fallback;
-                el.play().catch(()=>{});
-              } catch {}
-            }, 50);
-          }
         } catch {}
       });
     }
