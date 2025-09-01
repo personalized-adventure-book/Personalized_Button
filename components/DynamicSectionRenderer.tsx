@@ -1398,19 +1398,45 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     const el = globalAudioRef.current;
     if (!el) return;
     const targetSrc = audioSources[index];
-    // Pause any current playback first to avoid overlapping state changes
-    try { el.pause(); } catch {}
-    // If clicking the same index while playing -> treat as pause toggle
-    if (playingIndex === index && !el.paused) {
-      return; // already paused above
+    const currentlyPlayingSame = playingIndex === index && !el.paused;
+    const pausedSame = playingIndex === index && el.paused;
+
+    // CASE 1: Same track playing -> pause
+    if (currentlyPlayingSame) {
+      try { el.pause(); } catch {}
+      try {
+        const baseName = extractBaseName(targetSrc);
+        setPlaybackState({ index, baseName, time: el.currentTime || 0 });
+        comprehensiveTracker.trackAudioPause(index, baseName, el.duration || durations[index] || 0, el.currentTime);
+      } catch {}
+      return;
     }
-    // Always reset src to ensure clean load (cache bust via index to avoid Safari reusing stale buffer)
-    try { el.src = `${targetSrc}?v=${index}`; } catch {}
-    // Clear previous error attempt flags for new source
-    (el as any)._altTried = false;
-    (el as any)._blobFallbackTried = false;
+
+    // CASE 2: Same track paused -> resume without resetting src/currentTime (playingIndex retained)
+    if (pausedSame && el.src) {
+      const resumeAttempt = el.play();
+      if (resumeAttempt && typeof resumeAttempt.then === 'function') {
+        resumeAttempt.then(() => {
+          if (!el.paused) setPlayingIndex(index);
+        }).catch(() => {});
+      } else if (!el.paused) {
+        setPlayingIndex(index);
+      }
+      return;
+    }
+
+    // CASE 3: Different track selected -> pause current, load new source
+    if (!el.paused) {
+      try { el.pause(); } catch {}
+    }
+    // Only reload src if different track OR no src yet
+    const needsReload = !el.src || !el.currentSrc || !el.currentSrc.includes(targetSrc);
+    if (needsReload) {
+      try { el.src = `${targetSrc}?v=${index}`; } catch {}
+      (el as any)._altTried = false;
+      (el as any)._blobFallbackTried = false;
+    }
     const baseName = extractBaseName(targetSrc);
-    // Attempt to play
     const playAttempt = el.play();
     if (playAttempt && typeof playAttempt.then === 'function') {
       playAttempt.then(() => {
@@ -1425,7 +1451,8 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       setPlayingIndex(index);
       setPlaybackState({ index, baseName, time: el.currentTime || 0 });
     }
-    // One-time robust error handler (determine failing index by matching currentSrc)
+
+    // Attach one-time error handler if not already
     if (!(el as any)._errorBound) {
       (el as any)._errorBound = true;
       el.addEventListener('error', () => {
@@ -1435,15 +1462,11 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
           const failingIdx = audioSources.findIndex(s => failing.endsWith(s) || failing.includes(s + '?v='));
           console.warn('[GalleryAudio] Playback error', mediaErr?.code, 'for', failing, 'resolvedIndex=', failingIdx);
           if (failingIdx >= 0) {
-            // Do NOT permanently mark failed unless repeated
             setFailedAudio(prev => {
               const next = new Set(prev);
               const key = failingIdx;
-              if (next.has(key)) {
-                // repeated failure – keep it
-              } else {
+              if (!next.has(key)) {
                 next.add(key);
-                // Schedule a retry clearing after short delay (transient errors)
                 setTimeout(() => setFailedAudio(p => { const n = new Set(p); n.delete(key); return n; }), 3000);
               }
               return next;
