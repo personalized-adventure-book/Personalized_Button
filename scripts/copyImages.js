@@ -38,6 +38,10 @@ function copyDirectoryRecursive(source, target) {
 }
 
 function copyImages() {
+  if (process.env.SKIP_CONTENT_COPY === '1' || process.env.SKIP_CONTENT_COPY === 'true') {
+    console.log('⏭  SKIP_CONTENT_COPY enabled - skipping content folder copy.');
+    return;
+  }
   // Start from current working directory (Personalized_Button)
   const contentDir = path.join(process.cwd(), 'content');
   const publicDir = path.join(process.cwd(), 'public');
