@@ -55,6 +55,7 @@ function copyImages() {
   copyDirectoryRecursive(contentDir, targetContentDir);
   
   console.log('✅ Content folder copied to public/content for static access');
+  
 }
 
 if (require.main === module) {
