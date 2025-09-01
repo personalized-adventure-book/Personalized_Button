@@ -90,7 +90,7 @@ export function getGalleryImage(imageName: string, product?: string, language?: 
   const langFolder = getLanguageFolderName(lang);
   
   // Access images directly from content folder, same pattern as JSON files
-  // JSON: @/content/Button/ENGLISH.json
+  // JSON: @/JSONS/Button/ENGLISH.json (moved from /content)
   // Images: /Personalized_Button/content/Button/images/gallery/ENGLISH/gallery_01.png
   return `/Personalized_Button/content/${prod}/images/gallery/${langFolder}/${imageName}`;
 }

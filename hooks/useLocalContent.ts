@@ -1,25 +1,25 @@
 import { useState, useEffect } from 'react';
 
 // Import all content files
-import buttonEnglish from '@/content/Button/ENGLISH.json';
-import buttonFrench from '@/content/Button/FRENCH.json';
-import buttonItalian from '@/content/Button/ITALIAN.json';
-import buttonArabic from '@/content/Button/ARABIC.json';
+import buttonEnglish from '@/JSONS/Button/ENGLISH.json';
+import buttonFrench from '@/JSONS/Button/FRENCH.json';
+import buttonItalian from '@/JSONS/Button/ITALIAN.json';
+import buttonArabic from '@/JSONS/Button/ARABIC.json';
 
-import bookEnglish from '@/content/Book/ENGLISH.json';
-import bookFrench from '@/content/Book/FRENCH.json';
-import bookItalian from '@/content/Book/ITALIAN.json';
-import bookArabic from '@/content/Book/ARABIC.json';
+import bookEnglish from '@/JSONS/Book/ENGLISH.json';
+import bookFrench from '@/JSONS/Book/FRENCH.json';
+import bookItalian from '@/JSONS/Book/ITALIAN.json';
+import bookArabic from '@/JSONS/Book/ARABIC.json';
 
-import brandingEnglish from '@/content/Branding/ENGLISH.json';
-import brandingFrench from '@/content/Branding/FRENCH.json';
-import brandingItalian from '@/content/Branding/ITALIAN.json';
-import brandingArabic from '@/content/Branding/ARABIC.json';
+import brandingEnglish from '@/JSONS/Branding/ENGLISH.json';
+import brandingFrench from '@/JSONS/Branding/FRENCH.json';
+import brandingItalian from '@/JSONS/Branding/ITALIAN.json';
+import brandingArabic from '@/JSONS/Branding/ARABIC.json';
 // Song product content
-import songEnglish from '@/content/Song/ENGLISH.json';
-import songFrench from '@/content/Song/FRENCH.json';
-import songItalian from '@/content/Song/ITALIAN.json';
-import songArabic from '@/content/Song/ARABIC.json';
+import songEnglish from '@/JSONS/Song/ENGLISH.json';
+import songFrench from '@/JSONS/Song/FRENCH.json';
+import songItalian from '@/JSONS/Song/ITALIAN.json';
+import songArabic from '@/JSONS/Song/ARABIC.json';
 
 // Type definitions
 interface HeroData {
