@@ -11,8 +11,7 @@
     "start": "next start",
     "lint": "next lint",
   "inspect:wav": "node scripts/inspectWavHeaders.js",
-  "deploy": "ASSET_STRICT=1 SKIP_CONTENT_COPY=1 node scripts/generateImageManifest.js && node scripts/generateAudioManifest.js && node scripts/copyImages.js && node scripts/verifyStaticAssets.js && next build && touch out/.nojekyll && gh-pages -d out --add"
-  },
+  "deploy": "ASSET_STRICT=1 SKIP_CONTENT_COPY=1 node scripts/generateImageManifest.js && node scripts/generateAudioManifest.js && node scripts/copyImages.js && node scripts/verifyStaticAssets.js && npx next build && touch out/.nojekyll && gh-pages -d out --add"  },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.7",
     "autoprefixer": "^10.4.16",

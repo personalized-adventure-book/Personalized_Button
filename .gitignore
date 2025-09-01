@@ -17,3 +17,6 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Prevent JSONs from being copied to gh-pages
+content/**/*.json
