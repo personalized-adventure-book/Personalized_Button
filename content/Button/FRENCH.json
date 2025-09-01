@@ -1,0 +1,101 @@
+{
+  "homepage": {
+    "menu": {
+      "features": "Fonctionnalités",
+      "howItWorks": "Comment Ça Marche",
+      "gallery": "Galerie",
+      "pricing": "Tarifs",
+      "order": "Commander",
+      "orders": "Commandes",
+      "contact": "Contact",
+      "adventures": "Personnalisations",
+      "examples": "Exemples"
+    },
+    "urgency_banner": { "text": "⚡ Stock limité cette semaine — commandez vite !", "style": "highlight" },
+    "hero": { "title": "Bouton MyMood", "subtitle": "Personnalisez votre bouton lumineux magique avec prénom, couleurs & effets en quelques secondes !", "cta_text": "Commander maintenant" },
+    "about": { "title": "À propos de nos boutons", "text": "Chaque bouton est conçu pour s’illuminer avec la couleur et le message que vous choisissez. Plus qu’un produit – votre étincelle personnelle." },
+    "features": {
+      "title": "Caractéristiques",
+      "subtitle": "Pourquoi choisir nos boutons personnalisés",
+      "items": [
+        {
+          "icon": "✨",
+          "title": "S’allume au toucher",
+          "text": "Notre bouton s’éclaire doucement lorsqu’on l’appuie, révélant votre design personnalisé."
+        },
+        {
+          "icon": "🎨",
+          "title": "Couleurs personnalisables",
+          "text": "Choisissez parmi un arc-en-ciel de couleurs LED pour correspondre à votre humeur ou à l’occasion."
+        },
+        {
+          "icon": "🔋",
+          "title": "Pile incluse",
+          "text": "Pile longue durée intégrée. Prêt à l’emploi dès la sortie de la boîte !"
+        }
+      ]
+    },
+  "examples": { "title": "Personnalisations populaires", "items": [ { "text": "Bouton ‘Je t’aime’ avec lumière rose" }, { "text": "Boutons prénom pour anniversaire" }, { "text": "Citation motivation LED arc-en-ciel" } ] },
+    "gallery": {
+      "title": "Voyez la magie en action",
+      "subtitle": "De vrais boutons, de vrais moments - faites défiler horizontalement pour explorer notre collection!"
+    },
+  "how_it_works": { "title": "Comment ça marche", "steps": [ { "title": "Choisissez votre style", "description": "Forme, couleur & finition." }, { "title": "Ajoutez votre message", "description": "Prénom ou phrase inspirante." }, { "title": "Nous le fabriquons", "description": "Créé avec soin." }, { "title": "Livré chez vous", "description": "Prêt à briller." }, { "title": "Créez le vôtre", "description": "Une minute suffit !" } ] },
+  "why_people_love_it": { "title": "Pourquoi on l'adore", "points": [ "Cadeau unique toutes occasions", "Personnalise votre espace", "Parfait enfants, couples, créatifs" ] },
+  "testimonials": { "title": "Avis clients", "items": [ { "name": "Sarah", "comment": "J’adore mon bouton Zen Mode !", "rating": 5 }, { "name": "Ali", "comment": "Offert en cadeau — ils ont adoré !", "rating": 4.5 } ] },
+    "pricing": {
+      "title": "Nos offres",
+      "plans": [
+        {
+          "title": "Essentiel",
+          "price": "19€",
+          "features": [
+            "1 bouton personnalisé",
+            "Couleur au choix",
+            "Texte simple"
+          ]
+        },
+        {
+          "title": "Magique",
+          "price": "29€",
+          "features": [
+            "2 boutons",
+            "Texte + design",
+            "LED multicolores"
+          ]
+        },
+        {
+          "title": "Édition Cadeau",
+          "price": "39€",
+          "features": [
+            "Boîte cadeau incluse",
+            "Effets lumineux spéciaux",
+            "Message gravé"
+          ]
+        }
+      ]
+    },
+    "faq": [
+      {
+        "q": "Combien de temps dure la pile ?",
+        "a": "Jusqu’à 3 mois en usage quotidien. Facile à remplacer."
+      },
+      {
+        "q": "Puis-je graver un message personnalisé ?",
+        "a": "Bien sûr ! Jusqu’à 25 caractères sont autorisés."
+      },
+      {
+        "q": "Quelles couleurs sont disponibles ?",
+        "a": "Bleu, rouge, vert, jaune, violet, blanc ou arc-en-ciel."
+      }
+    ],
+    "footer": {
+      "company_name": "Glowify Co.",
+      "privacy": "Politique de confidentialité",
+      "terms": "Conditions d'utilisation",
+      "copyright": "© 2025 MyMood Button"
+    }
+  },
+  "form": {"steps": [{"id": "purpose","title": "Purpose","fields": [{"type": "select_box","name": "purpose","label": "Choose Your Button's Purpose","options": ["Focus Mode","Reading Light","Movie Night","Party Scene","Gaming Session","Meditation","Workout","Study Mode","Relaxation","Sleep Time","Wake Up","Mood Lighting","Custom Purpose"],"required": true},{"type": "text","name": "custom_purpose","label": "Describe your custom purpose","placeholder": "e.g., Evening meditation button, Study alarm...","required": true,"conditional": {"field": "purpose","value": "Custom Purpose"}}]},{"id": "style","title": "Style","fields": [{"type": "select_box","name": "shape","label": "Shape","options": ["Circle","Square","Hexagon","Octagon","Diamond","Star","Triangle","Heart","Oval","Pentagon","Rounded Square","Pill","Cloud","Flower","Lightning","Custom Shape"],"required": true},{"type": "text","name": "custom_shape","label": "Describe your custom shape","placeholder": "e.g., Custom geometric pattern, Logo shape","required": true,"conditional": {"field": "shape","value": "Custom Shape"}},{"type": "select_box","name": "color","label": "Color","options": ["Blue","Purple","Green","Yellow","Pink","Red","Teal","Indigo","Lime","Cyan","Orange","Custom"],"required": true},{"type": "text","name": "custom_color","label": "Describe your custom color","placeholder": "e.g., Gradient blue to purple, Neon green, #FF5733","required": true,"conditional": {"field": "color","value": "Custom"}},{"type": "select_box","name": "finish","label": "Finish","options": ["Matte","Glossy","Satin","Metallic","Pearl","Textured","Carbon Fiber","Soft Touch","Custom Finish"],"required": true},{"type": "text","name": "custom_finish","label": "Describe your custom finish","placeholder": "e.g., Holographic, Glow-in-the-dark, Wood grain","required": true,"conditional": {"field": "finish","value": "Custom Finish"}}]},{"id": "label","title": "Label","fields": [{"type": "choice_text","name": "label_text","label": "Button Text","options": ["I Love You","Focus Mode","Do Not Disturb","Good Luck","Stay Strong","Smile!"],"required": false,"placeholder": "Choose a label or select Custom..."},{"type": "choice_text","name": "text_size","label": "Text Size","options": ["Small (10px)","Medium (14px)","Large (18px)","Extra Large (24px)"],"required": false,"placeholder": "Choose text size"}]},{"id": "customer_info","title": "Customer Info","fields": [{"type": "text","name": "full_name","label": "Full Name","required": true},{"type": "email","name": "email","label": "Email Address","required": true},{"type": "tel","name": "phone","label": "Phone Number (optional)","required": false}]},{"id": "delivery","title": "Delivery","fields": [{"type": "text","name": "street","label": "Street Address","required": true},{"type": "text","name": "city","label": "City","required": true},{"type": "text","name": "state","label": "State/Province","required": false},{"type": "text","name": "zip","label": "Postal Code","required": true},{"type": "choice","name": "country","label": "Country","required": true,"options": ["France","United States","Italy","Saudi Arabia","United Arab Emirates","Algeria","Germany","Canada","Other"]},{"type": "textarea","name": "instructions","label": "Delivery Instructions (optional)","required": false}]}]},
+  "pricing_config": {"base_price": 30,"fields": {"purpose": {"Focus Mode": 0,"Reading Light": 5,"Movie Night": 7,"Party Scene": 12,"Gaming Session": 10,"Meditation": 4,"Workout": 6,"Study Mode": 3,"Relaxation": 4,"Sleep Time": 5,"Wake Up": 5,"Mood Lighting": 8,"Custom Purpose": 15},"shape": {"Circle": 0,"Square": 0,"Hexagon": 6,"Octagon": 8,"Diamond": 5,"Star": 10,"Triangle": 4,"Heart": 9,"Oval": 3,"Pentagon": 6,"Rounded Square": 2,"Pill": 3,"Cloud": 7,"Flower": 11,"Lightning": 12,"Custom Shape": 15},"color": {"Blue": 0,"Purple": 0,"Green": 0,"Yellow": 2,"Pink": 2,"Red": 2,"Teal": 3,"Indigo": 3,"Lime": 2,"Cyan": 2,"Orange": 3,"Custom": 10},"finish": {"Matte": 0,"Glossy": 4,"Satin": 5,"Metallic": 12,"Pearl": 9,"Textured": 6,"Carbon Fiber": 18,"Soft Touch": 7,"Custom Finish": 25},"text_size": {"Small (10px)": 0,"Medium (14px)": 2,"Large (18px)": 4,"Extra Large (24px)": 6}}}
+}
