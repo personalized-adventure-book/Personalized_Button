@@ -70,17 +70,5 @@
         "Demo.mov"
       ]
     }
-  },
-  "Book": {
-    "gallery": {},
-    "hero": {},
-    "features": {},
-    "demo": {}
-  },
-  "Branding": {
-    "gallery": {},
-    "hero": {},
-    "features": {},
-    "demo": {}
   }
 }
