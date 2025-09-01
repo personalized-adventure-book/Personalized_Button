@@ -1062,6 +1062,8 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   const rafRef = React.useRef<number | null>(null);
   // Single global audio element (not recreated on re-renders)
   const globalAudioRef = React.useRef<HTMLAudioElement | null>(null);
+  // Track the last paused index so we can resume without resetting src
+  const lastPausedRef = React.useRef<number | null>(null);
   useEffect(() => {
     if (typeof window !== 'undefined' && !globalAudioRef.current) {
       globalAudioRef.current = getGlobalAudio();
@@ -1394,12 +1396,45 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
 
   const recommendations = getRecommendedImageCounts('gallery');
 
+  function extractBaseName(url: string): string {
+    try {
+      const u = new URL(url, typeof window !== 'undefined' ? window.location.origin : 'http://localhost');
+      const qp = u.searchParams.get('file');
+      if (qp) return qp.toString();
+      const segs = u.pathname.split('/').filter(Boolean);
+      const last = segs[segs.length - 1] || '';
+      return last.replace(/\.[a-zA-Z0-9]+$/, '');
+    } catch { return ''; }
+  }
+
   const togglePlay = (index: number) => {
     const el = globalAudioRef.current;
     if (!el) return;
     const targetSrc = audioSources[index];
+    const baseNameForResume = extractBaseName(targetSrc);
+
+    // CASE 1: Resume previously paused same track (playingIndex null, lastPausedRef matches)
+    if (playingIndex == null && lastPausedRef.current === index) {
+      // Ensure we don't accidentally overwrite the source if same track
+      if (el.src.includes(targetSrc)) {
+        const resumeAttempt = el.play();
+        if (resumeAttempt && typeof resumeAttempt.then === 'function') {
+          resumeAttempt.then(() => {
+            if (!el.paused) {
+              setPlayingIndex(index);
+              setPlaybackState({ index, baseName: baseNameForResume, time: el.currentTime || 0 });
+              try { comprehensiveTracker.trackAudioPlay(index, baseNameForResume, el.duration || durations[index] || 0); } catch {}
+            }
+          }).catch(() => {});
+        } else if (!el.paused) {
+          setPlayingIndex(index);
+          setPlaybackState({ index, baseName: baseNameForResume, time: el.currentTime || 0 });
+        }
+        return;
+      }
+    }
     // If clicking the currently active track, toggle pause/play without resetting src
-    if (playingIndex === index) {
+  if (playingIndex === index) {
       if (el.paused) {
         // Resume
         const resumeAttempt = el.play();
@@ -1413,8 +1448,9 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       } else {
         // Pause
         try { el.pause(); } catch {}
-        setPlaybackState({ index: null, baseName: extractBaseName(targetSrc), time: el.currentTime || 0 });
-        setPlayingIndex(null);
+    lastPausedRef.current = index;
+    setPlaybackState({ index: null, baseName: extractBaseName(targetSrc), time: el.currentTime || 0 });
+    setPlayingIndex(null);
       }
       return;
     }
@@ -1428,12 +1464,13 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     try { el.src = `${targetSrc}?v=${index}`; } catch {}
     ;(el as any)._altTried = false;
     ;(el as any)._blobFallbackTried = false;
-    const baseName = extractBaseName(targetSrc);
+  const baseName = extractBaseName(targetSrc);
     const playAttempt = el.play();
     if (playAttempt && typeof playAttempt.then === 'function') {
       playAttempt.then(() => {
         if (!el.paused) {
           setPlayingIndex(index);
+      lastPausedRef.current = null;
           setPlaybackState({ index, baseName, time: el.currentTime || 0 });
           try { comprehensiveTracker.trackAudioPlay(index, baseName, el.duration || durations[index] || 0); } catch {}
           try { sessionStorage.setItem(RESTORE_KEY, JSON.stringify({ baseName, time: el.currentTime || 0, ts: Date.now() })); } catch {}
@@ -1441,6 +1478,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       }).catch(() => {});
     } else if (!el.paused) {
       setPlayingIndex(index);
+    lastPausedRef.current = null;
       setPlaybackState({ index, baseName, time: el.currentTime || 0 });
     }
     // One-time robust error handler (determine failing index by matching currentSrc)
@@ -1472,18 +1510,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     }
   };
 
-  const extractBaseName = (url: string): string => {
-    try {
-      const u = new URL(url, typeof window !== 'undefined' ? window.location.origin : 'http://localhost');
-      // Legacy (API) mode used ?file= param
-      const qp = u.searchParams.get('file');
-      if (qp) return qp.toString();
-      // Static mode: derive from pathname
-      const segs = u.pathname.split('/').filter(Boolean);
-      const last = segs[segs.length - 1] || '';
-      return last.replace(/\.[a-zA-Z0-9]+$/, '');
-    } catch { return ''; }
-  };
+  // (extractBaseName hoisted earlier)
 
   const handleHorizontalScroll = () => {
     const el = horizontalRef.current;
