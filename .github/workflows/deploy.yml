@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - gh-pages
+      - ai_main_239d030b9800
 
 permissions:
   contents: write
