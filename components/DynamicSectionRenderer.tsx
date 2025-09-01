@@ -1398,44 +1398,36 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     const el = globalAudioRef.current;
     if (!el) return;
     const targetSrc = audioSources[index];
-    const currentlyPlayingSame = playingIndex === index && !el.paused;
-    const pausedSame = playingIndex === index && el.paused;
-
-    // CASE 1: Same track playing -> pause
-    if (currentlyPlayingSame) {
-      try { el.pause(); } catch {}
-      try {
-        const baseName = extractBaseName(targetSrc);
-        setPlaybackState({ index, baseName, time: el.currentTime || 0 });
-        comprehensiveTracker.trackAudioPause(index, baseName, el.duration || durations[index] || 0, el.currentTime);
-      } catch {}
-      return;
-    }
-
-    // CASE 2: Same track paused -> resume without resetting src/currentTime (playingIndex retained)
-    if (pausedSame && el.src) {
-      const resumeAttempt = el.play();
-      if (resumeAttempt && typeof resumeAttempt.then === 'function') {
-        resumeAttempt.then(() => {
-          if (!el.paused) setPlayingIndex(index);
-        }).catch(() => {});
-      } else if (!el.paused) {
-        setPlayingIndex(index);
+    // If clicking the currently active track, toggle pause/play without resetting src
+    if (playingIndex === index) {
+      if (el.paused) {
+        // Resume
+        const resumeAttempt = el.play();
+        if (resumeAttempt && typeof resumeAttempt.then === 'function') {
+          resumeAttempt.then(() => {
+            if (!el.paused) {
+              setPlaybackState({ index, baseName: extractBaseName(targetSrc), time: el.currentTime || 0 });
+            }
+          }).catch(() => {});
+        }
+      } else {
+        // Pause
+        try { el.pause(); } catch {}
+        setPlaybackState({ index: null, baseName: extractBaseName(targetSrc), time: el.currentTime || 0 });
+        setPlayingIndex(null);
       }
       return;
     }
 
-    // CASE 3: Different track selected -> pause current, load new source
-    if (!el.paused) {
+    // Switching to a different track
+    if (playingIndex != null && playingIndex !== index) {
       try { el.pause(); } catch {}
     }
-    // Only reload src if different track OR no src yet
-    const needsReload = !el.src || !el.currentSrc || !el.currentSrc.includes(targetSrc);
-    if (needsReload) {
-      try { el.src = `${targetSrc}?v=${index}`; } catch {}
-      (el as any)._altTried = false;
-      (el as any)._blobFallbackTried = false;
-    }
+
+    // Always reset src when switching tracks (cache-bust with index to avoid Safari stale buffer)
+    try { el.src = `${targetSrc}?v=${index}`; } catch {}
+    ;(el as any)._altTried = false;
+    ;(el as any)._blobFallbackTried = false;
     const baseName = extractBaseName(targetSrc);
     const playAttempt = el.play();
     if (playAttempt && typeof playAttempt.then === 'function') {
@@ -1451,8 +1443,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       setPlayingIndex(index);
       setPlaybackState({ index, baseName, time: el.currentTime || 0 });
     }
-
-    // Attach one-time error handler if not already
+    // One-time robust error handler (determine failing index by matching currentSrc)
     if (!(el as any)._errorBound) {
       (el as any)._errorBound = true;
       el.addEventListener('error', () => {
@@ -1462,11 +1453,15 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
           const failingIdx = audioSources.findIndex(s => failing.endsWith(s) || failing.includes(s + '?v='));
           console.warn('[GalleryAudio] Playback error', mediaErr?.code, 'for', failing, 'resolvedIndex=', failingIdx);
           if (failingIdx >= 0) {
+            // Do NOT permanently mark failed unless repeated
             setFailedAudio(prev => {
               const next = new Set(prev);
               const key = failingIdx;
-              if (!next.has(key)) {
+              if (next.has(key)) {
+                // repeated failure – keep it
+              } else {
                 next.add(key);
+                // Schedule a retry clearing after short delay (transient errors)
                 setTimeout(() => setFailedAudio(p => { const n = new Set(p); n.delete(key); return n; }), 3000);
               }
               return next;
