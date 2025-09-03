@@ -1062,8 +1062,6 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   const rafRef = React.useRef<number | null>(null);
   // Single global audio element (not recreated on re-renders)
   const globalAudioRef = React.useRef<HTMLAudioElement | null>(null);
-  // Track the last paused index so we can resume without resetting src
-  const lastPausedRef = React.useRef<number | null>(null);
   useEffect(() => {
     if (typeof window !== 'undefined' && !globalAudioRef.current) {
       globalAudioRef.current = getGlobalAudio();
@@ -1396,45 +1394,12 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
 
   const recommendations = getRecommendedImageCounts('gallery');
 
-  function extractBaseName(url: string): string {
-    try {
-      const u = new URL(url, typeof window !== 'undefined' ? window.location.origin : 'http://localhost');
-      const qp = u.searchParams.get('file');
-      if (qp) return qp.toString();
-      const segs = u.pathname.split('/').filter(Boolean);
-      const last = segs[segs.length - 1] || '';
-      return last.replace(/\.[a-zA-Z0-9]+$/, '');
-    } catch { return ''; }
-  }
-
   const togglePlay = (index: number) => {
     const el = globalAudioRef.current;
     if (!el) return;
     const targetSrc = audioSources[index];
-    const baseNameForResume = extractBaseName(targetSrc);
-
-    // CASE 1: Resume previously paused same track (playingIndex null, lastPausedRef matches)
-    if (playingIndex == null && lastPausedRef.current === index) {
-      // Ensure we don't accidentally overwrite the source if same track
-      if (el.src.includes(targetSrc)) {
-        const resumeAttempt = el.play();
-        if (resumeAttempt && typeof resumeAttempt.then === 'function') {
-          resumeAttempt.then(() => {
-            if (!el.paused) {
-              setPlayingIndex(index);
-              setPlaybackState({ index, baseName: baseNameForResume, time: el.currentTime || 0 });
-              try { comprehensiveTracker.trackAudioPlay(index, baseNameForResume, el.duration || durations[index] || 0); } catch {}
-            }
-          }).catch(() => {});
-        } else if (!el.paused) {
-          setPlayingIndex(index);
-          setPlaybackState({ index, baseName: baseNameForResume, time: el.currentTime || 0 });
-        }
-        return;
-      }
-    }
     // If clicking the currently active track, toggle pause/play without resetting src
-  if (playingIndex === index) {
+    if (playingIndex === index) {
       if (el.paused) {
         // Resume
         const resumeAttempt = el.play();
@@ -1448,9 +1413,8 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       } else {
         // Pause
         try { el.pause(); } catch {}
-    lastPausedRef.current = index;
-    setPlaybackState({ index: null, baseName: extractBaseName(targetSrc), time: el.currentTime || 0 });
-    setPlayingIndex(null);
+        setPlaybackState({ index: null, baseName: extractBaseName(targetSrc), time: el.currentTime || 0 });
+        setPlayingIndex(null);
       }
       return;
     }
@@ -1464,13 +1428,12 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     try { el.src = `${targetSrc}?v=${index}`; } catch {}
     ;(el as any)._altTried = false;
     ;(el as any)._blobFallbackTried = false;
-  const baseName = extractBaseName(targetSrc);
+    const baseName = extractBaseName(targetSrc);
     const playAttempt = el.play();
     if (playAttempt && typeof playAttempt.then === 'function') {
       playAttempt.then(() => {
         if (!el.paused) {
           setPlayingIndex(index);
-      lastPausedRef.current = null;
           setPlaybackState({ index, baseName, time: el.currentTime || 0 });
           try { comprehensiveTracker.trackAudioPlay(index, baseName, el.duration || durations[index] || 0); } catch {}
           try { sessionStorage.setItem(RESTORE_KEY, JSON.stringify({ baseName, time: el.currentTime || 0, ts: Date.now() })); } catch {}
@@ -1478,7 +1441,6 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       }).catch(() => {});
     } else if (!el.paused) {
       setPlayingIndex(index);
-    lastPausedRef.current = null;
       setPlaybackState({ index, baseName, time: el.currentTime || 0 });
     }
     // One-time robust error handler (determine failing index by matching currentSrc)
@@ -1510,7 +1472,18 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     }
   };
 
-  // (extractBaseName hoisted earlier)
+  const extractBaseName = (url: string): string => {
+    try {
+      const u = new URL(url, typeof window !== 'undefined' ? window.location.origin : 'http://localhost');
+      // Legacy (API) mode used ?file= param
+      const qp = u.searchParams.get('file');
+      if (qp) return qp.toString();
+      // Static mode: derive from pathname
+      const segs = u.pathname.split('/').filter(Boolean);
+      const last = segs[segs.length - 1] || '';
+      return last.replace(/\.[a-zA-Z0-9]+$/, '');
+    } catch { return ''; }
+  };
 
   const handleHorizontalScroll = () => {
     const el = horizontalRef.current;
@@ -1623,51 +1596,23 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                               <span className="opacity-85 min-w-[32px] text-center">{format(current)}</span>
                               <div
                                 className="flex-1 mx-2 h-1.5 bg-white/25 hover:bg-white/30 active:bg-white/40 rounded cursor-pointer relative group"
-                                                onPointerDown={(e) => {
-                                                  const trackEl = e.currentTarget as HTMLDivElement;
-                                                  const audio = globalAudioRef.current;
-                                                  // Allow scrubbing if this track is playing OR was the last paused one
-                                                  const canScrub = playingIndex === i || (playingIndex == null && lastPausedRef.current === i);
-                                                  if (!audio || !canScrub || !audio.duration) return;
-                                                  const wasPlaying = !audio.paused;
-                                                  if (wasPlaying) { try { audio.pause(); } catch {} }
-                                                  const rect = trackEl.getBoundingClientRect();
-                                                  const updateFromEvent = (clientX: number, final: boolean = false) => {
-                                                    const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
-                                                    const prev = audio.currentTime;
-                                                    const newTime = ratio * (audio.duration || 0);
-                                                    try { audio.currentTime = newTime; } catch {}
-                                                    setPositions(prevPos => {
-                                                      const length = audioSources.length;
-                                                      const next = prevPos.length === length ? [...prevPos] : Array(length).fill(0);
-                                                      next[i] = newTime;
-                                                      return next;
-                                                    });
-                                                    setTick(t => t + 1);
-                                                    if (final && Math.abs(newTime - prev) > 0.5) {
-                                                      try {
-                                                        const baseName = extractBaseName(audioSources[i]);
-                                                        comprehensiveTracker.trackAudioSeek(i, baseName, prev, newTime, audio.duration || 0);
-                                                      } catch {}
-                                                    }
-                                                  };
-                                                  updateFromEvent(e.clientX);
-                                                  const move = (ev: PointerEvent) => { updateFromEvent(ev.clientX); };
-                                                  const up = (ev: PointerEvent) => {
-                                                    updateFromEvent(ev.clientX, true);
-                                                    window.removeEventListener('pointermove', move);
-                                                    window.removeEventListener('pointerup', up);
-                                                    // Resume only if it was playing before
-                                                    if (wasPlaying) {
-                                                      const playAttempt = audio.play();
-                                                      if (playAttempt && typeof playAttempt.then === 'function') {
-                                                        playAttempt.then(()=>{ setPlaybackState({ index: i, baseName: extractBaseName(audioSources[i]), time: audio.currentTime||0 }); }).catch(()=>{});
-                                                      }
-                                                    }
-                                                  };
-                                                  window.addEventListener('pointermove', move);
-                                                  window.addEventListener('pointerup', up, { once: true });
-                                                }}
+                                    onClick={(e) => {
+                                      const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+                                      const ratio = (e.clientX - rect.left) / rect.width;
+                                      const audio = globalAudioRef.current;
+                                      if (audio && playingIndex === i && audio.duration) {
+                                        const prev = audio.currentTime;
+                                        const newTime = Math.max(0, Math.min(audio.duration * ratio, audio.duration));
+                                        audio.currentTime = newTime;
+                                        setTick(t => t + 1);
+                                        if (Math.abs(newTime - prev) > 0.5) {
+                                          try {
+                                            const baseName = extractBaseName(audioSources[i]);
+                                            comprehensiveTracker.trackAudioSeek(i, baseName, prev, newTime, audio.duration);
+                                          } catch {}
+                                        }
+                                      }
+                                    }}
                                 aria-label="Seek audio position"
                                 role="slider"
                                 aria-valuemin={0}
