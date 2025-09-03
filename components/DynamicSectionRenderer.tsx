@@ -1057,13 +1057,6 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   const [durations, setDurations] = useState<number[]>([]);
   const [positions, setPositions] = useState<number[]>([]);
   const [failedAudio, setFailedAudio] = useState<Set<number>>(() => new Set());
-  // Drag / scrub state
-  const [dragIndex, setDragIndex] = useState<number | null>(null); // which card is being scrubbed
-  const dragActiveRef = React.useRef(false);
-  const dragIndexRef = React.useRef<number | null>(null);
-  const dragWasPlayingRef = React.useRef<boolean>(false);
-  const dragRectRef = React.useRef<{ left: number; width: number } | null>(null);
-  const dragLastTimeRef = React.useRef<number>(0);
   // force re-render on timeUpdate without coupling to playingIndex
   const [, setTick] = useState<number>(0);
   const rafRef = React.useRef<number | null>(null);
@@ -1150,60 +1143,6 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       }
     }
   }, [playingIndex, audioSources, durations]);
-
-  // Global mouse move/up listeners for dragging scrubber
-  useEffect(() => {
-    const handleMove = (e: MouseEvent) => {
-      if (!dragActiveRef.current) return;
-      const idx = dragIndexRef.current;
-      if (idx == null) return;
-      const rect = dragRectRef.current; if (!rect) return;
-      const el = globalAudioRef.current; if (!el) return;
-      let ratio = (e.clientX - rect.left) / rect.width;
-      ratio = Math.max(0, Math.min(1, ratio));
-      const dur = durations[idx] || el.duration || 0;
-      if (!dur) return;
-      const newTime = dur * ratio;
-      dragLastTimeRef.current = newTime;
-      // Update UI position optimistically
-      setPositions(prev => {
-        const len = audioSources.length; if (!len) return prev;
-        const next = prev.length === len ? [...prev] : Array(len).fill(0);
-        next[idx] = newTime;
-        return next;
-      });
-      setTick(t => t + 1);
-    };
-    const handleUp = () => {
-      if (!dragActiveRef.current) return;
-      const idx = dragIndexRef.current;
-      dragActiveRef.current = false;
-      setDragIndex(null);
-      const el = globalAudioRef.current;
-      if (el && idx != null) {
-        const applyTime = dragLastTimeRef.current;
-        try { el.currentTime = applyTime; } catch {}
-        const baseName = audioSources[idx] ? (() => { try { return extractBaseName(audioSources[idx]); } catch { return ''; } })() : '';
-        // Track seek only if meaningful change
-        if (durations[idx] && Math.abs(applyTime) >= 0) {
-          try { comprehensiveTracker.trackAudioSeek(idx, baseName, 0, applyTime, durations[idx] || el.duration); } catch {}
-        }
-        // Resume if was playing before
-        if (dragWasPlayingRef.current) {
-          const playAttempt = el.play();
-          if (playAttempt && typeof playAttempt.then === 'function') playAttempt.catch(()=>{});
-        }
-      }
-    };
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('mouseup', handleUp);
-    window.addEventListener('mouseleave', handleUp);
-    return () => {
-      window.removeEventListener('mousemove', handleMove);
-      window.removeEventListener('mouseup', handleUp);
-      window.removeEventListener('mouseleave', handleUp);
-    };
-  }, [audioSources, durations, positions]);
 
   // (interval updater moved below after isSong is defined)
   const currentProduct = React.useMemo(() => getCurrentProduct(), []);
@@ -1683,51 +1622,64 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                             <div className="flex items-center justify-between">
                               <span className="opacity-85 min-w-[32px] text-center">{format(current)}</span>
                               <div
-                                className="flex-1 mx-2 h-1.5 bg-white/25 hover:bg-white/30 active:bg-white/40 rounded cursor-pointer relative group select-none"
-                                role="slider"
+                                className="flex-1 mx-2 h-1.5 bg-white/25 hover:bg-white/30 active:bg-white/40 rounded cursor-pointer relative group"
+                                                onPointerDown={(e) => {
+                                                  const trackEl = e.currentTarget as HTMLDivElement;
+                                                  const audio = globalAudioRef.current;
+                                                  // Allow scrubbing if this track is playing OR was the last paused one
+                                                  const canScrub = playingIndex === i || (playingIndex == null && lastPausedRef.current === i);
+                                                  if (!audio || !canScrub || !audio.duration) return;
+                                                  const wasPlaying = !audio.paused;
+                                                  if (wasPlaying) { try { audio.pause(); } catch {} }
+                                                  const rect = trackEl.getBoundingClientRect();
+                                                  const updateFromEvent = (clientX: number, final: boolean = false) => {
+                                                    const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+                                                    const prev = audio.currentTime;
+                                                    const newTime = ratio * (audio.duration || 0);
+                                                    try { audio.currentTime = newTime; } catch {}
+                                                    setPositions(prevPos => {
+                                                      const length = audioSources.length;
+                                                      const next = prevPos.length === length ? [...prevPos] : Array(length).fill(0);
+                                                      next[i] = newTime;
+                                                      return next;
+                                                    });
+                                                    setTick(t => t + 1);
+                                                    if (final && Math.abs(newTime - prev) > 0.5) {
+                                                      try {
+                                                        const baseName = extractBaseName(audioSources[i]);
+                                                        comprehensiveTracker.trackAudioSeek(i, baseName, prev, newTime, audio.duration || 0);
+                                                      } catch {}
+                                                    }
+                                                  };
+                                                  updateFromEvent(e.clientX);
+                                                  const move = (ev: PointerEvent) => { updateFromEvent(ev.clientX); };
+                                                  const up = (ev: PointerEvent) => {
+                                                    updateFromEvent(ev.clientX, true);
+                                                    window.removeEventListener('pointermove', move);
+                                                    window.removeEventListener('pointerup', up);
+                                                    // Resume only if it was playing before
+                                                    if (wasPlaying) {
+                                                      const playAttempt = audio.play();
+                                                      if (playAttempt && typeof playAttempt.then === 'function') {
+                                                        playAttempt.then(()=>{ setPlaybackState({ index: i, baseName: extractBaseName(audioSources[i]), time: audio.currentTime||0 }); }).catch(()=>{});
+                                                      }
+                                                    }
+                                                  };
+                                                  window.addEventListener('pointermove', move);
+                                                  window.addEventListener('pointerup', up, { once: true });
+                                                }}
                                 aria-label="Seek audio position"
+                                role="slider"
                                 aria-valuemin={0}
                                 aria-valuemax={duration || 0}
                                 aria-valuenow={current || 0}
-                                onMouseDown={(e) => {
-                                  // Only allow drag on active (playing or paused) track
-                                  const isActiveTrack = playingIndex === i || (playingIndex == null && lastPausedRef.current === i);
-                                  if (!isActiveTrack) return; // ignore
-                                  const bar = e.currentTarget as HTMLDivElement;
-                                  const rect = bar.getBoundingClientRect();
-                                  dragRectRef.current = { left: rect.left, width: rect.width };
-                                  dragIndexRef.current = i;
-                                  setDragIndex(i);
-                                  dragActiveRef.current = true;
-                                  const el = globalAudioRef.current;
-                                  dragWasPlayingRef.current = !!(el && !el.paused);
-                                  if (el && dragWasPlayingRef.current) { try { el.pause(); } catch {} }
-                                  // Initial set based on click position
-                                  const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-                                  const dur = durations[i] || (el ? el.duration : 0) || 0;
-                                  if (dur) {
-                                    const newTime = dur * ratio;
-                                    dragLastTimeRef.current = newTime;
-                                    if (el && (playingIndex === i || lastPausedRef.current === i)) {
-                                      try { el.currentTime = newTime; } catch {}
-                                    }
-                                    setPositions(prev => {
-                                      const len = audioSources.length; if (!len) return prev;
-                                      const next = prev.length === len ? [...prev] : Array(len).fill(0);
-                                      next[i] = newTime;
-                                      return next;
-                                    });
-                                    setTick(t => t + 1);
-                                  }
-                                  e.preventDefault();
-                                }}
                               >
                                 <div className="absolute inset-0">
                                   <div className="h-full bg-white/90 transition-all" style={{ width: `${progress*100}%` }} />
                                 </div>
                                 <div
-                                  className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow transition-opacity ${dragIndex===i || isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
-                                  style={{ left: `calc(${progress*100}% - 6px)`, cursor: 'ew-resize' }}
+                                  className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow opacity-0 group-hover:opacity-100 transition-opacity"
+                                  style={{ left: `calc(${progress*100}% - 6px)` }}
                                 />
                               </div>
                               <span className="opacity-70 min-w-[32px] text-center">{duration ? format(duration) : '--:--'}</span>
