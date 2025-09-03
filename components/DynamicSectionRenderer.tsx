@@ -1398,19 +1398,47 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     const el = globalAudioRef.current;
     if (!el) return;
     const targetSrc = audioSources[index];
-    // Pause any current playback first to avoid overlapping state changes
-    try { el.pause(); } catch {}
-    // If clicking the same index while playing -> treat as pause toggle
+    const baseName = extractBaseName(targetSrc);
+
+    // CASE 1: Clicking the currently playing track -> pause (store position, keep it loaded)
     if (playingIndex === index && !el.paused) {
-      return; // already paused above
+      const cur = el.currentTime || 0;
+      try {
+        setPlaybackState({ index, baseName, time: cur });
+        sessionStorage.setItem(RESTORE_KEY, JSON.stringify({ baseName, time: cur, ts: Date.now() }));
+        // Optional analytics
+        try { (comprehensiveTracker as any).trackAudioPause?.(index, baseName, cur, el.duration || durations[index] || 0); } catch {}
+      } catch {}
+      try { el.pause(); } catch {}
+      // Clear active animation state
+      setPlayingIndex(null);
+      return;
     }
-    // Always reset src to ensure clean load (cache bust via index to avoid Safari reusing stale buffer)
+
+    // CASE 2: Resuming same track (it is paused & last saved index matches)
+    const savedState = getPlaybackState();
+    const isSamePausedTrack = savedState.index === index && el.paused && el.src.includes(targetSrc);
+    if (isSamePausedTrack) {
+      // Resume without resetting src/currentTime
+      const resumeAttempt = el.play();
+      if (resumeAttempt && typeof resumeAttempt.then === 'function') {
+        resumeAttempt.then(() => {
+          if (!el.paused) {
+            setPlayingIndex(index);
+            try { comprehensiveTracker.trackAudioPlay(index, baseName, el.duration || durations[index] || 0); } catch {}
+          }
+        }).catch(() => {});
+      } else if (!el.paused) {
+        setPlayingIndex(index);
+      }
+      return;
+    }
+
+    // CASE 3: Switching to a different track
+    try { el.pause(); } catch {}
     try { el.src = `${targetSrc}?v=${index}`; } catch {}
-    // Clear previous error attempt flags for new source
     (el as any)._altTried = false;
     (el as any)._blobFallbackTried = false;
-    const baseName = extractBaseName(targetSrc);
-    // Attempt to play
     const playAttempt = el.play();
     if (playAttempt && typeof playAttempt.then === 'function') {
       playAttempt.then(() => {
