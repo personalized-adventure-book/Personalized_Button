@@ -1398,37 +1398,19 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     const el = globalAudioRef.current;
     if (!el) return;
     const targetSrc = audioSources[index];
-    // If clicking the currently active track, toggle pause/play without resetting src
-    if (playingIndex === index) {
-      if (el.paused) {
-        // Resume
-        const resumeAttempt = el.play();
-        if (resumeAttempt && typeof resumeAttempt.then === 'function') {
-          resumeAttempt.then(() => {
-            if (!el.paused) {
-              setPlaybackState({ index, baseName: extractBaseName(targetSrc), time: el.currentTime || 0 });
-            }
-          }).catch(() => {});
-        }
-      } else {
-        // Pause
-        try { el.pause(); } catch {}
-        setPlaybackState({ index: null, baseName: extractBaseName(targetSrc), time: el.currentTime || 0 });
-        setPlayingIndex(null);
-      }
-      return;
+    // Pause any current playback first to avoid overlapping state changes
+    try { el.pause(); } catch {}
+    // If clicking the same index while playing -> treat as pause toggle
+    if (playingIndex === index && !el.paused) {
+      return; // already paused above
     }
-
-    // Switching to a different track
-    if (playingIndex != null && playingIndex !== index) {
-      try { el.pause(); } catch {}
-    }
-
-    // Always reset src when switching tracks (cache-bust with index to avoid Safari stale buffer)
+    // Always reset src to ensure clean load (cache bust via index to avoid Safari reusing stale buffer)
     try { el.src = `${targetSrc}?v=${index}`; } catch {}
-    ;(el as any)._altTried = false;
-    ;(el as any)._blobFallbackTried = false;
+    // Clear previous error attempt flags for new source
+    (el as any)._altTried = false;
+    (el as any)._blobFallbackTried = false;
     const baseName = extractBaseName(targetSrc);
+    // Attempt to play
     const playAttempt = el.play();
     if (playAttempt && typeof playAttempt.then === 'function') {
       playAttempt.then(() => {
