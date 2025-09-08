@@ -1180,6 +1180,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     dur: number;
     start: number; // starting time
     wasPlaying: boolean;
+  prevOverflowX?: string | null;
   } | null>(null);
   const dragMoveRaf = React.useRef<number | null>(null);
 
@@ -1425,11 +1426,13 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       return;
     }
 
-    // CASE 2: Resuming same track (it is paused & last saved index matches)
+    // CASE 2: Resuming same track (paused) — honor saved seek time
     const savedState = getPlaybackState();
     const isSamePausedTrack = savedState.index === index && el.paused && el.src.includes(targetSrc);
     if (isSamePausedTrack) {
-      // Resume without resetting src/currentTime
+      // Ensure we start from saved time
+      try { if (!isNaN(savedState.time)) el.currentTime = savedState.time; } catch {}
+      // Resume without resetting src
       const resumeAttempt = el.play();
       if (resumeAttempt && typeof resumeAttempt.then === 'function') {
         resumeAttempt.then(() => {
@@ -1453,6 +1456,11 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     if (playAttempt && typeof playAttempt.then === 'function') {
       playAttempt.then(() => {
         if (!el.paused) {
+          // If user just dragged before playing, seek to saved time
+          const s = getPlaybackState();
+          if (s.index === index && !isNaN(s.time)) {
+            try { el.currentTime = Math.min(s.time, el.duration || s.time); } catch {}
+          }
           setPlayingIndex(index);
           setPlaybackState({ index, baseName, time: el.currentTime || 0 });
           try { comprehensiveTracker.trackAudioPlay(index, baseName, el.duration || durations[index] || 0); } catch {}
@@ -1616,6 +1624,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                               <span className="opacity-85 min-w-[32px] text-center">{format(current)}</span>
                               <div
                                 className="flex-1 mx-2 h-1.5 bg-white/25 hover:bg-white/30 active:bg-white/40 rounded cursor-pointer relative group"
+                                style={{ touchAction: 'none' }}
                                     onClick={(e) => {
                                       const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
                                       const ratio = (e.clientX - rect.left) / rect.width;
@@ -1684,7 +1693,12 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
 
                                   const wasPlaying = !!(audio && !audio.paused && playingIndex === i);
                                   const start = isLoadedThisTrack && audio ? (audio.currentTime || 0) : (positions[i] || 0);
-                                  draggingRef.current = { index: i, baseName, rect, dur, start, wasPlaying };
+                                  // Prevent parent horizontal scroll while dragging
+                                  let prevOverflowX: string | null = null;
+                                  const scrollContainer = horizontalRef.current as HTMLDivElement | null;
+                                  if (scrollContainer) { prevOverflowX = scrollContainer.style.overflowX || ''; scrollContainer.style.overflowX = 'hidden'; }
+                                  draggingRef.current = { index: i, baseName, rect, dur, start, wasPlaying, prevOverflowX };
+                                  try { bar.setPointerCapture(e.pointerId); } catch {}
 
                                   const updateFromClientX = (clientX: number) => {
                                     const d = draggingRef.current;
@@ -1721,6 +1735,10 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                                     if (dragMoveRaf.current) { cancelAnimationFrame(dragMoveRaf.current); dragMoveRaf.current = null; }
                                     const d = draggingRef.current;
                                     draggingRef.current = null;
+                                    // Restore scroll
+                                    const scrollContainer = horizontalRef.current as HTMLDivElement | null;
+                                    if (scrollContainer && d && typeof d.prevOverflowX === 'string') { scrollContainer.style.overflowX = d.prevOverflowX; }
+                                    try { (bar as any).releasePointerCapture?.(e.pointerId); } catch {}
                                     if (d) {
                                       const ratio = Math.max(0, Math.min((ev.clientX - d.rect.left) / d.rect.width, 1));
                                       const endTime = Math.max(0, Math.min(d.dur * ratio, d.dur));
