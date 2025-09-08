@@ -1057,6 +1057,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   const [durations, setDurations] = useState<number[]>([]);
   const [positions, setPositions] = useState<number[]>([]);
   const [failedAudio, setFailedAudio] = useState<Set<number>>(() => new Set());
+  const [scrubbingIndex, setScrubbingIndex] = useState<number | null>(null);
   // force re-render on timeUpdate without coupling to playingIndex
   const [, setTick] = useState<number>(0);
   const rafRef = React.useRef<number | null>(null);
@@ -1439,6 +1440,20 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     try { el.src = `${targetSrc}?v=${index}`; } catch {}
     (el as any)._altTried = false;
     (el as any)._blobFallbackTried = false;
+    // If user scrubbed ahead before playing, honor that saved time
+    try {
+      const saved = getPlaybackState();
+      if (saved && saved.index === index && saved.baseName === baseName && typeof saved.time === 'number') {
+        const applySaved = () => {
+          try { el.currentTime = Math.min(saved.time, el.duration || saved.time); } catch {}
+        };
+        if (el.readyState >= 1 && !isNaN(el.duration)) {
+          applySaved();
+        } else {
+          el.addEventListener('loadedmetadata', applySaved, { once: true });
+        }
+      }
+    } catch {}
     const playAttempt = el.play();
     if (playAttempt && typeof playAttempt.then === 'function') {
       playAttempt.then(() => {
@@ -1656,74 +1671,74 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                                         try { comprehensiveTracker.trackAudioSeek(i, baseName, prev, newTime, dur); } catch {}
                                       }
                                     }}
-                                    onPointerDown={(e: any) => {
-                                      const container = e.currentTarget as HTMLDivElement;
-                                      const rect = container.getBoundingClientRect();
-                                      const pointerId = e.pointerId;
-                                      const audio = globalAudioRef.current;
-                                      const target = audioSources[i];
-                                      const baseName = extractBaseName(target);
-                                      const saved = getPlaybackState();
-                                      const isLoadedThisTrack = (() => {
-                                        if (!audio) return false;
-                                        try {
-                                          const loadedBase = extractBaseName(audio.currentSrc || audio.src || '');
-                                          return loadedBase === baseName && (!!audio.duration && !isNaN(audio.duration));
-                                        } catch { return false; }
-                                      })();
-                                      const dur = isLoadedThisTrack && audio ? (audio.duration || 0) : (durations[i] || 0);
-                                      if (!dur) return;
+                                onPointerDown={(e) => {
+                                  const startEl = e.currentTarget as HTMLDivElement;
+                                  const audio = globalAudioRef.current;
+                                  const target = audioSources[i];
+                                  const baseName = extractBaseName(target);
+                                  const rect = startEl.getBoundingClientRect();
+                                  const getRatio = (clientX: number) => Math.max(0, Math.min((clientX - rect.left) / rect.width, 1));
+                                  const isLoaded = (() => {
+                                    if (!audio) return false;
+                                    try {
+                                      const loadedBase = extractBaseName(audio.currentSrc || audio.src || '');
+                                      return loadedBase === baseName && (!!audio.duration && !isNaN(audio.duration));
+                                    } catch { return false; }
+                                  })();
+                                  const dur = isLoaded && audio ? (audio.duration || 0) : (durations[i] || 0);
+                                  if (!dur) return;
 
-                                      // UX: prevent text selection while scrubbing
-                                      const prevUserSelect = document.body.style.userSelect;
-                                      document.body.style.userSelect = 'none';
-                                      container.setPointerCapture?.(pointerId);
+                                  setScrubbingIndex(i);
+                                  (startEl as any).setPointerCapture?.(e.pointerId);
 
-                                      const handleMove = (ev: PointerEvent) => {
-                                        if (ev.pointerId !== pointerId) return;
-                                        const ratio = Math.max(0, Math.min((ev.clientX - rect.left) / rect.width, 1));
-                                        const newTime = dur * ratio;
-                                        // Update audio element if this track is loaded
-                                        if (isLoadedThisTrack && audio) {
-                                          try { audio.currentTime = newTime; } catch {}
-                                        }
-                                        // Update UI position
-                                        setPositions(prevPos => {
-                                          const len = audioSources.length;
-                                          const next = prevPos.length === len ? [...prevPos] : Array(len).fill(0);
-                                          next[i] = newTime;
-                                          return next;
-                                        });
-                                        setTick(t => t + 1);
-                                        // Persist state for resume
-                                        try {
-                                          setPlaybackState({ index: i, baseName, time: newTime });
-                                          sessionStorage.setItem(RESTORE_KEY, JSON.stringify({ baseName, time: newTime, ts: Date.now() }));
-                                        } catch {}
-                                      };
+                                  const apply = (clientX: number, commit: boolean) => {
+                                    const ratio = getRatio(clientX);
+                                    const newTime = Math.max(0, Math.min(dur * ratio, dur));
+                                    if (isLoaded && audio) {
+                                      try { audio.currentTime = newTime; } catch {}
+                                    }
+                                    setPositions(prevPos => {
+                                      const len = audioSources.length;
+                                      const next = prevPos.length === len ? [...prevPos] : Array(len).fill(0);
+                                      next[i] = newTime;
+                                      return next;
+                                    });
+                                    setTick(t => t + 1);
+                                    if (commit) {
+                                      try {
+                                        setPlaybackState({ index: i, baseName, time: newTime });
+                                        sessionStorage.setItem(RESTORE_KEY, JSON.stringify({ baseName, time: newTime, ts: Date.now() }));
+                                      } catch {}
+                                    }
+                                  };
 
-                                      const handleUp = (ev: PointerEvent) => {
-                                        if (ev.pointerId !== pointerId) return;
-                                        window.removeEventListener('pointermove', handleMove);
-                                        window.removeEventListener('pointerup', handleUp);
-                                        document.body.style.userSelect = prevUserSelect;
-                                      };
+                                  // initial
+                                  apply(e.clientX, false);
 
-                                      window.addEventListener('pointermove', handleMove);
-                                      window.addEventListener('pointerup', handleUp);
-                                    }}
+                                  const onMove = (ev: PointerEvent) => apply(ev.clientX, false);
+                                  const onUp = (ev: PointerEvent) => {
+                                    apply(ev.clientX, true);
+                                    setScrubbingIndex(null);
+                                    window.removeEventListener('pointermove', onMove);
+                                    window.removeEventListener('pointerup', onUp);
+                                    window.removeEventListener('pointercancel', onUp);
+                                  };
+                                  window.addEventListener('pointermove', onMove, { passive: true });
+                                  window.addEventListener('pointerup', onUp, { passive: true });
+                                  window.addEventListener('pointercancel', onUp, { passive: true });
+                                }}
                                 aria-label="Seek audio position"
                                 role="slider"
                                 aria-valuemin={0}
                                 aria-valuemax={duration || 0}
-                                aria-valuenow={current || 0}
+                                aria-valuenow={scrubbingIndex === i ? (positions[i] || 0) : (current || 0)}
                               >
                                 <div className="absolute inset-0">
-                                  <div className="h-full bg-white/90 transition-all" style={{ width: `${progress*100}%` }} />
+                                  <div className="h-full bg-white/90 transition-all" style={{ width: `${(scrubbingIndex === i ? (positions[i] || 0) / (duration || 1) : progress) * 100}%` }} />
                                 </div>
                                 <div
                                   className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow opacity-0 group-hover:opacity-100 transition-opacity"
-                                  style={{ left: `calc(${progress*100}% - 6px)` }}
+                                  style={{ left: `calc(${(scrubbingIndex === i ? (positions[i] || 0) / (duration || 1) : progress) * 100}% - 6px)` }}
                                 />
                               </div>
                               <span className="opacity-70 min-w-[32px] text-center">{duration ? format(duration) : '--:--'}</span>
