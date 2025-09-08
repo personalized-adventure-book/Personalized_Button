@@ -322,21 +322,7 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
     if (manifest) {
       const list: string[] | undefined = manifest?.Song?.gallery?.[lang];
       if (Array.isArray(list) && list.length) {
-        let files = list.slice(0, max).map(name => ({ name, path: `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}` }));
-        // Verify existence (HEAD) to avoid unusable sources producing media error 4
-        try {
-          const checks = await Promise.all(files.map(async f => {
-            try {
-              const res = await fetch(f.path, { method: 'HEAD' });
-              return res.ok ? f : null;
-            } catch { return null; }
-          }));
-          const filtered = checks.filter(Boolean) as DiscoveredAudio[];
-          if (filtered.length && filtered.length !== files.length) {
-            console.warn('[AudioGallery] Filtered missing audio files:', files.filter(f => !filtered.find(x => x.name===f.name)).map(f=>f.name));
-          }
-          if (filtered.length) files = filtered;
-        } catch {}
+        const files = list.slice(0, max).map(name => ({ name, path: `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}` }));
         return files;
       }
     }
