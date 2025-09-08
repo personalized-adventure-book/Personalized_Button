@@ -310,20 +310,15 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
   const FORCE_ROOT = typeof process !== 'undefined' && (process as any).env?.NEXT_PUBLIC_FORCE_ROOT === '1';
   const prefix = FORCE_ROOT ? '' : BASE_PATH;
 
-  // 1. Try manifest first (fast, no HEAD requests)
+  // 1. Try manifest first (fast, no HEAD requests) with simple session cache
   try {
-    // Session-level cache to avoid duplicate fetch bursts during mount churn
-    let manifest: any | null = null;
-    try {
-      const cached = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('audio_manifest_cache_v1') : null;
-      if (cached) manifest = JSON.parse(cached);
-    } catch {}
-    if (!manifest) {
-      const manifestResp = await fetch('/Personalized_Button/audio-manifest.json', { cache: 'no-store' });
-      if (!manifestResp.ok) throw new Error('manifest not ok');
-      manifest = await manifestResp.json();
-      try { sessionStorage.setItem('audio_manifest_cache_v1', JSON.stringify(manifest)); } catch {}
+    const g: any = (typeof globalThis !== 'undefined') ? (globalThis as any) : {};
+    if (!g.__audioManifestPromise) {
+      g.__audioManifestPromise = fetch('/Personalized_Button/audio-manifest.json', { cache: 'force-cache' })
+        .then(r => r.ok ? r.json() : null)
+        .catch(() => null);
     }
+    const manifest = await g.__audioManifestPromise;
     if (manifest) {
       const list: string[] | undefined = manifest?.Song?.gallery?.[lang];
       if (Array.isArray(list) && list.length) {

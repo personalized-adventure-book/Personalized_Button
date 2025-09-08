@@ -1143,8 +1143,9 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   }, [playingIndex, audioSources, durations]);
 
   // (interval updater moved below after isSong is defined)
-  const currentProduct = React.useMemo(() => getCurrentProduct(), []);
-  const currentLanguage = React.useMemo(() => getCurrentLanguage(), []);
+  // Cache product/language once during the session for stability in this section
+  const currentProduct = React.useRef<string>(getCurrentProduct()).current;
+  const currentLanguage = React.useRef<string>(getCurrentLanguage()).current;
   const isSong = currentProduct === 'Song';
   // Fallback interval updater (ensures UI ticks even if timeupdate sparse or RAF throttled)
   useEffect(() => {
@@ -1210,17 +1211,13 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   // Discover audios (Song)
   useEffect(() => {
     if (!isSong) return;
-  const loadKey = `${currentProduct}:${currentLanguage}`;
-  const loadedKeyRef = (GallerySection as any)._loadedKeyRef || ((GallerySection as any)._loadedKeyRef = { current: null });
-  if (loadedKeyRef.current === loadKey) return; // prevent duplicate loads for same product/lang during mount churn
-  loadedKeyRef.current = loadKey;
     const loadAudios = async () => {
       setIsLoading(true);
       try {
   const audios = await getGalleryAudios(24, currentProduct, currentLanguage);
   setAudioSources(audios);
-  setDurations(prev => audios.length !== prev.length ? Array(audios.length).fill(0) : prev);
-  setPositions(prev => audios.length !== prev.length ? Array(audios.length).fill(0) : prev);
+  setDurations(prev => (prev.length === audios.length ? prev : Array(audios.length).fill(0)));
+  setPositions(prev => (prev.length === audios.length ? prev : Array(audios.length).fill(0)));
       } catch (e) {
         console.error('Error loading gallery audios', e);
       } finally {
@@ -1228,7 +1225,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       }
     };
     loadAudios();
-  }, [currentProduct, currentLanguage, isSong]);
+  }, [isSong]);
 
   // Debug: fetch first bytes of each audio to verify correct RIFF header when ?audioDebug=1
   useEffect(() => {
@@ -1266,13 +1263,13 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     if (!isSong) return;
     if (!audioSources.length) return;
     // Limit initial batch (e.g., first 6) then expand after user interaction/visibility
-    const INITIAL_BATCH = 6;
+  const INITIAL_BATCH = 6;
     const CONCURRENCY = 3;
     let active = 0;
     let index = 0;
     let cancelled = false;
     const queue: HTMLAudioElement[] = [];
-    let expanded = false;
+  let expanded = false;
 
     const targetCountRef = { current: Math.min(INITIAL_BATCH, audioSources.length) } as { current: number };
 
@@ -1318,7 +1315,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       launchNext();
     };
 
-  // Expand on first horizontal scroll or when gallery becomes visible (no timed auto-expand)
+  // Expand on first horizontal scroll or when visible
     const scrollEl = horizontalRef.current;
     const onScrollOnce = () => { expand(); scrollEl && scrollEl.removeEventListener('scroll', onScrollOnce); };
     scrollEl && scrollEl.addEventListener('scroll', onScrollOnce, { passive: true });
