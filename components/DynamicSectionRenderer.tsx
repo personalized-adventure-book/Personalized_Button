@@ -1610,17 +1610,50 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                                       const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
                                       const ratio = (e.clientX - rect.left) / rect.width;
                                       const audio = globalAudioRef.current;
-                                      if (audio && playingIndex === i && audio.duration) {
-                                        const prev = audio.currentTime;
-                                        const newTime = Math.max(0, Math.min(audio.duration * ratio, audio.duration));
-                                        audio.currentTime = newTime;
-                                        setTick(t => t + 1);
-                                        if (Math.abs(newTime - prev) > 0.5) {
-                                          try {
-                                            const baseName = extractBaseName(audioSources[i]);
-                                            comprehensiveTracker.trackAudioSeek(i, baseName, prev, newTime, audio.duration);
-                                          } catch {}
-                                        }
+                                      const target = audioSources[i];
+                                      const baseName = extractBaseName(target);
+                                      const saved = getPlaybackState();
+                                      // Is the current audio element loaded with this track?
+                                      const isLoadedThisTrack = (() => {
+                                        if (!audio) return false;
+                                        try {
+                                          const loadedBase = extractBaseName(audio.currentSrc || audio.src || '');
+                                          return loadedBase === baseName && (!!audio.duration && !isNaN(audio.duration));
+                                        } catch { return false; }
+                                      })();
+
+                                      // Determine usable duration for clamping
+                                      const dur = isLoadedThisTrack && audio ? (audio.duration || 0) : (durations[i] || 0);
+                                      if (!dur) return; // nothing to do
+
+                                      const prev = isLoadedThisTrack && audio
+                                        ? (audio.currentTime || 0)
+                                        : (saved.index === i ? (saved.time || 0) : (positions[i] || 0));
+                                      const newTime = Math.max(0, Math.min(dur * ratio, dur));
+
+                                      // If this track is the one currently loaded (even if paused), set currentTime directly
+                                      if (isLoadedThisTrack && audio) {
+                                        try { audio.currentTime = newTime; } catch {}
+                                      }
+
+                                      // Update local UI state to reflect the new position
+                                      setPositions(prevPos => {
+                                        const len = audioSources.length;
+                                        const next = prevPos.length === len ? [...prevPos] : Array(len).fill(0);
+                                        next[i] = newTime;
+                                        return next;
+                                      });
+                                      setTick(t => t + 1);
+
+                                      // Persist playback state so resume starts from this point
+                                      try {
+                                        setPlaybackState({ index: i, baseName, time: newTime });
+                                        sessionStorage.setItem(RESTORE_KEY, JSON.stringify({ baseName, time: newTime, ts: Date.now() }));
+                                      } catch {}
+
+                                      // Analytics (only if a meaningful jump)
+                                      if (Math.abs(newTime - prev) > 0.5) {
+                                        try { comprehensiveTracker.trackAudioSeek(i, baseName, prev, newTime, dur); } catch {}
                                       }
                                     }}
                                 aria-label="Seek audio position"
