@@ -1554,16 +1554,10 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                   const ga = globalAudioRef.current;
                   const isActive = playingIndex === i;
                   const savedState = getPlaybackState();
-                  const isDragging = draggingRef.current?.index === i;
-                  const dragDur = draggingRef.current?.dur || 0;
-                  const baseDuration = durations[i] || ((isActive || savedState.index === i) && ga ? (ga.duration || 0) : 0);
-                  const duration = isDragging ? (dragDur || baseDuration || 0) : (baseDuration || 0);
-                  const current = isDragging
-                    ? (positions[i] ?? 0)
-                    : (isActive
-                        ? (positions[i] ?? (ga ? ga.currentTime : 0) ?? 0)
-                        : (savedState.index === i ? savedState.time : (positions[i] ?? 0))
-                      );
+                  const duration = durations[i] || ((isActive || savedState.index === i) && ga ? ga.duration : 0) || 0;
+                  const current = isActive
+                    ? (positions[i] ?? (ga ? ga.currentTime : 0) ?? 0)
+                    : (savedState.index === i ? savedState.time : (positions[i] ?? 0));
                   const progress = duration ? (current / duration) : 0;
                   const gradientPalette = [
                     'from-fuchsia-500 via-pink-500 to-rose-500',
@@ -1628,12 +1622,14 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                           <div className="absolute left-0 right-0 bottom-0 px-2 py-1.5 bg-black/45 backdrop-blur-md text-[11px] font-medium tabular-nums select-none">
                             <div className="flex items-center justify-between">
                               <span className="opacity-85 min-w-[32px] text-center">{format(current)}</span>
-                              <div
+                <div
                                 className="flex-1 mx-2 h-1.5 bg-white/25 hover:bg-white/30 active:bg-white/40 rounded cursor-pointer relative group"
                                 style={{ touchAction: 'none' }}
                                     onClick={(e) => {
                                       const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
                                       const ratio = (e.clientX - rect.left) / rect.width;
+                  // Instant visual feedback via CSS var
+                  try { (e.currentTarget as HTMLDivElement).style.setProperty('--progress', `${Math.max(0, Math.min(ratio, 1)) * 100}%`); } catch {}
                                       const audio = globalAudioRef.current;
                                       const target = audioSources[i];
                                       const baseName = extractBaseName(target);
@@ -1684,6 +1680,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                                 onPointerDown={(e) => {
                                   const bar = e.currentTarget as HTMLDivElement;
                                   const rect = bar.getBoundingClientRect();
+                                  e.preventDefault();
                                   const audio = globalAudioRef.current;
                                   const target = audioSources[i];
                                   const baseName = extractBaseName(target);
@@ -1711,6 +1708,8 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                                     if (!d) return;
                                     const ratio = Math.max(0, Math.min((clientX - d.rect.left) / d.rect.width, 1));
                                     const newTime = Math.max(0, Math.min(d.dur * ratio, d.dur));
+                                    // Instant visual feedback via CSS var (no transition)
+                                    try { bar.style.setProperty('--progress', `${ratio * 100}%`); } catch {}
                                     const audioEl = globalAudioRef.current;
                                     if (isLoadedThisTrack && audioEl) {
                                       try { audioEl.currentTime = newTime; } catch {}
@@ -1764,11 +1763,20 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                                 aria-valuenow={current || 0}
                               >
                                 <div className="absolute inset-0">
-                                  <div className="h-full bg-white/90 transition-all" style={{ width: `${progress*100}%` }} />
+                                  <div
+                                    className="h-full bg-white/90 transition-all"
+                                    style={{
+                                      width: `var(--progress, ${progress*100}%)`,
+                                      transitionDuration: draggingRef.current?.index === i ? '0ms' : undefined
+                                    }}
+                                  />
                                 </div>
                                 <div
                                   className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow opacity-0 group-hover:opacity-100 transition-opacity"
-                                  style={{ left: `calc(${Math.max(0, Math.min(progress, 1))*100}% - 6px)` }}
+                                  style={{
+                                    left: `calc(var(--progress, ${progress*100}%) - 6px)`,
+                                    transitionDuration: draggingRef.current?.index === i ? '0ms' : undefined
+                                  }}
                                 />
                               </div>
                               <span className="opacity-70 min-w-[32px] text-center">{duration ? format(duration) : '--:--'}</span>
