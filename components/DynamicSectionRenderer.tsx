@@ -1143,9 +1143,8 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   }, [playingIndex, audioSources, durations]);
 
   // (interval updater moved below after isSong is defined)
-  // Cache product/language once during the session for stability in this section
-  const currentProduct = React.useRef<string>(getCurrentProduct()).current;
-  const currentLanguage = React.useRef<string>(getCurrentLanguage()).current;
+  const currentProduct = React.useMemo(() => getCurrentProduct(), []);
+  const currentLanguage = React.useMemo(() => getCurrentLanguage(), []);
   const isSong = currentProduct === 'Song';
   // Fallback interval updater (ensures UI ticks even if timeupdate sparse or RAF throttled)
   useEffect(() => {
@@ -1208,22 +1207,25 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     discoverImages();
   }, [currentProduct, currentLanguage, isSong]);
 
-  // Discover audios (Song) — guarded against React Strict Mode double-invocation
-  const audioLoadRanRef = React.useRef(false);
+  // Discover audios (Song)
+  const loadedRef = React.useRef<string | null>(null);
   useEffect(() => {
     if (!isSong) return;
-    if (audioLoadRanRef.current) return;
-    audioLoadRanRef.current = true;
+    const key = `${currentProduct}:${currentLanguage}`;
+    // Avoid reloading if we already loaded the same product/language and have sources
+    if (loadedRef.current === key && audioSources.length) return;
     const loadAudios = async () => {
       setIsLoading(true);
       try {
         const audios = await getGalleryAudios(24, currentProduct, currentLanguage);
         setAudioSources(prev => {
-          const same = prev.length === audios.length && prev.every((v, i) => v === audios[i]);
+          // Prevent flicker: only update if list changed
+          const same = prev.length === audios.length && prev.every((v, idx) => v === audios[idx]);
           return same ? prev : audios;
         });
-        setDurations(prev => (prev.length === audios.length ? prev : Array(audios.length).fill(0)));
-        setPositions(prev => (prev.length === audios.length ? prev : Array(audios.length).fill(0)));
+        setDurations(prev => audios.length !== prev.length ? Array(audios.length).fill(0) : prev);
+        setPositions(prev => audios.length !== prev.length ? Array(audios.length).fill(0) : prev);
+        loadedRef.current = key;
       } catch (e) {
         console.error('Error loading gallery audios', e);
       } finally {
@@ -1231,7 +1233,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       }
     };
     loadAudios();
-  }, [isSong, currentProduct, currentLanguage]);
+  }, [currentProduct, currentLanguage, isSong]);
 
   // Debug: fetch first bytes of each audio to verify correct RIFF header when ?audioDebug=1
   useEffect(() => {
@@ -1264,7 +1266,95 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     })();
   }, [audioSources, isSong]);
 
-  // Disabled metadata prefetch to prevent secondary network bursts that can cause flicker
+  // Prefetch metadata with a small concurrency limit to avoid many parallel network requests (faster first paint)
+  useEffect(() => {
+    if (!isSong) return;
+    if (!audioSources.length) return;
+  // Limit initial batch (e.g., first 6) then expand once after user interaction/visibility
+    const INITIAL_BATCH = 6;
+    const CONCURRENCY = 3;
+    let active = 0;
+    let index = 0;
+    let cancelled = false;
+    const queue: HTMLAudioElement[] = [];
+  let expanded = false;
+  const expandedOnceRef = { current: false } as { current: boolean };
+
+    const targetCountRef = { current: Math.min(INITIAL_BATCH, audioSources.length) } as { current: number };
+
+    const launchNext = () => {
+      if (cancelled) return;
+      while (active < CONCURRENCY && index < targetCountRef.current) {
+        const i = index++;
+        if (durations[i]) continue;
+        try {
+          const el = document.createElement('audio');
+          el.preload = 'metadata';
+          el.src = audioSources[i];
+          queue.push(el);
+          active++;
+          const done = () => {
+            if (!cancelled) {
+              if (!isNaN(el.duration) && el.duration > 0) {
+                setDurations(prev => {
+                  if (prev[i]) return prev;
+                  const next = [...prev];
+                  next[i] = el.duration;
+                  return next;
+                });
+              }
+            }
+            el.removeEventListener('loadedmetadata', done);
+            el.removeEventListener('error', done);
+            active--;
+            launchNext();
+          };
+          el.addEventListener('loadedmetadata', done);
+          el.addEventListener('error', done);
+        } catch {
+          active--;
+        }
+      }
+    };
+
+    const expand = () => {
+      if (expanded || expandedOnceRef.current) return;
+      expanded = true;
+      expandedOnceRef.current = true;
+      targetCountRef.current = audioSources.length; // fetch rest
+      launchNext();
+    };
+
+    // Expand on first horizontal scroll or after 4s idle whichever comes first
+    const scrollEl = horizontalRef.current;
+    const onScrollOnce = () => { expand(); scrollEl && scrollEl.removeEventListener('scroll', onScrollOnce); };
+    scrollEl && scrollEl.addEventListener('scroll', onScrollOnce, { passive: true });
+    const timeoutId = window.setTimeout(expand, 4000);
+
+    // Also expand when gallery section enters viewport (IntersectionObserver)
+    const sectionEl = scrollEl; // same container is fine
+    let observer: IntersectionObserver | null = null;
+    if (sectionEl && 'IntersectionObserver' in window) {
+      observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            expand();
+            observer && observer.disconnect();
+          }
+        });
+      }, { threshold: 0.15 });
+      observer.observe(sectionEl);
+    }
+
+    launchNext();
+    return () => {
+      cancelled = true;
+      queue.forEach(a => { try { a.src = ''; } catch {} });
+      scrollEl && scrollEl.removeEventListener('scroll', onScrollOnce);
+      window.clearTimeout(timeoutId);
+      observer && observer.disconnect();
+    };
+  }, [isSong, audioSources, durations]);
 
   // ===================== PERSIST / RESTORE PLAYBACK =====================
   const RESTORE_KEY = 'gallery_audio_state_v1';
@@ -1370,7 +1460,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
 
     // CASE 3: Switching to a different track
     try { el.pause(); } catch {}
-  try { el.src = targetSrc; } catch {}
+    try { el.src = `${targetSrc}?v=${index}`; } catch {}
     (el as any)._altTried = false;
     (el as any)._blobFallbackTried = false;
     const playAttempt = el.play();
@@ -1709,7 +1799,8 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                     </div>
                   );
                 })}
-  {/* Global audio managed via getGlobalAudio() (no extra element here) */}
+    {/* Hidden global audio element (exists once) */}
+    <audio data-global-audio-hidden className="hidden" />
               </div>
               <style jsx global>{`
                 @keyframes eqBounce { 0%,100%{transform:scaleY(0.3)} 50%{transform:scaleY(1)} }
@@ -1740,7 +1831,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                     return (
                       <div key={`${currentLanguage}-${imageName}-${index}`} className="group relative bg-gray-200 dark:bg-gray-700 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-105 flex-shrink-0" style={{ width: '200px', height: '200px' }}>
                         {imageStatus?.exists ? (
-                          <Image src={`${imageStatus.path}?lang=${currentLanguage}`} alt={`Gallery image ${index + 1}`} fill className="object-cover" sizes="200px" />
+                          <Image src={`${imageStatus.path}?lang=${currentLanguage}&t=${Date.now()}`} alt={`Gallery image ${index + 1}`} fill className="object-cover" sizes="200px" />
                         ) : (
                           <>
                             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary-blue/20"></div>

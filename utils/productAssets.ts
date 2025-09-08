@@ -300,6 +300,19 @@ export async function audioExists(audioPath: string): Promise<boolean> {
 
 export interface DiscoveredAudio { name: string; path: string }
 
+// In-memory cache for audio manifest to prevent repeated fetches
+let __audioManifestCache: any | null = null;
+let __audioManifestPromise: Promise<any> | null = null;
+async function getAudioManifest(): Promise<any> {
+  if (__audioManifestCache) return __audioManifestCache;
+  if (__audioManifestPromise) return __audioManifestPromise;
+  __audioManifestPromise = fetch(`${BASE_PATH}/audio-manifest.json`, { cache: 'force-cache' })
+    .then(res => res.ok ? res.json() : {})
+    .then(json => { __audioManifestCache = json; __audioManifestPromise = null; return json; })
+    .catch(err => { __audioManifestPromise = null; throw err; });
+  return __audioManifestPromise;
+}
+
 // Discover available gallery audios: probe sequentially; small set so cost is low.
 export async function getAvailableGalleryAudios(product?: string, language?: string, max: number = 30): Promise<DiscoveredAudio[]> {
   const prod = product || getCurrentProduct();
@@ -310,71 +323,46 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
   const FORCE_ROOT = typeof process !== 'undefined' && (process as any).env?.NEXT_PUBLIC_FORCE_ROOT === '1';
   const prefix = FORCE_ROOT ? '' : BASE_PATH;
 
-  // Simple global cache to avoid repeated discovery or fallback probes across calls
-  const g: any = (typeof globalThis !== 'undefined') ? (globalThis as any) : {};
-  g.__audioListCache = g.__audioListCache || new Map<string, DiscoveredAudio[]>();
-  g.__audioListPromise = g.__audioListPromise || new Map<string, Promise<DiscoveredAudio[]>>();
-  const cacheKey = `${prod}:${lang}`;
-  const cached = g.__audioListCache.get(cacheKey);
-  if (cached && cached.length) {
-    return cached.slice(0, Math.min(max, cached.length));
-  }
-  const inflight = g.__audioListPromise.get(cacheKey);
-  if (inflight) {
-    const list = await inflight;
-    return list.slice(0, Math.min(max, list.length));
-  }
-
-  // 1. Try manifest first (fast, no HEAD requests) with simple session cache
+  // 1. Try manifest first (fast, no HEAD requests)
   try {
-    if (!g.__audioManifestPromise) {
-      // Use absolute URL to avoid basePath rewriting surprises and ensure one cache key
-      const origin = (typeof window !== 'undefined') ? window.location.origin : 'http://localhost:3000';
-      const manifestUrl = `${origin}${BASE_PATH}/audio-manifest.json`;
-      g.__audioManifestPromise = fetch(manifestUrl, { cache: 'force-cache' })
-        .then(r => r.ok ? r.json() : null)
-        .catch(() => null);
-    }
-    const manifest = await g.__audioManifestPromise;
-    if (manifest) {
-      const list: string[] | undefined = manifest?.Song?.gallery?.[lang];
+    const manifest = await getAudioManifest();
+    const list: string[] | undefined = manifest?.Song?.gallery?.[lang];
       if (Array.isArray(list) && list.length) {
-        const full = list.map(name => ({ name, path: `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}` }));
-        g.__audioListCache.set(cacheKey, full);
-        return full.slice(0, Math.min(max, full.length));
+        let files = list.slice(0, max).map(name => ({ name, path: `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}` }));
+        // Verify existence (HEAD) to avoid unusable sources producing media error 4
+        try {
+          const checks = await Promise.all(files.map(async f => {
+            try {
+              const res = await fetch(f.path, { method: 'HEAD' });
+              return res.ok ? f : null;
+            } catch { return null; }
+          }));
+          const filtered = checks.filter(Boolean) as DiscoveredAudio[];
+          if (filtered.length && filtered.length !== files.length) {
+            console.warn('[AudioGallery] Filtered missing audio files:', files.filter(f => !filtered.find(x => x.name===f.name)).map(f=>f.name));
+          }
+          if (filtered.length) files = filtered;
+        } catch {}
+        return files;
       }
-    }
   } catch (e) {
     // swallow and fallback
   }
 
   // 2. Fallback probing (only if manifest absent): sequential limited HEADs
-  const fallbackProbe = async (): Promise<DiscoveredAudio[]> => {
-    const files: DiscoveredAudio[] = [];
-    const limit = Math.min(30, 30); // always probe up to 30, cache full list
-    for (let i = 1; i <= limit; i++) {
-      const num = i.toString().padStart(2, '0');
-      for (const ext of ['.wav', '.mp3', '.wov']) {
-        const name = `song_gallery_${num}${ext}`;
-        const path = `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}`;
-        try {
-          if (await audioExists(path)) { files.push({ name, path }); break; }
-        } catch {}
-      }
+  const files: DiscoveredAudio[] = [];
+  const limit = Math.min(max, 30);
+  for (let i = 1; i <= limit; i++) {
+    const num = i.toString().padStart(2, '0');
+  for (const ext of ['.wav', '.mp3', '.wov']) { // preserve order but no cross-extension substitution later
+      const name = `song_gallery_${num}${ext}`;
+      let path = `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}`;
+      try {
+    if (await audioExists(path)) { files.push({ name, path }); break; }
+      } catch {}
     }
-    return files;
-  };
-  const promise = fallbackProbe().then(list => {
-    g.__audioListCache.set(cacheKey, list);
-    g.__audioListPromise.delete(cacheKey);
-    return list;
-  }).catch((e: any) => {
-    g.__audioListPromise.delete(cacheKey);
-    return [] as DiscoveredAudio[];
-  });
-  g.__audioListPromise.set(cacheKey, promise);
-  const list = await promise;
-  return list.slice(0, Math.min(max, list.length));
+  }
+  return files;
 }
 
 export async function getGalleryAudios(count: number = 12, product?: string, language?: string): Promise<string[]> {
