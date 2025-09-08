@@ -312,9 +312,19 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
 
   // 1. Try manifest first (fast, no HEAD requests)
   try {
-    const manifestResp = await fetch('/Personalized_Button/audio-manifest.json', { cache: 'no-store' });
-    if (manifestResp.ok) {
-      const manifest = await manifestResp.json();
+    // Session-level cache to avoid duplicate fetch bursts during mount churn
+    let manifest: any | null = null;
+    try {
+      const cached = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('audio_manifest_cache_v1') : null;
+      if (cached) manifest = JSON.parse(cached);
+    } catch {}
+    if (!manifest) {
+      const manifestResp = await fetch('/Personalized_Button/audio-manifest.json', { cache: 'no-store' });
+      if (!manifestResp.ok) throw new Error('manifest not ok');
+      manifest = await manifestResp.json();
+      try { sessionStorage.setItem('audio_manifest_cache_v1', JSON.stringify(manifest)); } catch {}
+    }
+    if (manifest) {
       const list: string[] | undefined = manifest?.Song?.gallery?.[lang];
       if (Array.isArray(list) && list.length) {
         let files = list.slice(0, max).map(name => ({ name, path: `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}` }));

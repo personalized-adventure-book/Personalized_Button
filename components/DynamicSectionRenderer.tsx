@@ -1210,6 +1210,10 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   // Discover audios (Song)
   useEffect(() => {
     if (!isSong) return;
+  const loadKey = `${currentProduct}:${currentLanguage}`;
+  const loadedKeyRef = (GallerySection as any)._loadedKeyRef || ((GallerySection as any)._loadedKeyRef = { current: null });
+  if (loadedKeyRef.current === loadKey) return; // prevent duplicate loads for same product/lang during mount churn
+  loadedKeyRef.current = loadKey;
     const loadAudios = async () => {
       setIsLoading(true);
       try {
@@ -1262,9 +1266,8 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     if (!isSong) return;
     if (!audioSources.length) return;
     // Limit initial batch (e.g., first 6) then expand after user interaction/visibility
-  const INITIAL_BATCH = 6;
-  const CONCURRENCY = 3;
-  const AUTO_EXPAND_AFTER_MS = 0; // disable auto-expand timer to prevent post-load flicker
+    const INITIAL_BATCH = 6;
+    const CONCURRENCY = 3;
     let active = 0;
     let index = 0;
     let cancelled = false;
@@ -1315,11 +1318,10 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       launchNext();
     };
 
-    // Expand on first horizontal scroll or after 4s idle whichever comes first
+  // Expand on first horizontal scroll or when gallery becomes visible (no timed auto-expand)
     const scrollEl = horizontalRef.current;
     const onScrollOnce = () => { expand(); scrollEl && scrollEl.removeEventListener('scroll', onScrollOnce); };
     scrollEl && scrollEl.addEventListener('scroll', onScrollOnce, { passive: true });
-  const timeoutId = AUTO_EXPAND_AFTER_MS > 0 ? window.setTimeout(expand, AUTO_EXPAND_AFTER_MS) : 0 as unknown as number;
 
     // Also expand when gallery section enters viewport (IntersectionObserver)
     const sectionEl = scrollEl; // same container is fine
@@ -1336,12 +1338,11 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       observer.observe(sectionEl);
     }
 
-    launchNext();
+  launchNext();
     return () => {
       cancelled = true;
       queue.forEach(a => { try { a.src = ''; } catch {} });
       scrollEl && scrollEl.removeEventListener('scroll', onScrollOnce);
-  if (AUTO_EXPAND_AFTER_MS > 0 && timeoutId) window.clearTimeout(timeoutId);
       observer && observer.disconnect();
     };
   }, [isSong, audioSources, durations]);
@@ -1453,18 +1454,6 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     try { el.src = `${targetSrc}?v=${index}`; } catch {}
     (el as any)._altTried = false;
     (el as any)._blobFallbackTried = false;
-    // Ensure we apply saved seek exactly after metadata is ready
-    const applySavedSeek = () => {
-      const s = getPlaybackState();
-      if (s.index === index && !isNaN(s.time)) {
-        try { el.currentTime = Math.min(s.time, el.duration || s.time); } catch {}
-      }
-    };
-    if (el.readyState < 1) {
-      el.addEventListener('loadedmetadata', applySavedSeek, { once: true });
-    } else {
-      applySavedSeek();
-    }
     const playAttempt = el.play();
     if (playAttempt && typeof playAttempt.then === 'function') {
       playAttempt.then(() => {
