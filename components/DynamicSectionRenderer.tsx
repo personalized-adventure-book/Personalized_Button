@@ -1210,25 +1210,17 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   // Discover audios (Song)
   useEffect(() => {
     if (!isSong) return;
-    const loadedOnceRef = { current: false } as { current: boolean };
     const loadAudios = async () => {
-      // Only show the loader if nothing has been loaded yet
-      setIsLoading(prev => (audioSources.length === 0 ? true : prev));
+      setIsLoading(true);
       try {
   const audios = await getGalleryAudios(24, currentProduct, currentLanguage);
-  // Only update if changed to avoid unnecessary remounts/flicker
-  setAudioSources(prev => {
-    const same = prev.length === audios.length && prev.every((v, idx) => v === audios[idx]);
-    return same ? prev : audios;
-  });
+  setAudioSources(audios);
   setDurations(prev => audios.length !== prev.length ? Array(audios.length).fill(0) : prev);
   setPositions(prev => audios.length !== prev.length ? Array(audios.length).fill(0) : prev);
       } catch (e) {
         console.error('Error loading gallery audios', e);
       } finally {
-        // Lock loading to false after first successful or attempted load to prevent later flicker
         setIsLoading(false);
-        loadedOnceRef.current = true;
       }
     };
     loadAudios();
@@ -1270,8 +1262,9 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     if (!isSong) return;
     if (!audioSources.length) return;
     // Limit initial batch (e.g., first 6) then expand after user interaction/visibility
-    const INITIAL_BATCH = 6;
-    const CONCURRENCY = 3;
+  const INITIAL_BATCH = 6;
+  const CONCURRENCY = 3;
+  const AUTO_EXPAND_AFTER_MS = 0; // disable auto-expand timer to prevent post-load flicker
     let active = 0;
     let index = 0;
     let cancelled = false;
@@ -1326,7 +1319,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     const scrollEl = horizontalRef.current;
     const onScrollOnce = () => { expand(); scrollEl && scrollEl.removeEventListener('scroll', onScrollOnce); };
     scrollEl && scrollEl.addEventListener('scroll', onScrollOnce, { passive: true });
-    const timeoutId = window.setTimeout(expand, 4000);
+  const timeoutId = AUTO_EXPAND_AFTER_MS > 0 ? window.setTimeout(expand, AUTO_EXPAND_AFTER_MS) : 0 as unknown as number;
 
     // Also expand when gallery section enters viewport (IntersectionObserver)
     const sectionEl = scrollEl; // same container is fine
@@ -1348,7 +1341,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       cancelled = true;
       queue.forEach(a => { try { a.src = ''; } catch {} });
       scrollEl && scrollEl.removeEventListener('scroll', onScrollOnce);
-      window.clearTimeout(timeoutId);
+  if (AUTO_EXPAND_AFTER_MS > 0 && timeoutId) window.clearTimeout(timeoutId);
       observer && observer.disconnect();
     };
   }, [isSong, audioSources, durations]);
@@ -1460,6 +1453,18 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     try { el.src = `${targetSrc}?v=${index}`; } catch {}
     (el as any)._altTried = false;
     (el as any)._blobFallbackTried = false;
+    // Ensure we apply saved seek exactly after metadata is ready
+    const applySavedSeek = () => {
+      const s = getPlaybackState();
+      if (s.index === index && !isNaN(s.time)) {
+        try { el.currentTime = Math.min(s.time, el.duration || s.time); } catch {}
+      }
+    };
+    if (el.readyState < 1) {
+      el.addEventListener('loadedmetadata', applySavedSeek, { once: true });
+    } else {
+      applySavedSeek();
+    }
     const playAttempt = el.play();
     if (playAttempt && typeof playAttempt.then === 'function') {
       playAttempt.then(() => {
@@ -1550,13 +1555,13 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
           )}
         </div>
         {isLoading ? (
-          <div className="text-center py-12 min-h-[15rem]">
+          <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-400">{isSong ? 'Loading audio samples...' : 'Discovering gallery images...'}</p>
           </div>
         ) : isSong ? (
           audioSources.length > 0 ? (
-            <div className="relative" key="audio-gallery-stable">
+            <div className="relative">
               <div ref={horizontalRef} onScroll={handleHorizontalScroll} className="overflow-x-auto flex gap-6 pb-4 pt-2 scrollbar-hide snap-x snap-mandatory px-1" style={{ WebkitOverflowScrolling: 'touch' }}>
                 {audioSources.map((src, i) => {
                   const ga = globalAudioRef.current;
