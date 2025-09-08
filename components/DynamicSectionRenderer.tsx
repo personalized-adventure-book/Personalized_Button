@@ -1554,10 +1554,16 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                   const ga = globalAudioRef.current;
                   const isActive = playingIndex === i;
                   const savedState = getPlaybackState();
-                  const duration = durations[i] || ((isActive || savedState.index === i) && ga ? ga.duration : 0) || 0;
-                  const current = isActive
-                    ? (positions[i] ?? (ga ? ga.currentTime : 0) ?? 0)
-                    : (savedState.index === i ? savedState.time : (positions[i] ?? 0));
+                  const isDragging = draggingRef.current?.index === i;
+                  const dragDur = draggingRef.current?.dur || 0;
+                  const baseDuration = durations[i] || ((isActive || savedState.index === i) && ga ? (ga.duration || 0) : 0);
+                  const duration = isDragging ? (dragDur || baseDuration || 0) : (baseDuration || 0);
+                  const current = isDragging
+                    ? (positions[i] ?? 0)
+                    : (isActive
+                        ? (positions[i] ?? (ga ? ga.currentTime : 0) ?? 0)
+                        : (savedState.index === i ? savedState.time : (positions[i] ?? 0))
+                      );
                   const progress = duration ? (current / duration) : 0;
                   const gradientPalette = [
                     'from-fuchsia-500 via-pink-500 to-rose-500',
@@ -1762,7 +1768,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                                 </div>
                                 <div
                                   className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow opacity-0 group-hover:opacity-100 transition-opacity"
-                                  style={{ left: `calc(${progress*100}% - 6px)` }}
+                                  style={{ left: `calc(${Math.max(0, Math.min(progress, 1))*100}% - 6px)` }}
                                 />
                               </div>
                               <span className="opacity-70 min-w-[32px] text-center">{duration ? format(duration) : '--:--'}</span>
