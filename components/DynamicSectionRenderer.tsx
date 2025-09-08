@@ -1656,6 +1656,62 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                                         try { comprehensiveTracker.trackAudioSeek(i, baseName, prev, newTime, dur); } catch {}
                                       }
                                     }}
+                                    onPointerDown={(e: any) => {
+                                      const container = e.currentTarget as HTMLDivElement;
+                                      const rect = container.getBoundingClientRect();
+                                      const pointerId = e.pointerId;
+                                      const audio = globalAudioRef.current;
+                                      const target = audioSources[i];
+                                      const baseName = extractBaseName(target);
+                                      const saved = getPlaybackState();
+                                      const isLoadedThisTrack = (() => {
+                                        if (!audio) return false;
+                                        try {
+                                          const loadedBase = extractBaseName(audio.currentSrc || audio.src || '');
+                                          return loadedBase === baseName && (!!audio.duration && !isNaN(audio.duration));
+                                        } catch { return false; }
+                                      })();
+                                      const dur = isLoadedThisTrack && audio ? (audio.duration || 0) : (durations[i] || 0);
+                                      if (!dur) return;
+
+                                      // UX: prevent text selection while scrubbing
+                                      const prevUserSelect = document.body.style.userSelect;
+                                      document.body.style.userSelect = 'none';
+                                      container.setPointerCapture?.(pointerId);
+
+                                      const handleMove = (ev: PointerEvent) => {
+                                        if (ev.pointerId !== pointerId) return;
+                                        const ratio = Math.max(0, Math.min((ev.clientX - rect.left) / rect.width, 1));
+                                        const newTime = dur * ratio;
+                                        // Update audio element if this track is loaded
+                                        if (isLoadedThisTrack && audio) {
+                                          try { audio.currentTime = newTime; } catch {}
+                                        }
+                                        // Update UI position
+                                        setPositions(prevPos => {
+                                          const len = audioSources.length;
+                                          const next = prevPos.length === len ? [...prevPos] : Array(len).fill(0);
+                                          next[i] = newTime;
+                                          return next;
+                                        });
+                                        setTick(t => t + 1);
+                                        // Persist state for resume
+                                        try {
+                                          setPlaybackState({ index: i, baseName, time: newTime });
+                                          sessionStorage.setItem(RESTORE_KEY, JSON.stringify({ baseName, time: newTime, ts: Date.now() }));
+                                        } catch {}
+                                      };
+
+                                      const handleUp = (ev: PointerEvent) => {
+                                        if (ev.pointerId !== pointerId) return;
+                                        window.removeEventListener('pointermove', handleMove);
+                                        window.removeEventListener('pointerup', handleUp);
+                                        document.body.style.userSelect = prevUserSelect;
+                                      };
+
+                                      window.addEventListener('pointermove', handleMove);
+                                      window.addEventListener('pointerup', handleUp);
+                                    }}
                                 aria-label="Seek audio position"
                                 role="slider"
                                 aria-valuemin={0}
