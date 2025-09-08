@@ -1210,17 +1210,25 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   // Discover audios (Song)
   useEffect(() => {
     if (!isSong) return;
+    const loadedOnceRef = { current: false } as { current: boolean };
     const loadAudios = async () => {
-      setIsLoading(true);
+      // Only show the loader if nothing has been loaded yet
+      setIsLoading(prev => (audioSources.length === 0 ? true : prev));
       try {
   const audios = await getGalleryAudios(24, currentProduct, currentLanguage);
-  setAudioSources(audios);
+  // Only update if changed to avoid unnecessary remounts/flicker
+  setAudioSources(prev => {
+    const same = prev.length === audios.length && prev.every((v, idx) => v === audios[idx]);
+    return same ? prev : audios;
+  });
   setDurations(prev => audios.length !== prev.length ? Array(audios.length).fill(0) : prev);
   setPositions(prev => audios.length !== prev.length ? Array(audios.length).fill(0) : prev);
       } catch (e) {
         console.error('Error loading gallery audios', e);
       } finally {
+        // Lock loading to false after first successful or attempted load to prevent later flicker
         setIsLoading(false);
+        loadedOnceRef.current = true;
       }
     };
     loadAudios();
@@ -1542,13 +1550,13 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
           )}
         </div>
         {isLoading ? (
-          <div className="text-center py-12">
+          <div className="text-center py-12 min-h-[15rem]">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-400">{isSong ? 'Loading audio samples...' : 'Discovering gallery images...'}</p>
           </div>
         ) : isSong ? (
           audioSources.length > 0 ? (
-            <div className="relative">
+            <div className="relative" key="audio-gallery-stable">
               <div ref={horizontalRef} onScroll={handleHorizontalScroll} className="overflow-x-auto flex gap-6 pb-4 pt-2 scrollbar-hide snap-x snap-mandatory px-1" style={{ WebkitOverflowScrolling: 'touch' }}>
                 {audioSources.map((src, i) => {
                   const ga = globalAudioRef.current;
