@@ -310,11 +310,28 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
   const FORCE_ROOT = typeof process !== 'undefined' && (process as any).env?.NEXT_PUBLIC_FORCE_ROOT === '1';
   const prefix = FORCE_ROOT ? '' : BASE_PATH;
 
+  // Simple global cache to avoid repeated discovery or fallback probes across calls
+  const g: any = (typeof globalThis !== 'undefined') ? (globalThis as any) : {};
+  g.__audioListCache = g.__audioListCache || new Map<string, DiscoveredAudio[]>();
+  g.__audioListPromise = g.__audioListPromise || new Map<string, Promise<DiscoveredAudio[]>>();
+  const cacheKey = `${prod}:${lang}`;
+  const cached = g.__audioListCache.get(cacheKey);
+  if (cached && cached.length) {
+    return cached.slice(0, Math.min(max, cached.length));
+  }
+  const inflight = g.__audioListPromise.get(cacheKey);
+  if (inflight) {
+    const list = await inflight;
+    return list.slice(0, Math.min(max, list.length));
+  }
+
   // 1. Try manifest first (fast, no HEAD requests) with simple session cache
   try {
-    const g: any = (typeof globalThis !== 'undefined') ? (globalThis as any) : {};
     if (!g.__audioManifestPromise) {
-      g.__audioManifestPromise = fetch('/Personalized_Button/audio-manifest.json', { cache: 'force-cache' })
+      // Use absolute URL to avoid basePath rewriting surprises and ensure one cache key
+      const origin = (typeof window !== 'undefined') ? window.location.origin : 'http://localhost:3000';
+      const manifestUrl = `${origin}${BASE_PATH}/audio-manifest.json`;
+      g.__audioManifestPromise = fetch(manifestUrl, { cache: 'force-cache' })
         .then(r => r.ok ? r.json() : null)
         .catch(() => null);
     }
@@ -322,8 +339,9 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
     if (manifest) {
       const list: string[] | undefined = manifest?.Song?.gallery?.[lang];
       if (Array.isArray(list) && list.length) {
-        const files = list.slice(0, max).map(name => ({ name, path: `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}` }));
-        return files;
+        const full = list.map(name => ({ name, path: `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}` }));
+        g.__audioListCache.set(cacheKey, full);
+        return full.slice(0, Math.min(max, full.length));
       }
     }
   } catch (e) {
@@ -331,19 +349,32 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
   }
 
   // 2. Fallback probing (only if manifest absent): sequential limited HEADs
-  const files: DiscoveredAudio[] = [];
-  const limit = Math.min(max, 30);
-  for (let i = 1; i <= limit; i++) {
-    const num = i.toString().padStart(2, '0');
-  for (const ext of ['.wav', '.mp3', '.wov']) { // preserve order but no cross-extension substitution later
-      const name = `song_gallery_${num}${ext}`;
-      let path = `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}`;
-      try {
-    if (await audioExists(path)) { files.push({ name, path }); break; }
-      } catch {}
+  const fallbackProbe = async (): Promise<DiscoveredAudio[]> => {
+    const files: DiscoveredAudio[] = [];
+    const limit = Math.min(30, 30); // always probe up to 30, cache full list
+    for (let i = 1; i <= limit; i++) {
+      const num = i.toString().padStart(2, '0');
+      for (const ext of ['.wav', '.mp3', '.wov']) {
+        const name = `song_gallery_${num}${ext}`;
+        const path = `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}`;
+        try {
+          if (await audioExists(path)) { files.push({ name, path }); break; }
+        } catch {}
+      }
     }
-  }
-  return files;
+    return files;
+  };
+  const promise = fallbackProbe().then(list => {
+    g.__audioListCache.set(cacheKey, list);
+    g.__audioListPromise.delete(cacheKey);
+    return list;
+  }).catch((e: any) => {
+    g.__audioListPromise.delete(cacheKey);
+    return [] as DiscoveredAudio[];
+  });
+  g.__audioListPromise.set(cacheKey, promise);
+  const list = await promise;
+  return list.slice(0, Math.min(max, list.length));
 }
 
 export async function getGalleryAudios(count: number = 12, product?: string, language?: string): Promise<string[]> {

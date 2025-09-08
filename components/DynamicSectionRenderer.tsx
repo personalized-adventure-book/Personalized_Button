@@ -1208,16 +1208,22 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     discoverImages();
   }, [currentProduct, currentLanguage, isSong]);
 
-  // Discover audios (Song)
+  // Discover audios (Song) — guarded against React Strict Mode double-invocation
+  const audioLoadRanRef = React.useRef(false);
   useEffect(() => {
     if (!isSong) return;
+    if (audioLoadRanRef.current) return;
+    audioLoadRanRef.current = true;
     const loadAudios = async () => {
       setIsLoading(true);
       try {
-  const audios = await getGalleryAudios(24, currentProduct, currentLanguage);
-  setAudioSources(audios);
-  setDurations(prev => (prev.length === audios.length ? prev : Array(audios.length).fill(0)));
-  setPositions(prev => (prev.length === audios.length ? prev : Array(audios.length).fill(0)));
+        const audios = await getGalleryAudios(24, currentProduct, currentLanguage);
+        setAudioSources(prev => {
+          const same = prev.length === audios.length && prev.every((v, i) => v === audios[i]);
+          return same ? prev : audios;
+        });
+        setDurations(prev => (prev.length === audios.length ? prev : Array(audios.length).fill(0)));
+        setPositions(prev => (prev.length === audios.length ? prev : Array(audios.length).fill(0)));
       } catch (e) {
         console.error('Error loading gallery audios', e);
       } finally {
@@ -1225,7 +1231,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
       }
     };
     loadAudios();
-  }, [isSong]);
+  }, [isSong, currentProduct, currentLanguage]);
 
   // Debug: fetch first bytes of each audio to verify correct RIFF header when ?audioDebug=1
   useEffect(() => {
@@ -1364,7 +1370,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
 
     // CASE 3: Switching to a different track
     try { el.pause(); } catch {}
-    try { el.src = `${targetSrc}?v=${index}`; } catch {}
+  try { el.src = targetSrc; } catch {}
     (el as any)._altTried = false;
     (el as any)._blobFallbackTried = false;
     const playAttempt = el.play();
@@ -1703,8 +1709,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                     </div>
                   );
                 })}
-    {/* Hidden global audio element (exists once) */}
-    <audio data-global-audio-hidden className="hidden" />
+  {/* Global audio managed via getGlobalAudio() (no extra element here) */}
               </div>
               <style jsx global>{`
                 @keyframes eqBounce { 0%,100%{transform:scaleY(0.3)} 50%{transform:scaleY(1)} }
@@ -1735,7 +1740,7 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                     return (
                       <div key={`${currentLanguage}-${imageName}-${index}`} className="group relative bg-gray-200 dark:bg-gray-700 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-105 flex-shrink-0" style={{ width: '200px', height: '200px' }}>
                         {imageStatus?.exists ? (
-                          <Image src={`${imageStatus.path}?lang=${currentLanguage}&t=${Date.now()}`} alt={`Gallery image ${index + 1}`} fill className="object-cover" sizes="200px" />
+                          <Image src={`${imageStatus.path}?lang=${currentLanguage}`} alt={`Gallery image ${index + 1}`} fill className="object-cover" sizes="200px" />
                         ) : (
                           <>
                             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary-blue/20"></div>
