@@ -300,18 +300,9 @@ export async function audioExists(audioPath: string): Promise<boolean> {
 
 export interface DiscoveredAudio { name: string; path: string }
 
-// In-memory cache for audio manifest to prevent repeated fetches
-let __audioManifestCache: any | null = null;
+// ---- Simple in-memory caches to avoid redundant network work per session ----
 let __audioManifestPromise: Promise<any> | null = null;
-async function getAudioManifest(): Promise<any> {
-  if (__audioManifestCache) return __audioManifestCache;
-  if (__audioManifestPromise) return __audioManifestPromise;
-  __audioManifestPromise = fetch(`${BASE_PATH}/audio-manifest.json`, { cache: 'force-cache' })
-    .then(res => res.ok ? res.json() : {})
-    .then(json => { __audioManifestCache = json; __audioManifestPromise = null; return json; })
-    .catch(err => { __audioManifestPromise = null; throw err; });
-  return __audioManifestPromise;
-}
+const __audioListCache = new Map<string, DiscoveredAudio[]>(); // key = `${product}:${lang}`
 
 // Discover available gallery audios: probe sequentially; small set so cost is low.
 export async function getAvailableGalleryAudios(product?: string, language?: string, max: number = 30): Promise<DiscoveredAudio[]> {
@@ -322,29 +313,30 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
   // Deployment policy: ALWAYS use BASE_PATH (GitHub Pages). Allow explicit opt-out via env.
   const FORCE_ROOT = typeof process !== 'undefined' && (process as any).env?.NEXT_PUBLIC_FORCE_ROOT === '1';
   const prefix = FORCE_ROOT ? '' : BASE_PATH;
+  const cacheKey = `${prod}:${langFolder}`;
+
+  // Serve from cache if available
+  const cached = __audioListCache.get(cacheKey);
+  if (cached && cached.length) {
+    return cached.slice(0, max);
+  }
 
   // 1. Try manifest first (fast, no HEAD requests)
   try {
-    const manifest = await getAudioManifest();
-    const list: string[] | undefined = manifest?.Song?.gallery?.[lang];
+    if (!__audioManifestPromise) {
+      __audioManifestPromise = fetch('/Personalized_Button/audio-manifest.json' /* let browser cache */)
+        .then(r => { if (!r.ok) throw new Error(`manifest ${r.status}`); return r.json(); })
+        .catch(err => { __audioManifestPromise = null; throw err; });
+    }
+    const manifest = await __audioManifestPromise;
+    if (manifest) {
+      const list: string[] | undefined = manifest?.Song?.gallery?.[lang];
       if (Array.isArray(list) && list.length) {
-        let files = list.slice(0, max).map(name => ({ name, path: `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}` }));
-        // Verify existence (HEAD) to avoid unusable sources producing media error 4
-        try {
-          const checks = await Promise.all(files.map(async f => {
-            try {
-              const res = await fetch(f.path, { method: 'HEAD' });
-              return res.ok ? f : null;
-            } catch { return null; }
-          }));
-          const filtered = checks.filter(Boolean) as DiscoveredAudio[];
-          if (filtered.length && filtered.length !== files.length) {
-            console.warn('[AudioGallery] Filtered missing audio files:', files.filter(f => !filtered.find(x => x.name===f.name)).map(f=>f.name));
-          }
-          if (filtered.length) files = filtered;
-        } catch {}
-        return files;
+        const files = list.map(name => ({ name, path: `${prefix}/content/Song/Audios/gallery/${langFolder}/${name}` }));
+        __audioListCache.set(cacheKey, files);
+        return files.slice(0, max);
       }
+    }
   } catch (e) {
     // swallow and fallback
   }
@@ -362,6 +354,7 @@ export async function getAvailableGalleryAudios(product?: string, language?: str
       } catch {}
     }
   }
+  if (files.length) __audioListCache.set(cacheKey, files);
   return files;
 }
 

@@ -1208,24 +1208,15 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   }, [currentProduct, currentLanguage, isSong]);
 
   // Discover audios (Song)
-  const loadedRef = React.useRef<string | null>(null);
   useEffect(() => {
     if (!isSong) return;
-    const key = `${currentProduct}:${currentLanguage}`;
-    // Avoid reloading if we already loaded the same product/language and have sources
-    if (loadedRef.current === key && audioSources.length) return;
     const loadAudios = async () => {
       setIsLoading(true);
       try {
-        const audios = await getGalleryAudios(24, currentProduct, currentLanguage);
-        setAudioSources(prev => {
-          // Prevent flicker: only update if list changed
-          const same = prev.length === audios.length && prev.every((v, idx) => v === audios[idx]);
-          return same ? prev : audios;
-        });
-        setDurations(prev => audios.length !== prev.length ? Array(audios.length).fill(0) : prev);
-        setPositions(prev => audios.length !== prev.length ? Array(audios.length).fill(0) : prev);
-        loadedRef.current = key;
+  const audios = await getGalleryAudios(24, currentProduct, currentLanguage);
+  setAudioSources(audios);
+  setDurations(prev => audios.length !== prev.length ? Array(audios.length).fill(0) : prev);
+  setPositions(prev => audios.length !== prev.length ? Array(audios.length).fill(0) : prev);
       } catch (e) {
         console.error('Error loading gallery audios', e);
       } finally {
@@ -1266,93 +1257,39 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     })();
   }, [audioSources, isSong]);
 
-  // Prefetch metadata with a small concurrency limit to avoid many parallel network requests (faster first paint)
+  // Prefetch only a small initial batch for durations; no late expansion to avoid UI jank
   useEffect(() => {
     if (!isSong) return;
     if (!audioSources.length) return;
-  // Limit initial batch (e.g., first 6) then expand once after user interaction/visibility
-    const INITIAL_BATCH = 6;
-    const CONCURRENCY = 3;
-    let active = 0;
-    let index = 0;
+    const INITIAL_BATCH = Math.min(6, audioSources.length);
     let cancelled = false;
     const queue: HTMLAudioElement[] = [];
-  let expanded = false;
-  const expandedOnceRef = { current: false } as { current: boolean };
-
-    const targetCountRef = { current: Math.min(INITIAL_BATCH, audioSources.length) } as { current: number };
-
-    const launchNext = () => {
-      if (cancelled) return;
-      while (active < CONCURRENCY && index < targetCountRef.current) {
-        const i = index++;
-        if (durations[i]) continue;
-        try {
-          const el = document.createElement('audio');
-          el.preload = 'metadata';
-          el.src = audioSources[i];
-          queue.push(el);
-          active++;
-          const done = () => {
-            if (!cancelled) {
-              if (!isNaN(el.duration) && el.duration > 0) {
-                setDurations(prev => {
-                  if (prev[i]) return prev;
-                  const next = [...prev];
-                  next[i] = el.duration;
-                  return next;
-                });
-              }
-            }
-            el.removeEventListener('loadedmetadata', done);
-            el.removeEventListener('error', done);
-            active--;
-            launchNext();
-          };
-          el.addEventListener('loadedmetadata', done);
-          el.addEventListener('error', done);
-        } catch {
-          active--;
-        }
-      }
-    };
-
-    const expand = () => {
-      if (expanded || expandedOnceRef.current) return;
-      expanded = true;
-      expandedOnceRef.current = true;
-      targetCountRef.current = audioSources.length; // fetch rest
-      launchNext();
-    };
-
-    // Expand on first horizontal scroll or after 4s idle whichever comes first
-    const scrollEl = horizontalRef.current;
-    const onScrollOnce = () => { expand(); scrollEl && scrollEl.removeEventListener('scroll', onScrollOnce); };
-    scrollEl && scrollEl.addEventListener('scroll', onScrollOnce, { passive: true });
-    const timeoutId = window.setTimeout(expand, 4000);
-
-    // Also expand when gallery section enters viewport (IntersectionObserver)
-    const sectionEl = scrollEl; // same container is fine
-    let observer: IntersectionObserver | null = null;
-    if (sectionEl && 'IntersectionObserver' in window) {
-      observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            expand();
-            observer && observer.disconnect();
+    for (let i = 0; i < INITIAL_BATCH; i++) {
+      if (durations[i]) continue;
+      try {
+        const el = document.createElement('audio');
+        el.preload = 'metadata';
+        el.src = audioSources[i];
+        queue.push(el);
+        const done = () => {
+          if (!cancelled && !isNaN(el.duration) && el.duration > 0) {
+            setDurations(prev => {
+              if (prev[i]) return prev;
+              const next = [...prev];
+              next[i] = el.duration;
+              return next;
+            });
           }
-        });
-      }, { threshold: 0.15 });
-      observer.observe(sectionEl);
+          el.removeEventListener('loadedmetadata', done);
+          el.removeEventListener('error', done);
+        };
+        el.addEventListener('loadedmetadata', done);
+        el.addEventListener('error', done);
+      } catch {}
     }
-
-    launchNext();
     return () => {
       cancelled = true;
       queue.forEach(a => { try { a.src = ''; } catch {} });
-      scrollEl && scrollEl.removeEventListener('scroll', onScrollOnce);
-      window.clearTimeout(timeoutId);
-      observer && observer.disconnect();
     };
   }, [isSong, audioSources, durations]);
 
