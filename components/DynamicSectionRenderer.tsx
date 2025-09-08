@@ -1057,7 +1057,6 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   const [durations, setDurations] = useState<number[]>([]);
   const [positions, setPositions] = useState<number[]>([]);
   const [failedAudio, setFailedAudio] = useState<Set<number>>(() => new Set());
-  const [scrubbingIndex, setScrubbingIndex] = useState<number | null>(null);
   // force re-render on timeUpdate without coupling to playingIndex
   const [, setTick] = useState<number>(0);
   const rafRef = React.useRef<number | null>(null);
@@ -1173,6 +1172,16 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
   const horizontalRef = React.useRef<HTMLDivElement | null>(null);
   const lastScrollPercentRef = React.useRef<number>(-1);
   const lastScrollTrackTs = React.useRef<number>(0);
+  // Drag-to-seek support
+  const draggingRef = React.useRef<{
+    index: number;
+    baseName: string;
+    rect: DOMRect;
+    dur: number;
+    start: number; // starting time
+    wasPlaying: boolean;
+  } | null>(null);
+  const dragMoveRaf = React.useRef<number | null>(null);
 
   // Discover images (non Song)
   useEffect(() => {
@@ -1440,20 +1449,6 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
     try { el.src = `${targetSrc}?v=${index}`; } catch {}
     (el as any)._altTried = false;
     (el as any)._blobFallbackTried = false;
-    // If user scrubbed ahead before playing, honor that saved time
-    try {
-      const saved = getPlaybackState();
-      if (saved && saved.index === index && saved.baseName === baseName && typeof saved.time === 'number') {
-        const applySaved = () => {
-          try { el.currentTime = Math.min(saved.time, el.duration || saved.time); } catch {}
-        };
-        if (el.readyState >= 1 && !isNaN(el.duration)) {
-          applySaved();
-        } else {
-          el.addEventListener('loadedmetadata', applySaved, { once: true });
-        }
-      }
-    } catch {}
     const playAttempt = el.play();
     if (playAttempt && typeof playAttempt.then === 'function') {
       playAttempt.then(() => {
@@ -1672,30 +1667,33 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                                       }
                                     }}
                                 onPointerDown={(e) => {
-                                  const startEl = e.currentTarget as HTMLDivElement;
+                                  const bar = e.currentTarget as HTMLDivElement;
+                                  const rect = bar.getBoundingClientRect();
                                   const audio = globalAudioRef.current;
                                   const target = audioSources[i];
                                   const baseName = extractBaseName(target);
-                                  const rect = startEl.getBoundingClientRect();
-                                  const getRatio = (clientX: number) => Math.max(0, Math.min((clientX - rect.left) / rect.width, 1));
-                                  const isLoaded = (() => {
+                                  const isLoadedThisTrack = (() => {
                                     if (!audio) return false;
                                     try {
                                       const loadedBase = extractBaseName(audio.currentSrc || audio.src || '');
                                       return loadedBase === baseName && (!!audio.duration && !isNaN(audio.duration));
                                     } catch { return false; }
                                   })();
-                                  const dur = isLoaded && audio ? (audio.duration || 0) : (durations[i] || 0);
-                                  if (!dur) return;
+                                  const dur = isLoadedThisTrack && audio ? (audio.duration || 0) : (durations[i] || 0);
+                                  if (!dur) return; // can't drag without duration
 
-                                  setScrubbingIndex(i);
-                                  (startEl as any).setPointerCapture?.(e.pointerId);
+                                  const wasPlaying = !!(audio && !audio.paused && playingIndex === i);
+                                  const start = isLoadedThisTrack && audio ? (audio.currentTime || 0) : (positions[i] || 0);
+                                  draggingRef.current = { index: i, baseName, rect, dur, start, wasPlaying };
 
-                                  const apply = (clientX: number, commit: boolean) => {
-                                    const ratio = getRatio(clientX);
-                                    const newTime = Math.max(0, Math.min(dur * ratio, dur));
-                                    if (isLoaded && audio) {
-                                      try { audio.currentTime = newTime; } catch {}
+                                  const updateFromClientX = (clientX: number) => {
+                                    const d = draggingRef.current;
+                                    if (!d) return;
+                                    const ratio = Math.max(0, Math.min((clientX - d.rect.left) / d.rect.width, 1));
+                                    const newTime = Math.max(0, Math.min(d.dur * ratio, d.dur));
+                                    const audioEl = globalAudioRef.current;
+                                    if (isLoadedThisTrack && audioEl) {
+                                      try { audioEl.currentTime = newTime; } catch {}
                                     }
                                     setPositions(prevPos => {
                                       const len = audioSources.length;
@@ -1704,41 +1702,49 @@ const GallerySection = React.memo(function GallerySection({ data, t }: { data: a
                                       return next;
                                     });
                                     setTick(t => t + 1);
-                                    if (commit) {
-                                      try {
-                                        setPlaybackState({ index: i, baseName, time: newTime });
-                                        sessionStorage.setItem(RESTORE_KEY, JSON.stringify({ baseName, time: newTime, ts: Date.now() }));
-                                      } catch {}
-                                    }
+                                    try {
+                                      setPlaybackState({ index: i, baseName: d.baseName, time: newTime });
+                                      sessionStorage.setItem(RESTORE_KEY, JSON.stringify({ baseName: d.baseName, time: newTime, ts: Date.now() }));
+                                    } catch {}
                                   };
 
-                                  // initial
-                                  apply(e.clientX, false);
+                                  // First update on pointer down
+                                  updateFromClientX(e.clientX);
 
-                                  const onMove = (ev: PointerEvent) => apply(ev.clientX, false);
+                                  const onMove = (ev: PointerEvent) => {
+                                    if (dragMoveRaf.current) cancelAnimationFrame(dragMoveRaf.current);
+                                    dragMoveRaf.current = requestAnimationFrame(() => updateFromClientX(ev.clientX));
+                                  };
                                   const onUp = (ev: PointerEvent) => {
-                                    apply(ev.clientX, true);
-                                    setScrubbingIndex(null);
                                     window.removeEventListener('pointermove', onMove);
                                     window.removeEventListener('pointerup', onUp);
-                                    window.removeEventListener('pointercancel', onUp);
+                                    if (dragMoveRaf.current) { cancelAnimationFrame(dragMoveRaf.current); dragMoveRaf.current = null; }
+                                    const d = draggingRef.current;
+                                    draggingRef.current = null;
+                                    if (d) {
+                                      const ratio = Math.max(0, Math.min((ev.clientX - d.rect.left) / d.rect.width, 1));
+                                      const endTime = Math.max(0, Math.min(d.dur * ratio, d.dur));
+                                      // Track one analytics event for the drag if moved significantly
+                                      if (Math.abs((d.start || 0) - endTime) > 0.5) {
+                                        try { comprehensiveTracker.trackAudioSeek(i, d.baseName, d.start || 0, endTime, d.dur); } catch {}
+                                      }
+                                    }
                                   };
                                   window.addEventListener('pointermove', onMove, { passive: true });
                                   window.addEventListener('pointerup', onUp, { passive: true });
-                                  window.addEventListener('pointercancel', onUp, { passive: true });
                                 }}
                                 aria-label="Seek audio position"
                                 role="slider"
                                 aria-valuemin={0}
                                 aria-valuemax={duration || 0}
-                                aria-valuenow={scrubbingIndex === i ? (positions[i] || 0) : (current || 0)}
+                                aria-valuenow={current || 0}
                               >
                                 <div className="absolute inset-0">
-                                  <div className="h-full bg-white/90 transition-all" style={{ width: `${(scrubbingIndex === i ? (positions[i] || 0) / (duration || 1) : progress) * 100}%` }} />
+                                  <div className="h-full bg-white/90 transition-all" style={{ width: `${progress*100}%` }} />
                                 </div>
                                 <div
                                   className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow opacity-0 group-hover:opacity-100 transition-opacity"
-                                  style={{ left: `calc(${(scrubbingIndex === i ? (positions[i] || 0) / (duration || 1) : progress) * 100}% - 6px)` }}
+                                  style={{ left: `calc(${progress*100}% - 6px)` }}
                                 />
                               </div>
                               <span className="opacity-70 min-w-[32px] text-center">{duration ? format(duration) : '--:--'}</span>
