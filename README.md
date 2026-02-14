@@ -143,6 +143,3 @@ The project is deployed on GitHub Pages and serves all products from the same UR
 - Add new products through content/config, not new apps.
 - Keep multilingual support in mind for any new feature.
 
-## License
-
-Specify your license here (MIT, Apache-2.0, etc.).
