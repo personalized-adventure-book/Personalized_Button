@@ -10,14 +10,7 @@ Despite its origins as a button-based product, the engine is fully **generic**: 
 
 In short: **prompt → website.**
 
-## Live Examples
-
-The same engine serves multiple products. Only the `id` in the URL changes:
-
-- https://personalized-adventure-book.github.io/Personalized_Product/?id=BK3
-- https://personalized-adventure-book.github.io/Personalized_Product/?id=BT2
-
-Each `id` corresponds to a different personalized product configuration (content, texts, images, language, features, etc.).
+> 🚧 The project is still under development — public demo links will be added once it's ready.
 
 ## What This Project Does
 
@@ -109,7 +102,7 @@ This generated content is fed into the same engine to instantly create a new, fu
 
 ## Deployment
 
-The project is deployed on GitHub Pages and serves all products from the same URL, using query parameters to switch between them.
+The project is set up for deployment on GitHub Pages, serving all products from the same URL using query parameters to switch between them. Public links will be shared once it's ready.
 
 ## Contributing
 
